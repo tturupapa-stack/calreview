@@ -1,0 +1,203 @@
+"use client";
+
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+import type { Campaign } from "@/types/campaign";
+
+interface CampaignCardProps {
+  campaign: Campaign;
+}
+
+const SiteNameMap: Record<string, string> = {
+  reviewnote: "리뷰노트",
+  dinnerqueen: "디너의여왕",
+  gangnam: "강남맛집",
+  reviewplace: "리뷰플레이스",
+  seoulouba: "서울오빠",
+  modooexperience: "모두의체험단",
+  pavlovu: "파블로",
+};
+
+export function CampaignCard({ campaign }: CampaignCardProps) {
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    const checkBookmarkStatus = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setIsChecking(false);
+          return;
+        }
+
+        const response = await fetch(`/api/applications/check?campaign_id=${campaign.id}`);
+        if (response.ok) {
+          const { application } = await response.json();
+          if (application) {
+            setIsBookmarked(true);
+          }
+        }
+      } catch (error) {
+        console.error("북마크 상태 확인 오류:", error);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    checkBookmarkStatus();
+  }, [campaign.id, supabase]);
+
+  const handleBookmark = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      router.push("/login?redirect=/search");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campaign_id: campaign.id,
+          status: "bookmarked",
+        }),
+      });
+
+      if (!response.ok) throw new Error("북마크 추가 실패");
+      setIsBookmarked(true);
+    } catch (error: any) {
+      alert(error.message || "북마크 추가 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUnbookmark = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!confirm("북마크를 해제하시겠습니까?")) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/applications/check?campaign_id=${campaign.id}`);
+      if (!response.ok) throw new Error("북마크 정보 조회 실패");
+
+      const { application } = await response.json();
+      if (!application) throw new Error("북마크 정보 없음");
+
+      const deleteResponse = await fetch(`/api/applications/${application.id}`, {
+        method: "DELETE",
+      });
+
+      if (!deleteResponse.ok) throw new Error("북마크 해제 실패");
+      setIsBookmarked(false);
+    } catch (error: any) {
+      alert(error.message || "북마크 해제 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const imageUrl = campaign.thumbnail_url || campaign.image_url;
+  const hasValidUrl = campaign.source_url && campaign.source_url.trim() !== "";
+
+  return (
+    <div className="bg-white rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden">
+      <a
+        href={hasValidUrl ? campaign.source_url : undefined}
+        target={hasValidUrl ? "_blank" : undefined}
+        rel={hasValidUrl ? "noopener noreferrer" : undefined}
+        className={hasValidUrl ? "block" : "block cursor-not-allowed opacity-75"}
+        onClick={!hasValidUrl ? (e) => e.preventDefault() : undefined}
+      >
+        {/* 이미지 */}
+        <div className="relative w-full h-48 bg-gray-200">
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={campaign.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              unoptimized
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-400">
+              <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+          )}
+        </div>
+        
+        <div className="p-4">
+          {/* 출처 & 마감일 */}
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+              {SiteNameMap[campaign.source] || campaign.source}
+            </span>
+            {campaign.deadline && (
+              <span className="text-xs text-gray-500">{campaign.deadline}</span>
+            )}
+          </div>
+          
+          {/* 제목 */}
+          <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
+            {campaign.title}
+          </h3>
+          
+          {/* 태그 */}
+          <div className="flex flex-wrap gap-2">
+            {campaign.category && (
+              <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                {campaign.category}
+              </span>
+            )}
+            {(campaign.location || campaign.region) && (
+              <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                {campaign.location || campaign.region}
+              </span>
+            )}
+          </div>
+        </div>
+      </a>
+      
+      {/* 북마크 버튼 */}
+      <div className="px-4 pb-4">
+        {isChecking ? (
+          <button disabled className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-400 rounded">
+            확인 중...
+          </button>
+        ) : isBookmarked ? (
+          <button
+            onClick={handleUnbookmark}
+            disabled={isLoading}
+            className="w-full px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          >
+            {isLoading ? "처리 중..." : "북마크됨"}
+          </button>
+        ) : (
+          <button
+            onClick={handleBookmark}
+            disabled={isLoading}
+            className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50"
+          >
+            {isLoading ? "처리 중..." : "북마크"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}

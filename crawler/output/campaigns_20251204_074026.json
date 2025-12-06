@@ -1,0 +1,776 @@
+[
+  {
+    "title": "필립스 전자동 에스프레소 커피머신",
+    "url": "https://www.reviewnote.co.kr/campaign/985180",
+    "site_name": "reviewnote",
+    "category": "기타",
+    "deadline": "D-28",
+    "location": "재택 재택",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/3cf3fdad-e3cd-4abf-9f68-efacf784c07f"
+  },
+  {
+    "title": "프리미엄 GPS 젠타 ZENTA",
+    "url": "https://www.reviewnote.co.kr/campaign/973713",
+    "site_name": "reviewnote",
+    "category": "디지털",
+    "deadline": "D-3",
+    "location": "재택 재택",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/0c324701-1f5b-4ab7-9ea5-d8ad0bee19f4"
+  },
+  {
+    "title": "루프홍대점",
+    "url": "https://www.reviewnote.co.kr/campaign/978367",
+    "site_name": "reviewnote",
+    "category": "기타",
+    "deadline": "D-5",
+    "location": "마포구 서울",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/09419bb8-0712-4a7e-a1de-2670aa32ba08"
+  },
+  {
+    "title": "107짬뽕",
+    "url": "https://www.reviewnote.co.kr/campaign/979180",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-8",
+    "location": "강릉시 강원",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/reGenerateImage/116735dd-6866-4c59-8fe9-c8cbaf8b11f0"
+  },
+  {
+    "title": "잇센스",
+    "url": "https://www.reviewnote.co.kr/campaign/976852",
+    "site_name": "reviewnote",
+    "category": "기타",
+    "deadline": "D-4",
+    "location": "재택 재택",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/2a3d2c8c-6171-4388-9009-0c4814cffa45"
+  },
+  {
+    "title": "소제이소꼬리찜",
+    "url": "https://www.reviewnote.co.kr/campaign/976982",
+    "site_name": "reviewnote",
+    "category": "식품",
+    "deadline": "D-4",
+    "location": "재택 재택",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/c7997f80-c846-4973-8bd7-a22b25b02698"
+  },
+  {
+    "title": "스위츠온",
+    "url": "https://www.reviewnote.co.kr/campaign/970827",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-2",
+    "location": "재택 재택",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/03627e7c-fb1c-4ab5-82f4-d498f950b667"
+  },
+  {
+    "title": "김여사능이버섯백숙",
+    "url": "https://www.reviewnote.co.kr/campaign/968689",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-1",
+    "location": "재택 재택",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/fb0cd428-32ae-448c-810d-1dea730483a2"
+  },
+  {
+    "title": "486즉석떡볶이",
+    "url": "https://www.reviewnote.co.kr/campaign/977033",
+    "site_name": "reviewnote",
+    "category": "식품",
+    "deadline": "D-4",
+    "location": "재택 재택",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/036de7ca-3c0e-40b3-9dd3-6352497c80f3"
+  },
+  {
+    "title": "파파갤럭시",
+    "url": "https://www.reviewnote.co.kr/campaign/978649",
+    "site_name": "reviewnote",
+    "category": "식품",
+    "deadline": "D-3",
+    "location": "재택 재택",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/bd9029cd-0d1e-407f-9c51-64d565e16710"
+  },
+  {
+    "title": "집으로 오는 면세쇼핑 ZIKOO",
+    "url": "https://www.reviewnote.co.kr/campaign/971057",
+    "site_name": "reviewnote",
+    "category": "뷰티",
+    "deadline": "D-2",
+    "location": "재택 재택",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/e3ca28ea-9915-449b-96fa-d1eb0df71558"
+  },
+  {
+    "title": "엄마의 한스푼",
+    "url": "https://www.reviewnote.co.kr/campaign/970844",
+    "site_name": "reviewnote",
+    "category": "식품",
+    "deadline": "D-2",
+    "location": "재택 재택",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/2d8a8a65-4493-4305-b18f-62028e306dad"
+  },
+  {
+    "title": "마인드바디필라테스&요가 구월점",
+    "url": "https://www.reviewnote.co.kr/campaign/972386",
+    "site_name": "reviewnote",
+    "category": "기타",
+    "deadline": "D-0",
+    "location": "남동구 인천",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/031c06bf-9224-4e35-831d-f4695c1897dc"
+  },
+  {
+    "title": "막본가",
+    "url": "https://www.reviewnote.co.kr/campaign/972404",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-0",
+    "location": "남구 부산",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/2cdcba0a-6fea-4925-81fd-be1f3ec8e6b7"
+  },
+  {
+    "title": "에이엠필라테&플라잉요가 오산시청점",
+    "url": "https://www.reviewnote.co.kr/campaign/972453",
+    "site_name": "reviewnote",
+    "category": "기타",
+    "deadline": "D-0",
+    "location": "오산시 경기",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/da8e2317-6893-4cde-b822-bc392d2e21bd"
+  },
+  {
+    "title": "연티끄",
+    "url": "https://www.reviewnote.co.kr/campaign/972454",
+    "site_name": "reviewnote",
+    "category": "뷰티",
+    "deadline": "D-0",
+    "location": "강동구 서울",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/3d86e064-6717-486f-a498-c79c16a37b3f"
+  },
+  {
+    "title": "나주목초밥",
+    "url": "https://www.reviewnote.co.kr/campaign/972484",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-0",
+    "location": "나주시 전남",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/db30925e-1fce-4e6b-ba3c-7b2e6057ab42"
+  },
+  {
+    "title": "옹기묵방",
+    "url": "https://www.reviewnote.co.kr/campaign/972485",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-0",
+    "location": "세종 세종",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/28e1d10b-8a99-4027-acbd-27c3e88d3cc1"
+  },
+  {
+    "title": "안면도카트체험장",
+    "url": "https://www.reviewnote.co.kr/campaign/972490",
+    "site_name": "reviewnote",
+    "category": "여행",
+    "deadline": "D-0",
+    "location": "태안군 충남",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/1971ac4d-d28d-40a0-8201-4f648a557e0f"
+  },
+  {
+    "title": "현대정육점 성정두정점",
+    "url": "https://www.reviewnote.co.kr/campaign/972494",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-0",
+    "location": "천안시 충남",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/c35fa4e0-7529-44cb-8387-7dcc0f488e9e"
+  },
+  {
+    "title": "양키스 버거앤피자",
+    "url": "https://www.reviewnote.co.kr/campaign/989823",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-11",
+    "location": "영등포구 서울",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/a552b233-cc97-4bf7-a9bf-98241a58b5b9"
+  },
+  {
+    "title": "양키스 버거앤피자",
+    "url": "https://www.reviewnote.co.kr/campaign/989822",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-11",
+    "location": "영등포구 서울",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/0c595279-9ff6-4c82-8b92-10716ebbb651"
+  },
+  {
+    "title": "빌리브짐",
+    "url": "https://www.reviewnote.co.kr/campaign/989817",
+    "site_name": "reviewnote",
+    "category": "기타",
+    "deadline": "D-11",
+    "location": "진주시 경남",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/3ea8aeb5-4bfa-4c00-9679-7399100eaf35"
+  },
+  {
+    "title": "유리래쉬",
+    "url": "https://www.reviewnote.co.kr/campaign/989808",
+    "site_name": "reviewnote",
+    "category": "뷰티",
+    "deadline": "D-11",
+    "location": "사하구 부산",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/6144013c-f8d6-4e10-a3f9-1d74f62d9429"
+  },
+  {
+    "title": "한우방자로스 노형점",
+    "url": "https://www.reviewnote.co.kr/campaign/989800",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-11",
+    "location": "제주시 제주",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/28df39ff-8139-45eb-a072-61b53c1b4b65"
+  },
+  {
+    "title": "육회한 사시미",
+    "url": "https://www.reviewnote.co.kr/campaign/989793",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-11",
+    "location": "천안시 충남",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/f3ac4567-38af-4ca8-8f13-5a9b215cc1d2"
+  },
+  {
+    "title": "베리굿 노래타운 홍대본점",
+    "url": "https://www.reviewnote.co.kr/campaign/989791",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-11",
+    "location": "마포구 서울",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/campaigns/ee0e38a3-329f-4479-9fa6-55136181beb5"
+  },
+  {
+    "title": "쌍팔쟁반",
+    "url": "https://www.reviewnote.co.kr/campaign/989770",
+    "site_name": "reviewnote",
+    "category": "맛집",
+    "deadline": "D-11",
+    "location": "수성구 대구",
+    "image_url": "https://reviewnote-production.s3.ap-northeast-2.amazonaws.com/reGenerateImage/aed2796f-731b-4aa6-9b35-1306be7d7d90"
+  },
+  {
+    "title": "1인세신샵 NEUL[늘]",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986083",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "충남 아산",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986083-dd738017cebb4c70e736bb16175b6cb0aebefd75_300x300.jpg"
+  },
+  {
+    "title": "써티올테니스 영등포역점",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985492",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "서울 영등포",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985492-d86e067b92fdf0e11798bf0dca59e0fcdb14e559_300x300.jpg"
+  },
+  {
+    "title": "정원참치",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985626",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "경기 부천",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985626-22f732807ed7b35f2ef2f40943346179b731afe7_300x300.jpg"
+  },
+  {
+    "title": "니드베이커리 앤 브런치",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986115",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "경기 여주",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986115-c1dc769c043ff4a976fff56c9ce9a3937ba42e9a_300x300.jpg"
+  },
+  {
+    "title": "고양이이발관 부천신중동점",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985813",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "경기 부천",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985813-648dd8097943d4a0761524d1c509584a30c8d9ac_300x300.png"
+  },
+  {
+    "title": "이원장댁 & 에어바디",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986080",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "경기 고양",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986080-21430a6e17deeea4a3641f1fe2919fc47c700c7e_300x300.png"
+  },
+  {
+    "title": "아이박스안경 부산화명점",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986492",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "부산 북구",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986492-f35585bd1a9446682a53eaf550579cee93b7a617_300x300.jpg"
+  },
+  {
+    "title": "토종고기마을",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985710",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "충남 부여",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985710-a5bc0bcac82ac27acd38b43c1039c4750e43136f_300x300.jpg"
+  },
+  {
+    "title": "네일해조",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985887",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "경기 화성",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985887-68de9f36c8106b7b35e0bf170294dcdf51714c4b_300x300.jpg"
+  },
+  {
+    "title": "아비꼬 광주충장로점",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985557",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "광주 동구",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985557-bb9424efdd55218a01ba4f1cb6f3874b580af08a_300x300.jpg"
+  },
+  {
+    "title": "한컵마라탕",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986557",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "인천 부평",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986557-817514c8bdd7036c8d90df0b8aefafaa84aefdda_300x300.jpg"
+  },
+  {
+    "title": "에스떼청담",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985611",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "울산 동구",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985611-8179b6db14b98b8039dcafae6750563baacda6dc_300x300.png"
+  },
+  {
+    "title": "에스테티아 지웰시티점",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985612",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "충북 청주",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985612-ea824953bbc4f223b1843c312aea897823a3af1c_300x300.jpg"
+  },
+  {
+    "title": "지리산약명도사",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985695",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "서울 용산",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985695-dc5bbe24c51cde31832ce737067bdc2ff8f5bd31_300x300.jpg"
+  },
+  {
+    "title": "구이사꼬막&칡냉면",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985539",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "경기 광주",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985539-6e80823b8b8926e9c584c9542bdf609bf2b332d6_300x300.png"
+  },
+  {
+    "title": "글라스링크",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985577",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "서울 동작",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985577-3f5078f19e7b97527d28269f78148b8662a1c195_300x300.jpg"
+  },
+  {
+    "title": "발칸다이닝펍",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986682",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "경기 이천",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986682-abfac3859a0a6a3540724a0a26503a331f34a25a_300x300.jpg"
+  },
+  {
+    "title": "동가래별빛펜션",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986054",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "강원 횡성",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986054-dbf9b4325b56ecc3e8ba4a90e8eddc12fd505786_300x300.png"
+  },
+  {
+    "title": "전주식당",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985365",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "전북 진안",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985365-eaf3b8869bfe7f112ef75383f501e1c39dc85ff0_300x300.jpg"
+  },
+  {
+    "title": "온유어 필라테스",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986865",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "서울 구로",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986865-2c6cf3cea8497e1e9fc961831b66da3061cd6061_300x300.jpg"
+  },
+  {
+    "title": "메이드유",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985810",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "서울 영등포",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985810-56045e01c6aac0f7c0c63fc9506812fc8d69b170_300x300.jpg"
+  },
+  {
+    "title": "타이누들앤쿡",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986552",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "서울 중구",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986552-a672645b6b06fef0b8d83ccde6388dc618e40a6b_300x300.jpg"
+  },
+  {
+    "title": "꽃,담다",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985869",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "경남 창원",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985869-1594f4a78cf0541cff2a6be97abf781e8bea7868_300x300.jpg"
+  },
+  {
+    "title": "청춘장어",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986672",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "서울 영등포",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986672-022c961a67a3ac39df0947ef5e708bc6f00874d0_300x300.jpg"
+  },
+  {
+    "title": "바다의별셀프바베큐",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985294",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "경기 안산",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985294-b909632a44e6627d8e0e3567f77911e484c515ea_300x300.png"
+  },
+  {
+    "title": "맛찬들왕소금구이 진주초전점",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986854",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "경남 진주",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986854-d8fc7decd8ea49e810124ce8e922bba588631c6d_300x300.jpg"
+  },
+  {
+    "title": "샐러드밥 대명점",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1986032",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "대구 남구",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1986032-0360970d9aa7bd0a7e1ad2ecc3967c70e294c7f5_300x300.jpg"
+  },
+  {
+    "title": "이비스헤어 본점",
+    "url": "https://xn--939au0g4vj8sq.net/cp/?id=1985339",
+    "site_name": "gangnam",
+    "category": "방문형",
+    "deadline": "5일 남음",
+    "location": "경북 구미",
+    "image_url": "https://gangnam-review.net/data/file/cmp/2025/12/02/thumb-cmp_1985339-ca7c72a497c7f32ffa008bbb25d8bff98e5623dc_300x300.jpg"
+  },
+  {
+    "title": "3030잉글리시 앱으로 영어공부, 더이상 미루지 말고 시작하세요~!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=257041",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/11/28/thumb-257041_78f7a239c0ecdfce3c021f3cd9edac3a7bc373bc_230x230.png"
+  },
+  {
+    "title": "소중한 반려동물, 프로큐민 에센스로 언제나 건강하게!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=257317",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 4",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/01/thumb-257317_bb62b26d1a3ed2544fb0e16ba317eb6ca781083e_230x230.png"
+  },
+  {
+    "title": "소중한 반려동물, 프로큐민 에센스로 언제나 건강하게!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=257306",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 4",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/01/thumb-31400146_lG6vLVaU_bb62b26d1a3ed2544fb0e16ba317eb6ca781083e_230x230.png"
+  },
+  {
+    "title": "매그니토 노쿵자석경첩 추천",
+    "url": "https://www.reviewplace.co.kr/pr/?id=255909",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 4",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/11/21/thumb-31400146_vEZjSNWR_7e3cddaa7e367999cce6c9945be233689bac9cff_230x230.png"
+  },
+  {
+    "title": "(총60정/2개월분] 하루 한 알, 보통사람들 식물성 멜라토닌 대용량 5mg♥",
+    "url": "https://www.reviewplace.co.kr/pr/?id=256089",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 3",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/11/24/thumb-256089_2b037def05177be2d48bbb43e0f3bc9680a343a2_230x230.png"
+  },
+  {
+    "title": "메디리턴 요좁 스팟 크림 추천해요!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=257260",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "오늘마감",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/11/28/thumb-257260_e3601e821f5a0232e760dde24fd0c9beba4ca08e_230x230.png"
+  },
+  {
+    "title": "무드휴 건조기시트 추천",
+    "url": "https://www.reviewplace.co.kr/pr/?id=256868",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "오늘마감",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/11/27/thumb-256868_f0908fc28b14ac0fb936ea767ccd43b656b26694_230x230.png"
+  },
+  {
+    "title": "비대면 보험상담으로 꼭 필요한 보험만 준비해보자!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=255808",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "오늘마감",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/11/21/thumb-255808_4aabbe46121643d78ff861943e73fa0be2cc27c2_230x230.jpg"
+  },
+  {
+    "title": "구강관리의 시작! 이지비오랄 구강유산균♥",
+    "url": "https://www.reviewplace.co.kr/pr/?id=251471",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "오늘마감",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/10/30/thumb-251471_a6a92f2a3b0cde473c9a73c0f22719149ea35071_230x230.jpg"
+  },
+  {
+    "title": "귀에 똑 붙이는 귀침 wbL 이혈패치로 꾸며보세요!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=244858",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "오늘마감",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/09/16/thumb-244858_e16c1c35b783bd0e0e0c7b86580ee60b12a062ee_230x230.png"
+  },
+  {
+    "title": "비린맛 제로! 자연의 감칠맛이 가득한 블랜딩 액젓",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258249",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 7",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-31400146_4CH50eyj_574322fefbd61ed2923f3e4dab131acb4be5ff4b_230x230.png"
+  },
+  {
+    "title": "자극 없이 산뜻한 데일리 Y존 케어! 로즈마리 비건 청결제 ♥",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258241",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 7",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-31400146_gw2E9SUO_3fb67763d09bb1f17240db4cffda25273a30c235_230x230.jpg"
+  },
+  {
+    "title": "따뜻한 크리스마스, 엄마와 나에게 에스톤업 회화나무 영양제를 선물해요♥",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258226",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 7",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-31400146_PUROjwiW_17d59031bab6b47d11128852bec23825e22a6ec4_230x230.jpg"
+  },
+  {
+    "title": "글로벌 셀럽이 선택한 프리미엄 치약! 프로벨 메디테라 치약",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258222",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 3",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-31400146_PjZl6J1e_0d58627a8ab2f9a514b01ee5c5d972fc23189f6e_230x230.jpg"
+  },
+  {
+    "title": "22그램 홈카페 필수템! 원두·드립백 체험 ♥",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258217",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 7",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-31400146_Qa8nIz5f_79e577981116b7e44a172cc003f59a01b41e038e_230x230.jpg"
+  },
+  {
+    "title": "활력을 위한다면 블랙마카 영양제! 120정 (2.1만 상당)",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258156",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 7",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-31400146_07YSfE4k_28e27a9b20731ad4a20f2f578750107e14624a50_230x230.jpg"
+  },
+  {
+    "title": "잇생치약으로 관리 시작해보세요!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258095",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-258095_bbfc6276bda320fd6a3f2142658f7d81d5cc9504_230x230.jpg"
+  },
+  {
+    "title": "잇생치약으로 관리 시작해보세요!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258093",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-258093_bbfc6276bda320fd6a3f2142658f7d81d5cc9504_230x230.jpg"
+  },
+  {
+    "title": "잇생치약으로 관리 시작해보세요!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258092",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-258092_bbfc6276bda320fd6a3f2142658f7d81d5cc9504_230x230.jpg"
+  },
+  {
+    "title": "소중한 우리아이 이유식은 홈메이드 맘앤맘마로 :)",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258074",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-258074_bfe2971ad9de73aea3df841f62b6c8b9d55d795b_230x230.png"
+  },
+  {
+    "title": "반려견을 위한 펫쏘몰 강아지 프로바이오틱스 라이브 플러스와 이뮨메가샷♥",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258021",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-258021_f9a94240276f8cbdd303b40918b2e0111839daf6_230x230.jpg"
+  },
+  {
+    "title": "건조한 모발에는 원올 헤어미스트 퍼퓸 추천!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=257987",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-31400146_0rZgunfq_f4a1213d2cf400e98fcab16a01029d638422b3de_230x230.png"
+  },
+  {
+    "title": "최상위 프리미엄 맥주 효모로 완성한 비어랩 샴푸",
+    "url": "https://www.reviewplace.co.kr/pr/?id=256567",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/11/26/thumb-256567_343fb906d7e2a95f560faa244616a80d4c3fe7a5_230x230.jpg"
+  },
+  {
+    "title": "자연에서 찾은 식이섬유 데이즈온 알파CD프로",
+    "url": "https://www.reviewplace.co.kr/pr/?id=256566",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/11/26/thumb-256566_23bc7b41659847387cc2bb45d9f5a02b179f04e2_230x230.jpg"
+  },
+  {
+    "title": "쫄깃탱탱 슬라이스 족발! 집에서 따뜻하게 드셔보세요!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258248",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-31400146_EmvO4tN7_c2248c7786080cda565a2068ebc4ab2e04700db0_230x230.jpg"
+  },
+  {
+    "title": "향이 예술인 리큐르! 나과 네이키드 허니",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258240",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-31400146_OBuUmAV1_4b8b25942e2d187994d1c72fb4c9b88ba025168e_230x230.jpg"
+  },
+  {
+    "title": "유튜브에서 유명한 그 엽땡식 떡볶이분말",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258239",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 4",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-258239_4475e3ae20710957fe635791679f92b829ff7535_230x230.jpg"
+  },
+  {
+    "title": "유튜브에서 유명한 엽땡 떡볶이소스 분말!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258237",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 4",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-31400146_Rok53OnP_4475e3ae20710957fe635791679f92b829ff7535_230x230.jpg"
+  },
+  {
+    "title": "한 알로 달라진 나의 꿀잠 루틴, 고용량 멜라토닌 추천!",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258224",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://www.reviewplace.co.kr/img/cmp_noimg.jpg"
+  },
+  {
+    "title": "한 알에 담긴 노하우! 칼슨 오메가3 추천해요",
+    "url": "https://www.reviewplace.co.kr/pr/?id=258223",
+    "site_name": "reviewplace",
+    "category": null,
+    "deadline": "D - 6",
+    "location": "배송",
+    "image_url": "https://cdn.cdnreviewplace.co.kr/data/file/product/2025/12/03/thumb-258223_0f76b200c36403e383ef525d35c36c5015351ce1_230x230.jpg"
+  }
+]
