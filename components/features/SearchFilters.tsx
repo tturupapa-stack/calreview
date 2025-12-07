@@ -1,7 +1,10 @@
 "use client";
 
+import { KOREA_REGIONS } from "@/constants/regions";
+
 interface Filters {
   region: string;
+  detailedRegion: string;
   category: string;
   type: string;
   channel: string;
@@ -16,13 +19,20 @@ interface SearchFiltersProps {
 
 export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) {
   const updateFilter = (key: keyof Filters, value: string) => {
-    onFiltersChange({ ...filters, [key]: value });
+    if (key === "region") {
+      // 지역 변경 시 상세지역 초기화
+      onFiltersChange({ ...filters, region: value, detailedRegion: "" });
+    } else {
+      onFiltersChange({ ...filters, [key]: value });
+    }
   };
+
+  const detailedRegions = filters.region ? KOREA_REGIONS[filters.region] || [] : [];
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
-        {/* 지역 선택 */}
+        {/* 지역 선택 (시/도) */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             지역
@@ -30,51 +40,57 @@ export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) 
           <select
             value={filters.region}
             onChange={(e) => updateFilter("region", e.target.value)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full rounded-lg border-border/60 bg-white/50 text-sm py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           >
             <option value="">전체</option>
-            <option value="서울">서울</option>
-            <option value="경기">경기</option>
-            <option value="인천">인천</option>
-            <option value="강원">강원</option>
-            <option value="충남">충남</option>
-            <option value="충북">충북</option>
-            <option value="전남">전남</option>
-            <option value="전북">전북</option>
-            <option value="경남">경남</option>
-            <option value="경북">경북</option>
-            <option value="제주">제주</option>
-            <option value="전국">전국</option>
+            {Object.keys(KOREA_REGIONS).map((region) => (
+              <option key={region} value={region}>
+                {region}
+              </option>
+            ))}
             <option value="배송">배송</option>
           </select>
         </div>
 
-        {/* 카테고리 선택 */}
+        {/* 상세 지역 선택 (구/군) */}
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            상세 지역
+          </label>
+          <select
+            value={filters.detailedRegion || ""}
+            onChange={(e) => updateFilter("detailedRegion", e.target.value)}
+            disabled={!filters.region || detailedRegions.length === 0}
+            className="w-full rounded-lg border-border/60 bg-white/50 text-sm py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all disabled:opacity-50 disabled:bg-gray-100"
+          >
+            <option value="">전체</option>
+            {detailedRegions.map((detail) => (
+              <option key={detail} value={detail}>
+                {detail}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 카테고리 선택 (Pill Buttons) */}
+        <div className="col-span-full">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             카테고리
           </label>
-          <select
-            value={filters.category}
-            onChange={(e) => updateFilter("category", e.target.value)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="">전체</option>
-            <option value="맛집">맛집</option>
-            <option value="뷰티">뷰티</option>
-            <option value="여행">여행</option>
-            <option value="생활">생활</option>
-            <option value="식품">식품</option>
-            <option value="패션">패션</option>
-            <option value="디지털">디지털</option>
-            <option value="유아동">유아동</option>
-            <option value="도서">도서</option>
-            <option value="반려동물">반려동물</option>
-            <option value="배송">배송</option>
-            <option value="문화">문화</option>
-            <option value="재택">재택</option>
-            <option value="기타">기타</option>
-          </select>
+          <div className="flex flex-wrap gap-2">
+            {["", "맛집", "뷰티", "여행", "생활", "식품", "패션", "디지털", "유아동", "도서", "반려동물", "배송", "문화", "재택", "기타"].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => updateFilter("category", cat)}
+                className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-full border ${filters.category === cat
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm ring-2 ring-primary/20 scale-105"
+                  : "bg-white text-gray-600 border-border hover:bg-secondary/50 hover:border-border/80 hover:text-foreground"
+                  }`}
+              >
+                {cat === "" ? "전체" : cat}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* 유형 선택 */}
@@ -85,7 +101,7 @@ export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) 
           <select
             value={filters.type}
             onChange={(e) => updateFilter("type", e.target.value)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full rounded-lg border-border/60 bg-white/50 text-sm py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           >
             <option value="">전체</option>
             <option value="visit">방문형</option>
@@ -102,7 +118,7 @@ export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) 
           <select
             value={filters.channel}
             onChange={(e) => updateFilter("channel", e.target.value)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full rounded-lg border-border/60 bg-white/50 text-sm py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           >
             <option value="">전체</option>
             <option value="블로그">블로그</option>
@@ -123,7 +139,7 @@ export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) 
           <select
             value={filters.site_name || ""}
             onChange={(e) => updateFilter("site_name", e.target.value)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full rounded-lg border-border/60 bg-white/50 text-sm py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           >
             <option value="">전체</option>
             <option value="seoulouba">서울오빠</option>
@@ -144,7 +160,7 @@ export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) 
           <select
             value={filters.sort}
             onChange={(e) => updateFilter("sort", e.target.value)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full rounded-lg border-border/60 bg-white/50 text-sm py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           >
             <option value="deadline">마감임박순</option>
             <option value="latest">최신순</option>

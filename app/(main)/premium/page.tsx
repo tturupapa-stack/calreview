@@ -26,7 +26,7 @@ export default function PremiumPage() {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-50 min-h-screen">
+      <div className="bg-background min-h-screen">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="text-center">로딩 중...</div>
         </div>
@@ -35,7 +35,7 @@ export default function PremiumPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-background min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {/* 헤더 */}
         <div className="text-center mb-12">
@@ -49,7 +49,7 @@ export default function PremiumPage() {
 
         {/* 제공 기능 */}
         <div className="max-w-4xl mx-auto mb-16">
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-xl p-10 border-2 border-blue-300">
+          <div className="bg-gradient-to-br from-primary/5 to-secondary rounded-2xl shadow-xl p-10 border-2 border-primary/20">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-3">
                 캘리뷰의 모든 기능
@@ -195,11 +195,11 @@ export default function PremiumPage() {
           <div className="space-y-6 max-w-3xl mx-auto">
             {/* Phase 1 */}
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-32 text-center">
-                <div className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-bold">
-                  Phase 1
-                </div>
-                <p className="text-sm text-gray-600 mt-2">0~6개월</p>
+              <div className="flex-shrink-0 bg-primary/10 p-3 rounded-lg">
+                <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="block text-primary font-bold mt-1">Phase 1</span>
               </div>
               <div className="flex-1 bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
                 <h4 className="font-bold text-gray-900 mb-2">
@@ -278,7 +278,7 @@ export default function PremiumPage() {
                 Q. 구글 캘린더가 없어도 사용할 수 있나요?
               </h4>
               <p className="text-gray-700">
-                A. 네! 구글 캘린더 연동은 선택 사항입니다. 
+                A. 네! 구글 캘린더 연동은 선택 사항입니다.
                 검색, 북마크, 신청 관리 기능은 캘린더 없이도 모두 이용하실 수 있습니다.
               </p>
             </div>
@@ -288,7 +288,7 @@ export default function PremiumPage() {
                 Q. 회원가입이 필요한가요?
               </h4>
               <p className="text-gray-700">
-                A. 검색은 로그인 없이도 가능합니다. 북마크, 신청 관리, 캘린더 연동 기능은 
+                A. 검색은 로그인 없이도 가능합니다. 북마크, 신청 관리, 캘린더 연동 기능은
                 로그인이 필요합니다. 카카오, 구글, 네이버 계정으로 간편하게 가입하실 수 있습니다.
               </p>
             </div>
@@ -298,8 +298,8 @@ export default function PremiumPage() {
                 Q. 어떻게 운영되나요?
               </h4>
               <p className="text-gray-700">
-                A. 현재는 성장에 집중하고 있으며, 향후 사용자가 늘어나면 
-                광고나 중개 플랫폼으로 발전할 계획입니다. 
+                A. 현재는 성장에 집중하고 있으며, 향후 사용자가 늘어나면
+                광고나 중개 플랫폼으로 발전할 계획입니다.
                 변화가 있을 때는 미리 공지하고 사용자 의견을 반영하겠습니다.
               </p>
             </div>

@@ -143,7 +143,7 @@ export default function SettingsPage() {
             </p>
             <button
               onClick={() => router.push("/login?redirect=/settings")}
-              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90 transition-colors"
             >
               로그인하기
             </button>
@@ -154,7 +154,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-background min-h-screen">
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">설정</h1>
 
@@ -170,7 +170,7 @@ export default function SettingsPage() {
             {settings?.google_calendar_connected ? (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600 font-medium">연결됨</span>
+                  <span className="text-emerald-600 font-medium">연결됨</span>
                 </div>
                 <button
                   onClick={handleDisconnectCalendar}
@@ -183,7 +183,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleConnectCalendar}
                 disabled={isConnecting}
-                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:opacity-90 disabled:opacity-50"
               >
                 {isConnecting ? "연결 중..." : "구글 캘린더 연결"}
               </button>
@@ -199,10 +199,10 @@ export default function SettingsPage() {
             <p className="text-sm text-gray-600 mb-4">
               마감이 임박한 체험단은 마이페이지에서 자동으로 알려드립니다.
             </p>
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+            <div className="p-4 bg-primary/5 border border-primary/20 rounded-md">
               <div className="flex items-start gap-3">
                 <svg
-                  className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0"
+                  className="w-5 h-5 text-primary mt-0.5 flex-shrink-0"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -213,10 +213,10 @@ export default function SettingsPage() {
                   />
                 </svg>
                 <div>
-                  <p className="text-sm text-blue-900 font-medium mb-1">
+                  <p className="text-sm text-primary font-medium mb-1">
                     마감 임박 알림 작동 방식
                   </p>
-                  <ul className="text-sm text-blue-800 space-y-1">
+                  <ul className="text-sm text-primary/80 space-y-1">
                     <li>• 마이페이지 접속 시 D-3 이하인 체험단을 알림</li>
                     <li>• 구글 캘린더에도 자동으로 일정 등록</li>
                     <li>• 구글 캘린더의 알림 기능 활용</li>

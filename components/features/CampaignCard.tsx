@@ -143,7 +143,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
     .filter(c => c.length > 0);
 
   return (
-    <div className="bg-white rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden">
+    <div className="group bg-white rounded-xl border border-border/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
       <a
         href={hasValidUrl ? campaign.source_url : undefined}
         target={hasValidUrl ? "_blank" : undefined}
@@ -163,7 +163,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
               unoptimized
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-400">
+            <div className="flex items-center justify-center h-full text-muted-foreground">
               <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -221,7 +221,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           <div className="flex flex-wrap gap-2">
             {/* 대분류: Type */}
             {campaign.type && TypeLabelMap[campaign.type] && (
-              <span className="text-xs font-medium text-white bg-gray-800 px-2 py-1 rounded">
+              <span className="text-xs font-medium text-white bg-primary px-2 py-1 rounded">
                 {TypeLabelMap[campaign.type]}
               </span>
             )}
@@ -231,7 +231,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
               !(campaign.source === "seoulouba" && campaign.type === "delivery") &&
               // 카테고리명과 타입명이 동일하면 숨김 (예: [배송] [배송])
               campaign.category !== TypeLabelMap[campaign.type || ""] && (
-                <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                <span className="text-xs text-foreground/80 bg-secondary px-2 py-1 rounded">
                   {campaign.category}
                 </span>
               )}
@@ -249,7 +249,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           <button
             onClick={handleUnbookmark}
             disabled={isLoading}
-            className="w-full px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded hover:opacity-90 disabled:opacity-50"
           >
             {isLoading ? "처리 중..." : "북마크됨"}
           </button>
@@ -257,7 +257,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           <button
             onClick={handleBookmark}
             disabled={isLoading}
-            className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50"
+            className="w-full px-3 py-2 text-sm bg-secondary text-foreground rounded hover:bg-secondary/80 disabled:opacity-50"
           >
             {isLoading ? "처리 중..." : "북마크"}
           </button>

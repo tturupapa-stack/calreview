@@ -76,7 +76,7 @@ export function BookmarkButton({ campaignId, sourceUrl }: BookmarkButtonProps) {
       }
 
       setIsBookmarked(true);
-      
+
       // 성공 메시지 표시
       alert("✓ 북마크에 저장되었습니다.");
     } catch (error: any) {
@@ -142,7 +142,7 @@ export function BookmarkButton({ campaignId, sourceUrl }: BookmarkButtonProps) {
       <button
         onClick={handleUnbookmark}
         disabled={isLoading}
-        className="flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-all"
+        className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all"
       >
         <svg className="w-5 h-5 fill-current text-white" viewBox="0 0 24 24">
           <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />

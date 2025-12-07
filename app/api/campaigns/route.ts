@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
     // 자연어 검색 쿼리 또는 일반 필터 파라미터
     const q = searchParams.get("q"); // 자연어 검색
     const region = searchParams.get("region");
+    const detailedRegion = searchParams.get("detailed_region");
     const category = searchParams.get("category");
     const type = searchParams.get("type");
     const channel = searchParams.get("channel");
@@ -165,6 +166,25 @@ export async function GET(request: NextRequest) {
       } else {
         // 도 단위 검색: 기존 로직 유지
         query = query.ilike("region", `%${finalRegion}%`);
+      }
+    }
+    if (detailedRegion) {
+      // "시", "구", "군" 접미사 제거
+      let keyword = detailedRegion.replace(/(시|구|군)$/, "");
+
+      // 1. 단음절 방지 (중구 -> 중, 동구 -> 동 검색 방지)
+      // 접미사를 제거했는데 1글자가 되면 제거하지 않음 (예: "중구", "서구"는 그대로 검색)
+      if (keyword.length < 2) {
+        keyword = detailedRegion;
+      }
+
+      // 2. "고양" (지역) vs "고양이" (동물) 구분
+      // 키워드가 "고양"인 경우, 제목 검색 시 "고양이"가 아닌 "고양"만 찾도록 정규식 사용
+      // Postgres 정규식: 고양($|[^이]) -> "고양" 뒤에 끝이거나 "이"가 아닌 문자가 옴
+      if (keyword === "고양") {
+        query = query.or(`region.ilike.%${keyword}%,title.match.고양($|[^이])`);
+      } else {
+        query = query.or(`region.ilike.%${keyword}%,title.ilike.%${keyword}%`);
       }
     }
     if (finalCategory) {

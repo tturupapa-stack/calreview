@@ -43,7 +43,7 @@ export function SiteLogo({ site, siteName, className = "", size = 24 }: SiteLogo
     if (error || !logoUrl) {
         return (
             // Fallback text badge
-            <span className={`text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block ${className}`}>
+            <span className={`text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded inline-block ${className}`}>
                 {name}
             </span>
         );

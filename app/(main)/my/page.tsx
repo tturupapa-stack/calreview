@@ -141,14 +141,14 @@ export default function MyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">마이페이지</h1>
 
         {/* 마감 임박 알림 */}
         {upcomingDeadlines.length > 0 && (
-          <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
-            <h3 className="text-lg font-semibold text-red-800 mb-2">
+          <div className="mb-6 bg-destructive/5 border-l-4 border-destructive p-4 rounded">
+            <h3 className="text-lg font-semibold text-destructive mb-2">
               🚨 리뷰 마감이 임박했습니다!
             </h3>
             <div className="space-y-2">
@@ -176,19 +176,18 @@ export default function MyPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span
-                        className={`px-3 py-1 rounded-full text-sm font-bold ${
-                          daysLeft === 0
-                            ? "bg-red-100 text-red-700"
+                        className={`px-3 py-1 rounded-full text-sm font-bold ${daysLeft === 0
+                            ? "bg-destructive/10 text-destructive"
                             : daysLeft === 1
-                            ? "bg-orange-100 text-orange-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
+                              ? "bg-orange-100 text-orange-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
                       >
                         D-{daysLeft}
                       </span>
                       <Link
                         href="/my/campaigns"
-                        className="text-sm text-blue-600 hover:underline"
+                        className="text-sm text-primary hover:underline"
                       >
                         확인 →
                       </Link>
@@ -202,16 +201,16 @@ export default function MyPage() {
 
         {/* 캘린더 연동 안내 */}
         {!isCalendarConnected && (
-          <div className="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-            <h3 className="text-lg font-semibold text-blue-800 mb-1">
+          <div className="mb-6 bg-primary/10 border-l-4 border-primary p-4 rounded">
+            <h3 className="text-lg font-semibold text-primary mb-1">
               📅 구글 캘린더를 연동하세요
             </h3>
-            <p className="text-sm text-blue-700 mb-3">
+            <p className="text-sm text-primary/80 mb-3">
               당첨된 체험단의 방문일과 리뷰 마감일이 자동으로 구글 캘린더에 등록됩니다.
             </p>
             <button
               onClick={() => router.push("/settings")}
-              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700"
+              className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded hover:opacity-90"
             >
               지금 연동하기
             </button>
@@ -225,9 +224,9 @@ export default function MyPage() {
             className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow md:col-span-2"
           >
             <div className="flex items-center gap-4 mb-2">
-              <div className="w-10 h-10 bg-purple-100 rounded flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary/10 rounded flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-purple-600"
+                  className="w-5 h-5 text-primary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -249,12 +248,12 @@ export default function MyPage() {
 
           <Link
             href="/settings"
-            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow border-2 border-blue-100"
+            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow border-2 border-primary/20"
           >
             <div className="flex items-center gap-4 mb-2">
-              <div className="w-10 h-10 bg-blue-100 rounded flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary/10 rounded flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-blue-600"
+                  className="w-5 h-5 text-primary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -318,16 +317,16 @@ export default function MyPage() {
         <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">빠른 링크</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link href="/search" className="text-sm text-blue-600 hover:underline">
+            <Link href="/search" className="text-sm text-primary hover:underline">
               체험단 검색
             </Link>
-            <Link href="/premium" className="text-sm text-blue-600 hover:underline">
+            <Link href="/premium" className="text-sm text-primary hover:underline">
               서비스 안내
             </Link>
-            <Link href="/settings" className="text-sm text-blue-600 hover:underline">
+            <Link href="/settings" className="text-sm text-primary hover:underline">
               설정
             </Link>
-            <Link href="/" className="text-sm text-blue-600 hover:underline">
+            <Link href="/" className="text-sm text-primary hover:underline">
               메인으로
             </Link>
           </div>

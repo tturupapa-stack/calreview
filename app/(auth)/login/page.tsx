@@ -29,7 +29,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
@@ -41,13 +41,13 @@ export default function LoginPage() {
         </div>
 
         {currentUser && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-            <p className="text-sm text-blue-800">
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-center">
+            <p className="text-sm text-primary">
               이미 로그인되어 있습니다.
             </p>
             <button
               onClick={() => router.push("/")}
-              className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-700"
+              className="mt-2 text-sm font-medium text-primary hover:text-primary/80"
             >
               메인으로 이동 →
             </button>
@@ -61,11 +61,11 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-xs text-gray-500">
           로그인 시{" "}
-          <a href="/terms" className="text-blue-600 hover:text-blue-500">
+          <a href="/terms" className="text-primary hover:text-primary/80">
             이용약관
           </a>
           과{" "}
-          <a href="/privacy" className="text-blue-600 hover:text-blue-500">
+          <a href="/privacy" className="text-primary hover:text-primary/80">
             개인정보처리방침
           </a>
           에 동의하게 됩니다.

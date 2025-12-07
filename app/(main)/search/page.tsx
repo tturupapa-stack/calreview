@@ -82,11 +82,11 @@ function SitePreviewSection({ siteId, siteName, onMoreClick }: { siteId: string,
         <h2 className="text-xl font-bold flex items-center gap-2">
           <SiteLogo site={siteId} size={24} className="mr-1" />
           {siteName}
-          <span className="text-sm font-normal text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full">마감임박</span>
+          <span className="text-sm font-normal text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">마감임박</span>
         </h2>
         <button
           onClick={() => onMoreClick(siteId)}
-          className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center"
+          className="text-sm text-primary hover:text-primary/80 font-medium flex items-center"
         >
           더보기 &gt;
         </button>
@@ -94,7 +94,7 @@ function SitePreviewSection({ siteId, siteName, onMoreClick }: { siteId: string,
 
       {loading ? (
         <div className="flex justify-center py-8">
-          <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -114,6 +114,7 @@ export default function SearchPage() {
   const [smartQuery, setSmartQuery] = useState("");
   const [filters, setFilters] = useState({
     region: "",
+    detailedRegion: "",
     category: "",
     type: "",
     channel: "",
@@ -125,7 +126,7 @@ export default function SearchPage() {
   const [total, setTotal] = useState(0);
 
   // Check if preview mode (no filters active)
-  const isPreviewMode = !smartQuery && !filters.region && !filters.category && !filters.type && !filters.channel && !filters.site_name && filters.sort === "deadline";
+  const isPreviewMode = !smartQuery && !filters.region && !filters.detailedRegion && !filters.category && !filters.type && !filters.channel && !filters.site_name && filters.sort === "deadline";
 
   useEffect(() => {
     if (!isPreviewMode) {
@@ -150,6 +151,7 @@ export default function SearchPage() {
         params.append("q", smartQuery);
       } else {
         if (filters.region) params.append("region", filters.region);
+        if (filters.detailedRegion) params.append("detailed_region", filters.detailedRegion);
         if (filters.category) params.append("category", filters.category);
         if (filters.type) params.append("type", filters.type);
         if (filters.channel) params.append("channel", filters.channel);
@@ -198,6 +200,7 @@ export default function SearchPage() {
     if (query) {
       setFilters({
         region: "",
+        detailedRegion: "",
         category: "",
         type: "",
         channel: "",
@@ -211,6 +214,7 @@ export default function SearchPage() {
     setSmartQuery(tag);
     setFilters({
       region: "",
+      detailedRegion: "",
       category: "",
       type: "",
       channel: "",
@@ -246,7 +250,7 @@ export default function SearchPage() {
         <>
           {isLoading ? (
             <div className="text-center py-12">
-              <div className="inline-block w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+              <div className="inline-block w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
               <p className="mt-2 text-gray-600">로딩 중...</p>
             </div>
           ) : campaigns.length === 0 ? (
@@ -261,9 +265,9 @@ export default function SearchPage() {
                   <button
                     onClick={() => {
                       setSmartQuery("");
-                      setFilters({ region: "", category: "", type: "", channel: "", site_name: "", sort: "deadline" });
+                      setFilters({ region: "", detailedRegion: "", category: "", type: "", channel: "", site_name: "", sort: "deadline" });
                     }}
-                    className="ml-4 text-blue-600 hover:underline"
+                    className="ml-4 text-primary hover:underline"
                   >
                     검색 초기화
                   </button>
@@ -281,7 +285,7 @@ export default function SearchPage() {
                   <button
                     onClick={loadMore}
                     disabled={isLoadingMore}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                    className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50"
                   >
                     {isLoadingMore ? "로딩 중..." : `더 보기 (${total - campaigns.length}개 남음)`}
                   </button>

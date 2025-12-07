@@ -114,7 +114,7 @@ export function PopularTags({ onTagClick }: PopularTagsProps) {
           <button
             key={index}
             onClick={() => onTagClick(tag)}
-            className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-colors"
+            className="px-3 py-1.5 text-sm bg-white border border-border rounded-full hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-colors"
           >
             {tag}
           </button>
