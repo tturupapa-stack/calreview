@@ -44,6 +44,18 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "ssl.pstatic.net",
       },
+      {
+        protocol: "https",
+        hostname: "logo.clearbit.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.google.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.reviewplace.co.kr",
+      },
     ],
   },
 };

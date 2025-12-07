@@ -65,9 +65,13 @@ def _extract_campaigns_from_page_props(page_props: dict) -> list[Campaign]:
                 url = f"https://www.reviewnote.co.kr/campaigns/{source_id}"
                 category = item.get("category", {}).get("title") or None
                 location = (
-                    f"{item.get('sido', {}).get('name', '')} {item.get('city', '')}".strip()
+                    f"{item.get('city', '')} {item.get('sido', {}).get('name', '')}".strip()
                     or None
                 )
+                
+                # "제품" 카테고리거나 지역에 "배송"이 포함되면 "배송"으로 통일
+                if category == "제품" or (location and "배송" in location):
+                     location = "배송"
                 # 리뷰노트 데이터에는 신청 마감일이 ISO 문자열로 포함되어 있음
                 # 조회 시점 기준으로 D-day 형식으로 변환
                 apply_end_at = item.get("applyEndAt")
@@ -136,6 +140,20 @@ def _extract_campaigns_from_page_props(page_props: dict) -> list[Campaign]:
                 except Exception as e:
                     logger.warning("리뷰노트 리뷰 기간 계산 실패: %s", e)
 
+                # 카테고리 기반 캠페인 타입(Type) 추론
+                campaign_type = None
+                if category:
+                    if category in ["맛집", "뷰티", "여행", "숙박", "문화"]:
+                        campaign_type = "visit"
+                    elif category in ["제품", "디지털", "생활", "식품", "도서", "유아동", "패션", "반려동물", "기타", "재택"]:
+                        campaign_type = "delivery"
+                    elif "기자단" in category or "기자단" in title:
+                        campaign_type = "reporter"
+                
+                # location에 "배송"이 있으면 delivery로 강제 (단, 기자단 제외)
+                if location == "배송" and campaign_type != "reporter":
+                    campaign_type = "delivery"
+
                 campaigns.append(
                     Campaign(
                         title=title,
@@ -146,6 +164,7 @@ def _extract_campaigns_from_page_props(page_props: dict) -> list[Campaign]:
                         location=location,
                         image_url=image_url,
                         channel=channel,
+                        type=campaign_type,
                         review_deadline_days=review_deadline_days,
                     )
                 )

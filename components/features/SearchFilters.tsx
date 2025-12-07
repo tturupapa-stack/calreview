@@ -4,6 +4,8 @@ interface Filters {
   region: string;
   category: string;
   type: string;
+  channel: string;
+  site_name: string;
   sort: string;
 }
 
@@ -19,7 +21,7 @@ export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) 
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
         {/* 지역 선택 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -60,7 +62,17 @@ export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) 
             <option value="">전체</option>
             <option value="맛집">맛집</option>
             <option value="뷰티">뷰티</option>
-            <option value="제품">제품</option>
+            <option value="여행">여행</option>
+            <option value="생활">생활</option>
+            <option value="식품">식품</option>
+            <option value="패션">패션</option>
+            <option value="디지털">디지털</option>
+            <option value="유아동">유아동</option>
+            <option value="도서">도서</option>
+            <option value="반려동물">반려동물</option>
+            <option value="배송">배송</option>
+            <option value="문화">문화</option>
+            <option value="재택">재택</option>
             <option value="기타">기타</option>
           </select>
         </div>
@@ -79,6 +91,48 @@ export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) 
             <option value="visit">방문형</option>
             <option value="delivery">배송형</option>
             <option value="reporter">기자단</option>
+          </select>
+        </div>
+
+        {/* 채널 선택 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            채널
+          </label>
+          <select
+            value={filters.channel}
+            onChange={(e) => updateFilter("channel", e.target.value)}
+            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            <option value="">전체</option>
+            <option value="블로그">블로그</option>
+            <option value="인스타">인스타그램</option>
+            <option value="유튜브">유튜브</option>
+            <option value="릴스">릴스</option>
+            <option value="쇼츠">쇼츠</option>
+            <option value="틱톡">틱톡</option>
+            <option value="클립">클립</option>
+          </select>
+        </div>
+
+        {/* 사이트 선택 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            사이트
+          </label>
+          <select
+            value={filters.site_name || ""}
+            onChange={(e) => updateFilter("site_name", e.target.value)}
+            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            <option value="">전체</option>
+            <option value="seoulouba">서울오빠</option>
+            <option value="reviewplace">리뷰플레이스</option>
+            <option value="reviewnote">리뷰노트</option>
+            <option value="dinnerqueen">디너의여왕</option>
+            <option value="modooexperience">모두의체험단</option>
+            <option value="pavlovu">파블로체험단</option>
+            <option value="gangnam">강남맛집</option>
           </select>
         </div>
 

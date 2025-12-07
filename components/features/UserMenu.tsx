@@ -121,54 +121,60 @@ export function UserMenu() {
         <div style={{
           position: 'absolute',
           right: 0,
-          marginTop: '8px',
+          top: '100%',
+          paddingTop: '8px',
           width: '192px',
-          borderRadius: '6px',
-          backgroundColor: 'white',
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-          border: '1px solid #e5e7eb'
+          zIndex: 50,
         }}>
-          <div style={{ padding: '4px 0' }}>
-            <a
-              href="/my/campaigns"
-              style={{
-                display: 'block',
-                padding: '8px 16px',
-                fontSize: '14px',
-                color: '#374151',
-                textDecoration: 'none'
-              }}
-            >
-              체험단 관리
-            </a>
-            <a
-              href="/settings"
-              style={{
-                display: 'block',
-                padding: '8px 16px',
-                fontSize: '14px',
-                color: '#374151',
-                textDecoration: 'none'
-              }}
-            >
-              설정
-            </a>
-            <button
-              onClick={handleLogout}
-              style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                padding: '8px 16px',
-                fontSize: '14px',
-                color: '#374151',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer'
-              }}
-            >
-              로그아웃
-            </button>
+          <div style={{
+            borderRadius: '6px',
+            backgroundColor: 'white',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #e5e7eb',
+            overflow: 'hidden',
+          }}>
+            <div style={{ padding: '4px 0' }}>
+              <a
+                href="/my/campaigns"
+                style={{
+                  display: 'block',
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  color: '#374151',
+                  textDecoration: 'none'
+                }}
+              >
+                체험단 관리
+              </a>
+              <a
+                href="/settings"
+                style={{
+                  display: 'block',
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  color: '#374151',
+                  textDecoration: 'none'
+                }}
+              >
+                설정
+              </a>
+              <button
+                onClick={handleLogout}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  color: '#374151',
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer'
+                }}
+              >
+                로그아웃
+              </button>
+            </div>
           </div>
         </div>
       )}

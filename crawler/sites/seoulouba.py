@@ -1,21 +1,40 @@
 """서울오빠 크롤러"""
 
 import re
-from typing import List
+import concurrent.futures
+from typing import List, Tuple
 import requests
 from bs4 import BeautifulSoup
 
 from crawler.models import Campaign
 from crawler.utils import clean_text, logger
-from crawler.utils_detail import extract_review_deadline_days
+from crawler.category import normalize_category
 
 BASE_URL = "https://www.seoulouba.co.kr"
-LIST_PATH = "/campaign/?qq=popular"
 
-def _parse_card(card) -> Campaign | None:
+# 카테고리 ID 매핑 (ID -> (Type, Raw Category))
+CATEGORY_MAP = {
+    # 방문형 (Visit)
+    378: ("visit", "맛집"),
+    379: ("visit", "여행"),
+    380: ("visit", "뷰티"),  # 뷰티/패션
+    381: ("visit", "생활"),  # 문화/생활
+    # 배송형 (Delivery)
+    384: ("delivery", "식품"),
+    385: ("delivery", "뷰티"),
+    386: ("delivery", "디지털"),
+    387: ("delivery", "패션"),
+    388: ("delivery", "생활"),
+    389: ("delivery", "유아동"),
+    390: ("delivery", "도서"),
+    391: ("delivery", "반려동물"),
+}
+
+
+def _parse_card(card, fixed_type: str, fixed_category: str) -> Campaign | None:
     """카드 하나를 파싱하여 Campaign 객체 반환."""
     try:
-        # 링크 - a.tum_img 또는 a href
+        # 링크
         link_el = card.select_one("a")
         if not link_el:
             return None
@@ -23,13 +42,13 @@ def _parse_card(card) -> Campaign | None:
         href = link_el.get("href", "")
         url = href if href.startswith("http") else BASE_URL + href
         
-        # 제목 - .s_campaign_title
+        # 제목
         title_el = card.select_one(".s_campaign_title, strong.s_campaign_title")
         if not title_el:
             return None
         title = clean_text(title_el.get_text())
         
-        # 이미지 - .tum_img img
+        # 이미지
         img_el = card.select_one(".tum_img img, img")
         image_url = None
         if img_el:
@@ -41,7 +60,7 @@ def _parse_card(card) -> Campaign | None:
             elif src.startswith("http"):
                 image_url = src
         
-        # 마감일 - .d_day span
+        # 마감일
         deadline_el = card.select_one(".d_day span, .d_day")
         deadline = clean_text(deadline_el.get_text()) if deadline_el else None
         
@@ -49,54 +68,45 @@ def _parse_card(card) -> Campaign | None:
         if deadline:
             deadline_lower = deadline.lower()
             if any(keyword in deadline_lower for keyword in ["마감", "종료", "closed"]):
-                logger.debug("서울오빠 캠페인: 마감됨 (%s), 스킵", deadline)
                 return None
             if re.search(r"D\s*\+\s*\d+", deadline, re.IGNORECASE):
-                logger.debug("서울오빠 캠페인: 마감 지남 (%s), 스킵", deadline)
                 return None
         
-        # 타입/카테고리 - .icon_tag span
-        type_el = card.select_one(".icon_tag span")
-        category = clean_text(type_el.get_text()) if type_el else None
-        
-        # 지역 - 제목에서 추출
+        # 지역 추출 (방문형인 경우)
         location = None
-        if title:
-            # [가평], [서울 강남] 같은 패턴
-            location_match = re.search(r"\[([^\]]+)\]", title)
+        if fixed_type == "visit":
+            location_match = re.search(r"^\s*\[([^\]]+)\]", title)
             if location_match:
                 location = location_match.group(1)
-                # 제목에서 지역 부분 제거
-                title = re.sub(r"\[[^\]]+\]\s*", "", title).strip()
-        
-        # 채널 - .ltop_icon img alt
+                title = re.sub(r"^\s*\[[^\]]+\]\s*", "", title).strip()
+        elif fixed_type == "delivery":
+            location = "배송"
+
+        # 채널
         channel_el = card.select_one(".ltop_icon .icon_box img")
         channel = None
         if channel_el:
             alt = channel_el.get("alt", "")
-            # "네이버블로그" -> "블로그"로 변환
-            if "블로그" in alt:
-                channel = "블로그"
-            elif "인스타" in alt:
-                channel = "인스타"
-            elif "유튜브" in alt:
-                channel = "유튜브"
-            else:
-                channel = alt
+            if "블로그" in alt: channel = "블로그"
+            elif "인스타" in alt: channel = "인스타"
+            elif "유튜브" in alt: channel = "유튜브"
+            else: channel = alt
         
-        # 리뷰 기간 추출 (상세 페이지 크롤링)
-        review_deadline_days = extract_review_deadline_days(url, "seoulouba")
-        
+        # 카테고리 정규화
+        # URL에서 가져온 고정 카테고리를 바탕으로, 제목 키워드 등을 고려해 최종 정규화
+        final_category = normalize_category("seoulouba", fixed_category, title)
+
         return Campaign(
             title=title,
             url=url,
             site_name="seoulouba",
-            category=category,
+            category=final_category,
             deadline=deadline,
             location=location,
             image_url=image_url,
             channel=channel,
-            review_deadline_days=review_deadline_days,
+            type=fixed_type,
+            review_deadline_days=None,  # 목록에서는 알 수 없음 (속도 위해 포기)
         )
     
     except Exception as e:
@@ -104,41 +114,53 @@ def _parse_card(card) -> Campaign | None:
         return None
 
 
-def crawl() -> List[Campaign]:
-    """서울오빠 크롤링."""
-    logger.info("서울오빠 크롤링 시작")
-    
-    campaigns: List[Campaign] = []
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
-        )
-    }
+def _crawl_category(cat_id: int, c_type: str, c_cat: str) -> List[Campaign]:
+    """특정 카테고리 페이지 크롤링"""
+    url = f"{BASE_URL}/campaign/?cat={cat_id}"
+    campaigns = []
     
     try:
-        url = BASE_URL + LIST_PATH
-        res = requests.get(url, headers=headers, timeout=10)
+        res = requests.get(url, headers={
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }, timeout=10)
         res.raise_for_status()
         
         soup = BeautifulSoup(res.text, "html.parser")
-        
-        # 카드 선택자 - .campaign_content
         cards = soup.select(".campaign_content")
         
-        logger.info("서울오빠 %s 에서 %d개 카드 발견", url, len(cards))
+        logger.info("[서울오빠] %s (%s) - %d개 발견", c_cat, c_type, len(cards))
         
+        # 순차 파싱 (이미지/텍스트 파싱만 하므로 매우 빠름)
         for card in cards:
-            campaign = _parse_card(card)
-            if campaign:
-                campaigns.append(campaign)
-        
-        logger.info("서울오빠 총 %d개 캠페인 수집", len(campaigns))
-    
+            c = _parse_card(card, c_type, c_cat)
+            if c:
+                campaigns.append(c)
+                
     except Exception as e:
-        logger.error("서울오빠 크롤링 중 오류: %s", e)
-    
-    logger.info("서울오빠 크롤링 완료")
+        logger.error(f"[서울오빠] 카테고리 {cat_id} 크롤링 실패: {e}")
+        
     return campaigns
 
+
+def crawl() -> List[Campaign]:
+    """서울오빠 크롤링 (카테고리별 수집)"""
+    logger.info("서울오빠 크롤링 시작 (카테고리 기반)")
+    
+    all_campaigns: List[Campaign] = []
+    
+    # 카테고리별 병렬 요청
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        future_to_cat = {
+            executor.submit(_crawl_category, cid, ctype, ccat): (cid, ctype, ccat)
+            for cid, (ctype, ccat) in CATEGORY_MAP.items()
+        }
+        
+        for future in concurrent.futures.as_completed(future_to_cat):
+            try:
+                campaigns = future.result()
+                all_campaigns.extend(campaigns)
+            except Exception as e:
+                logger.error(f"카테고리 작업 실패: {e}")
+
+    logger.info("서울오빠 크롤링 완료 - 총 %d개 수집", len(all_campaigns))
+    return all_campaigns

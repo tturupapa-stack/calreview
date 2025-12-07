@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get("type");
     const channel = searchParams.get("channel");
     const sort = searchParams.get("sort") || "deadline";
-    
+
     // 페이지네이션 파라미터
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "50");
@@ -64,10 +64,16 @@ export async function GET(request: NextRequest) {
     }
 
     // Supabase 쿼리 빌더 (count 옵션 추가)
+    // KST 기준으로 오늘 날짜 계산 (UTC+9)
+    const now = new Date();
+    const kstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const todayStr = kstDate.toISOString().split("T")[0];
+
     let query = supabase
       .from("campaigns")
       .select("*", { count: "exact" })
-      .eq("is_active", true);
+      .eq("is_active", true)
+      .gte("application_deadline", todayStr); // 오늘 날짜 이후의 게시물만 조회
 
     // 필터 적용 (자연어 검색 결과 우선, 없으면 일반 파라미터 사용)
     const finalRegion = parsedQuery?.region || region;
@@ -171,6 +177,14 @@ export async function GET(request: NextRequest) {
       query = query.ilike("channel", `%${finalChannel}%`);
     }
 
+    // 사이트 이름 필터 (디버깅/검증용)
+
+
+    const site_name = searchParams.get("site_name");
+    if (site_name) {
+      query = query.eq("source", site_name);
+    }
+
     // 제목 검색 (필터 키워드를 제외한 나머지)
     if (titleSearchQuery) {
       query = query.ilike("title", `%${titleSearchQuery}%`);
@@ -243,6 +257,7 @@ export async function GET(request: NextRequest) {
     query = query.range(offset, offset + limit - 1);
 
     const { data, error, count } = await query;
+    console.log("[API Debug] Count:", count, "Error:", error?.message);
 
     if (error) {
       console.error("Supabase 쿼리 오류:", error);

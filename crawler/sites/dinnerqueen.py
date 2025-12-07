@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 from crawler.models import Campaign
 from crawler.utils import clean_text, logger
-from crawler.utils_detail import extract_review_deadline_days
+from crawler.utils_detail import extract_detail_info
 
 
 # 실제 서비스 도메인/목록 URL
@@ -150,8 +150,16 @@ def _parse_campaign_element(card) -> Campaign | None:
         else:
             image_url = None
 
-        # 상세 페이지에서 리뷰 기간 추출
-        review_deadline_days = extract_review_deadline_days(url, "dinnerqueen")
+        # 리뷰 기간 추출
+        try:
+            from crawler.utils_detail import extract_detail_info
+            info = extract_detail_info(url, "dinnerqueen")
+            review_deadline_days = info.get("review_deadline_days")
+        except Exception:
+            review_deadline_days = None
+        
+        if category == "배송" or (category and "제품" in category):
+             location = "배송"
 
         return Campaign(
             title=title,

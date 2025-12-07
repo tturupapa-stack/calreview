@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from supabase import Client, create_client
 
 from crawler.models import Campaign
+from crawler.category import normalize_category
+from crawler.region import normalize_region
 
 # 로컬 실행 시 사용할 .env.local 로드 (없어도 에러는 발생시키지 않음)
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
@@ -116,22 +118,48 @@ def _campaign_to_supabase_dict(campaign: Campaign) -> dict:
         elif re.match(r"\d{4}-\d{2}-\d{2}", campaign.deadline):
             application_deadline = campaign.deadline
     
-    # type 필드 매핑 (category나 다른 정보에서 추론)
-    campaign_type = None
-    if campaign.location == "배송":
+    # 표준 카테고리 정규화 적용
+    std_category = normalize_category(campaign.site_name, campaign.category, campaign.title)
+    
+    # 지역명 정규화 적용
+    std_region = normalize_region(campaign.location)
+
+    # type 필드 매핑
+    # 1. 강력한 카테고리 기반 강제 (크롤러가 잘못 지정한 경우 수정)
+    if std_category in ["디지털", "식품", "도서", "유아동", "패션", "반려동물", "배송", "재택"]:
         campaign_type = "delivery"
-    elif campaign.category == "맛집" and campaign.location and "배송" not in campaign.location:
-        campaign_type = "visit"
+    # 2. 크롤러가 지정한 타입이 있으면 우선 사용
+    elif campaign.type:
+        campaign_type = campaign.type
+    # 3. 타입이 없는 경우 추론
+    else:
+        # 지역명 기반 추론
+        if std_region == "배송" or campaign.location == "배송":
+            campaign_type = "delivery"
+        # 생활 카테고리는 지역 유무로 판단
+        elif std_category == "생활":
+            if not std_region or std_region == "배송":
+                campaign_type = "delivery"
+            else:
+                campaign_type = "visit"
+        # 나머지 방문형 카테고리
+        elif std_category in ["맛집", "뷰티", "여행", "문화"]:
+            campaign_type = "visit"
+        # 기자단 키워드
+        elif "기자단" in campaign.title:
+            campaign_type = "reporter"
+        else:
+            campaign_type = None
     
     return {
         "source": campaign.site_name,
         "source_id": source_id,
-        "source_url": campaign.url,
         "title": campaign.title,
-        "description": None,  # 크롤러에서는 아직 추출하지 않음
+        "description": "",  # 상세 설명은 별도 크롤링 필요
+        "source_url": campaign.url,    
         "thumbnail_url": campaign.image_url,
-        "category": campaign.category,
-        "region": campaign.location,  # location을 region에 저장
+        "category": std_category,  # 정규화된 카테고리 저장    
+        "region": std_region,  # 정규화된 지역명 저장
         "type": campaign_type,
         "channel": campaign.channel,  # 채널 정보 저장
         "reward": None,

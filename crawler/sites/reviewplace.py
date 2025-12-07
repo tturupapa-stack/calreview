@@ -1,36 +1,51 @@
-from __future__ import annotations
-
-from typing import List
+"""리뷰플레이스 크롤러 (카테고리 기반)"""
 
 import re
-
+import concurrent.futures
+from typing import List, Tuple
 import requests
 from bs4 import BeautifulSoup
 
 from crawler.models import Campaign
 from crawler.utils import clean_text, logger
-from crawler.utils_detail import extract_review_deadline_days
-
+from crawler.category import normalize_category
 
 BASE_URL = "https://www.reviewplace.co.kr"
-LIST_PATH = "/pr/?ct1=%EC%A0%9C%ED%92%88"
 
+# 카테고리 매핑 (Query String -> (Type, Raw Category))
+# 한글 파라미터는 requests가 자동으로 인코딩해주지 않으므로, URL에 직접 넣을 때는 주의 필요.
+# 여기서는 requests.get(params=...) 방식을 사용하여 처리를 위임하는 것이 좋음.
+# 키를 튜플로 정의: (ct1, ct2)
+CATEGORY_MAP = {
+    # 제품 (Delivery)
+    ("제품", "식품"): ("delivery", "식품"),
+    ("제품", "생활"): ("delivery", "생활"),
+    ("제품", "뷰티"): ("delivery", "뷰티"),
+    ("제품", "유아동"): ("delivery", "유아동"),
+    ("제품", "운동/건강"): ("delivery", "생활"), 
+    ("제품", "디지털"): ("delivery", "디지털"),
+    ("제품", "패션/잡화"): ("delivery", "패션"),
+    ("제품", "반려동물"): ("delivery", "반려동물"),
+    ("제품", "도서/교육"): ("delivery", "도서"),
+    ("제품", "서비스"): ("delivery", "생활"),
+    ("제품", "기타"): ("delivery", "기타"),
 
-def _parse_campaign_element(card, category: str | None = None) -> Campaign | None:
-    """리뷰플레이스 캠페인 카드 한 개를 Campaign으로 변환.
+    # 지역 (Visit)
+    ("지역", "맛집"): ("visit", "맛집"),
+    ("지역", "카페/베이커리"): ("visit", "맛집"),
+    ("지역", "뷰티/건강"): ("visit", "뷰티"),
+    ("지역", "운동/스포츠"): ("visit", "생활"),
+    ("지역", "숙박"): ("visit", "여행"),
+    ("지역", "문화/체험"): ("visit", "문화"),
+    ("지역", "생활/편의"): ("visit", "생활"),
+    ("지역", "기타"): ("visit", "기타"),
+    
+    # 기자단 (Reporter) - ct2 없이 ct1만 사용
+    ("기자단", None): ("reporter", "기자단"),
+}
 
-    HTML 구조 예시:
-    - div#cmp_list.campaign_list_c_list 안의 div.item
-      - a[href="/pr/?id=..."]                  -> 상세 링크
-        - img.thumbimg                         -> 메인 이미지
-      - div.txt_wrap > p.tit                  -> 제목 (예: "[서울/강남] 더하노이...")
-      - div.date_wrap > p.date                -> 마감 정보 (예: "D - 4")
-
-    Args:
-        card: BeautifulSoup 요소 (div.item)
-        category: URL 파라미터에서 추출한 카테고리 (예: "제품", "맛집" 등)
-    """
-
+def _parse_card(card, fixed_type: str, fixed_category: str) -> Campaign | None:
+    """리뷰플레이스 캠페인 파싱"""
     try:
         link_el = card.select_one("a[href*='/pr/?id=']")
         if not link_el:
@@ -42,196 +57,158 @@ def _parse_campaign_element(card, category: str | None = None) -> Campaign | Non
         else:
             url = href or BASE_URL
 
-        # 제목 + [지역/채널] 정보
+        # 제목
         title_el = card.select_one("div.txt_wrap p.tit")
         if not title_el:
             return None
         raw_title = clean_text(title_el.get_text())
+        title = raw_title
 
-        # 채널 정보 추출 (여러 개 가능)
-        channel_list: list[str] = []
-        channel_keywords = [
-            "블로그",
-            "인스타",
-            "릴스",
-            "유튜브",
-            "쇼츠",
-            "틱톡",
-            "클립",
-        ]
-
-        # HTML에서 sns_icon 아이콘 순서로 채널 정보 추출
-        # 첫 번째: blog_icon -> 블로그
-        # 두 번째: instagram_icon 또는 insta_icon -> 인스타
-        # 등등
+        # 채널 정보 추출
+        channel_list = []
+        
+        # 1. 아이콘 기반
         sns_icon_el = card.select_one("div.sns_icon")
         if sns_icon_el:
-            # sns_icon 안의 모든 아이콘 div 찾기
             icon_divs = sns_icon_el.select("div[class*='_icon'], div[class*='icon']")
             for icon_div in icon_divs:
                 icon_class = " ".join(icon_div.get("class", []))
-                # 클래스명에서 채널 타입 추출
                 if "blog" in icon_class.lower():
-                    if "블로그" not in channel_list:
-                        channel_list.append("블로그")
-                elif "insta" in icon_class.lower() or "instagram" in icon_class.lower():
-                    if "인스타" not in channel_list:
-                        channel_list.append("인스타")
+                    if "블로그" not in channel_list: channel_list.append("블로그")
+                elif "insta" in icon_class.lower():
+                    if "인스타" not in channel_list: channel_list.append("인스타")
                 elif "youtube" in icon_class.lower() or "yt" in icon_class.lower():
-                    if "유튜브" not in channel_list:
-                        channel_list.append("유튜브")
+                    if "유튜브" not in channel_list: channel_list.append("유튜브")
                 elif "tiktok" in icon_class.lower():
-                    if "틱톡" not in channel_list:
-                        channel_list.append("틱톡")
+                    if "틱톡" not in channel_list: channel_list.append("틱톡")
                 elif "clip" in icon_class.lower():
-                    if "클립" not in channel_list:
-                        channel_list.append("클립")
-                elif "reels" in icon_class.lower():
-                    if "릴스" not in channel_list:
-                        channel_list.append("릴스")
-
-        # 모든 대괄호 패턴 찾기: "[인스타][릴스] 제목" 또는 "[인스타/릴스] 제목"
-        bracket_pattern = r"\[([^\]]+)\]"
-        all_brackets = re.findall(bracket_pattern, raw_title)
-
-        # 카테고리가 "제품"인 경우: location을 "배송"으로 고정
-        if category == "제품":
-            location = "배송"
-            # 제목에서 대괄호 부분 제거
-            title = re.sub(r"\[[^\]]+\]\s*", "", raw_title).strip()
-            
-            # 모든 대괄호에서 채널 정보 추출
-            for bracket_text in all_brackets:
-                # 예: "[인스타/릴스]" 또는 "[인스타]" 형태
-                raw_parts = re.split(r"[\/,\s]+", bracket_text)
-                parts = [p.strip() for p in raw_parts if p.strip()]
-                
-                for part in parts:
-                    if part in channel_keywords and part not in channel_list:
-                        channel_list.append(part)
-        else:
-            # 그 외의 경우: 기존 로직대로 지명 파싱
-            location: str | None = None
-            title = raw_title
-            
-            # 모든 대괄호에서 채널 정보 추출
-            for bracket_text in all_brackets:
-                # 예: "[인스타/서울/강남]" 또는 "[인스타/릴스]" 형태
-                raw_parts = re.split(r"[\/,\s]+", bracket_text)
-                parts = [p.strip() for p in raw_parts if p.strip()]
-                
-                # 채널 정보 추출 (여러 개 가능)
-                has_channel = False
-                for part in parts:
-                    if part in channel_keywords:
-                        if part not in channel_list:
-                            channel_list.append(part)
-                        has_channel = True
-                
-                # 채널 정보가 없으면 지역 정보로 판단
-                if not has_channel and not location:
-                    location = bracket_text
-            
-            # 제목에서 모든 대괄호 제거
-            title = re.sub(r"\[[^\]]+\]\s*", "", raw_title).strip()
+                    if "클립" not in channel_list: channel_list.append("클립")
         
-        # 채널이 여러 개면 "/"로 구분하여 저장
+        # 2. 텍스트(대괄호) 기반
+        channel_keywords = ["블로그", "인스타", "릴스", "유튜브", "쇼츠", "틱톡", "클립"]
+        bracket_matches = re.findall(r"\[([^\]]+)\]", raw_title)
+        
+        clean_brackets = [] # 지역 정보 후보
+        
+        for b_text in bracket_matches:
+            # 채널 찾기
+            found_chan = False
+            parts = re.split(r"[\/,\s]+", b_text)
+            for part in parts:
+                p_clean = part.strip()
+                if p_clean in channel_keywords:
+                    if p_clean not in channel_list:
+                        channel_list.append(p_clean)
+                    found_chan = True
+            
+            if not found_chan:
+                clean_brackets.append(b_text)
+        
         channel = "/".join(channel_list) if channel_list else None
 
-        # 남은 기간(마감 정보) - "D - 4" 형태를 그대로 deadline 필드에 저장
-        # p.date 안에 em.d_ico와 텍스트가 있음
-        date_el = card.select_one("div.date_wrap p.date")
-        if date_el:
-            # em.d_ico 제거하고 텍스트만 추출
-            date_text = date_el.get_text()
-            # "D - 4" 형태로 정리
-            deadline = clean_text(date_text)
-            
-            # 마감된 체험단 제외
-            if deadline:
-                deadline_lower = deadline.lower()
-                # "마감", "종료" 키워드가 있으면 스킵
-                if any(keyword in deadline_lower for keyword in ["마감", "종료", "closed"]):
-                    logger.debug("리뷰플레이스 캠페인: 마감됨 (%s), 스킵", deadline)
-                    return None  # 함수이므로 return 사용
-                # D+N 또는 D + N 형태 (이미 지남)
-                if re.search(r"D\s*\+\s*\d+", deadline, re.IGNORECASE):
-                    logger.debug("리뷰플레이스 캠페인: 마감 지남 (%s), 스킵", deadline)
-                    return None  # 함수이므로 return 사용
-        else:
-            deadline = None
+        # 지역 정보
+        location = None
+        if fixed_type == "delivery":
+            location = "배송"
+        elif fixed_type == "visit":
+            # 남은 대괄호 내용을 지역으로 간주 (첫번째 것만)
+            if clean_brackets:
+                location = clean_brackets[0]
+        
+        # 제목 정제 (대괄호 제거)
+        title = re.sub(r"\[[^\]]+\]\s*", "", raw_title).strip()
 
-        # 메인 이미지
+        # 마감일
+        deadline_el = card.select_one("div.date_wrap p.date")
+        deadline = None
+        if deadline_el:
+            date_text = clean_text(deadline_el.get_text())
+            # "마감", "종료" 체크
+            if any(k in date_text.lower() for k in ["마감", "종료", "closed"]):
+                return None
+            if re.search(r"D\s*\+\s*\d+", date_text, re.IGNORECASE):
+                # 이미 지난 마감일
+                return None
+            deadline = date_text
+
+        # 이미지
         img_el = card.select_one("div.img img, img.thumbimg")
-        src = img_el.get("src") if img_el else None
-        if src:
-            if src.startswith("//"):
-                image_url = "https:" + src
-            elif src.startswith("/"):
-                image_url = BASE_URL + src
-            else:
-                image_url = src
-        else:
-            image_url = None
+        image_url = None
+        if img_el:
+            src = img_el.get("src")
+            if src:
+                if src.startswith("//"): image_url = "https:" + src
+                elif src.startswith("/"): image_url = BASE_URL + src
+                else: image_url = src
 
-        # 상세 페이지에서 리뷰 기간 추출
-        review_deadline_days = extract_review_deadline_days(url, "reviewplace")
+        # 카테고리 정규화
+        final_category = normalize_category("reviewplace", fixed_category, title)
 
         return Campaign(
             title=title,
             url=url,
             site_name="reviewplace",
-            category=category,
-            deadline=deadline or None,
+            category=final_category,
+            deadline=deadline,
             location=location,
             image_url=image_url,
             channel=channel,
-            review_deadline_days=review_deadline_days,
+            type=fixed_type,
+            review_deadline_days=None,
         )
-    except Exception as e:  # pragma: no cover
-        logger.error("리뷰플레이스 캠페인 파싱 중 오류: %s", e)
+
+    except Exception as e:
+        logger.error(f"리뷰플레이스 파싱 오류: {e}")
         return None
 
 
-def crawl(max_pages: int = 1) -> List[Campaign]:
-    """리뷰플레이스 크롤링 로직."""
-
-    logger.info("리뷰플레이스 크롤링 시작")
-    campaigns: list[Campaign] = []
-
-    for page in range(1, max_pages + 1):
-        try:
-            # 제품 카테고리 목록 페이지 (페이지네이션 구조 확인 전까지 page는 미사용)
-            url = f"{BASE_URL}{LIST_PATH}"
-            res = requests.get(url, timeout=10)
-            res.raise_for_status()
-
-            # URL 파라미터에서 카테고리 추출: ct1=%EC%A0%9C%ED%92%88 (제품) 등
-            category = None
-            try:
-                from urllib.parse import unquote, parse_qs, urlparse
-                parsed_url = urlparse(url)
-                params = parse_qs(parsed_url.query)
-                if "ct1" in params:
-                    # URL 디코딩: %EC%A0%9C%ED%92%88 -> 제품
-                    category = unquote(params["ct1"][0])
-            except Exception:
-                pass
-
-            soup = BeautifulSoup(res.text, "html.parser")
-            # 메인 리스트: div#cmp_list.campaign_list_c_list 안의 div.item
-            cards = soup.select("#cmp_list div.item")
-            logger.info("리뷰플레이스 %s 에서 %d개 카드 발견 (카테고리: %s)", url, len(cards), category or "없음")
-
-            for card in cards:
-                campaign = _parse_campaign_element(card, category=category)
-                if campaign:
-                    campaigns.append(campaign)
-        except Exception as e:  # pragma: no cover
-            logger.error("리뷰플레이스 페이지 %d 크롤링 중 오류: %s", page, e)
-            break
-
-    logger.info("리뷰플레이스 총 %d개 캠페인 수집", len(campaigns))
-    logger.info("리뷰플레이스 크롤링 완료")
+def _crawl_category(ct1: str, ct2: str | None, c_type: str, c_cat: str) -> List[Campaign]:
+    """특정 카테고리 페이지 크롤링"""
+    url = f"{BASE_URL}/pr/"
+    params = {"ct1": ct1}
+    if ct2:
+        params["ct2"] = ct2
+        
+    campaigns = []
+    try:
+        res = requests.get(url, params=params, headers={
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }, timeout=10)
+        res.raise_for_status()
+        
+        soup = BeautifulSoup(res.text, "html.parser")
+        cards = soup.select("#cmp_list div.item")
+        
+        logger.info(f"[리뷰플레이스] {c_cat} ({ct1}/{ct2}) - {len(cards)}개 발견")
+        
+        for card in cards:
+            c = _parse_card(card, c_type, c_cat)
+            if c:
+                campaigns.append(c)
+                
+    except Exception as e:
+        logger.error(f"[리뷰플레이스] 요청 실패 ({ct1}, {ct2}): {e}")
+        
     return campaigns
+
+
+def crawl() -> List[Campaign]:
+    """리뷰플레이스 크롤링 (카테고리 기반, 병렬)"""
+    logger.info("리뷰플레이스 크롤링 시작")
+    all_campaigns = []
+    
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        futures = []
+        for (ct1, ct2), (ctype, ccat) in CATEGORY_MAP.items():
+            futures.append(executor.submit(_crawl_category, ct1, ct2, ctype, ccat))
+            
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                result = future.result()
+                all_campaigns.extend(result)
+            except Exception as e:
+                logger.error(f"작업 실패: {e}")
+                
+    logger.info(f"리뷰플레이스 총 {len(all_campaigns)}개 수집 완료")
+    return all_campaigns
 

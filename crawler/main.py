@@ -52,6 +52,7 @@ def _campaign_to_dict(c: Campaign) -> Dict:
         "location": c.location,
         "image_url": c.image_url,
         "channel": c.channel,
+        "type": c.type,
         "review_deadline_days": c.review_deadline_days,
     }
 

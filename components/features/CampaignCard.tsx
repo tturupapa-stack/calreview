@@ -1,5 +1,8 @@
 "use client";
 
+import { Instagram, Youtube, FileText, Video, MonitorPlay } from "lucide-react";
+import { SiteLogo } from "@/components/ui/SiteLogo";
+
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
@@ -18,6 +21,23 @@ const SiteNameMap: Record<string, string> = {
   seoulouba: "서울오빠",
   modooexperience: "모두의체험단",
   pavlovu: "파블로",
+};
+
+const TypeLabelMap: Record<string, string> = {
+  visit: "방문",
+  delivery: "배송",
+  "기자단": "기자단",
+};
+
+const ChannelIconMap: Record<string, any> = {
+  "블로그": FileText,
+  "인스타": Instagram,
+  "유튜브": Youtube,
+  "릴스": Instagram,
+  "쇼츠": Youtube,
+  "틱톡": Video,
+  "클립": MonitorPlay,
+  "기자단": FileText,
 };
 
 export function CampaignCard({ campaign }: CampaignCardProps) {
@@ -113,6 +133,15 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
   const imageUrl = campaign.thumbnail_url || campaign.image_url;
   const hasValidUrl = campaign.source_url && campaign.source_url.trim() !== "";
 
+  // 지역 정보 (region이 있으면 사용하고, 없으면 location 사용, 그래도 없으면 빈 문자열)
+  const regionText = campaign.region || campaign.location || "";
+
+  // 채널 정보 파싱 (쉼표로 구분된 경우 처리)
+  const channels = (campaign.channel || "")
+    .split(",")
+    .map(c => c.trim())
+    .filter(c => c.length > 0);
+
   return (
     <div className="bg-white rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden">
       <a
@@ -141,39 +170,75 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
             </div>
           )}
         </div>
-        
+
         <div className="p-4">
-          {/* 출처 & 마감일 */}
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
-              {SiteNameMap[campaign.source] || campaign.source}
-            </span>
+          {/* 출처 & 채널 아이콘 & 마감일 */}
+          <div className="flex justify-between items-center mb-2">
+            <div className="flex items-center gap-3">
+              <SiteLogo
+                site={campaign.source}
+                siteName={SiteNameMap[campaign.source] || campaign.source}
+                size={24} // Slightly larger for better visibility
+              />
+
+              {/* 채널 아이콘 표시 */}
+              <div className="flex gap-1">
+                {channels.map((ch, idx) => {
+                  // 포함 관계 매핑 (예: "블로그"가 포함되면 FileText)
+                  let IconComponent = null;
+                  for (const [key, Icon] of Object.entries(ChannelIconMap)) {
+                    if (ch.includes(key)) {
+                      IconComponent = Icon;
+                      break;
+                    }
+                  }
+
+                  if (!IconComponent) return null;
+
+                  return (
+                    <div key={idx} className="text-gray-400" title={ch}>
+                      <IconComponent size={14} />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             {campaign.deadline && (
               <span className="text-xs text-gray-500">{campaign.deadline}</span>
             )}
           </div>
-          
-          {/* 제목 */}
+
+          {/* 제목 (지역명 크게 + 제목) */}
           <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
+            {regionText && (
+              <span className="text-lg font-bold text-gray-800 mr-1.5">[{regionText}]</span>
+            )}
             {campaign.title}
           </h3>
-          
-          {/* 태그 */}
+
+          {/* 태그 (1: 대분류, 2: 중분류) */}
           <div className="flex flex-wrap gap-2">
-            {campaign.category && (
-              <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                {campaign.category}
+            {/* 대분류: Type */}
+            {campaign.type && TypeLabelMap[campaign.type] && (
+              <span className="text-xs font-medium text-white bg-gray-800 px-2 py-1 rounded">
+                {TypeLabelMap[campaign.type]}
               </span>
             )}
-            {(campaign.location || campaign.region) && (
-              <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                {campaign.location || campaign.region}
-              </span>
-            )}
+            {/* 중분류: Category */}
+            {campaign.category &&
+              // 서울오빠 배송형이면 카테고리 태그 숨김 (사용자 요청)
+              !(campaign.source === "seoulouba" && campaign.type === "delivery") &&
+              // 카테고리명과 타입명이 동일하면 숨김 (예: [배송] [배송])
+              campaign.category !== TypeLabelMap[campaign.type || ""] && (
+                <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                  {campaign.category}
+                </span>
+              )}
           </div>
         </div>
       </a>
-      
+
       {/* 북마크 버튼 */}
       <div className="px-4 pb-4">
         {isChecking ? (
