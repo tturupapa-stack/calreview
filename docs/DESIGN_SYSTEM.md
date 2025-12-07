@@ -6,27 +6,31 @@
 
 캘리뷰는 가독성과 심미성을 위해 다음 두 가지 폰트를 사용합니다.
 
-- **Heading**: `Outfit`
-  - 모던하고 깔끔한 느낌을 주는 산세리프 폰트입니다.
-  - 주요 제목(H1 ~ H3) 및 강조 텍스트에 사용합니다.
-- **Body**: `Inter`
-  - 웹 표준에 가까운 높은 가독성을 가진 폰트입니다.
-  - 본문, 버튼, 입력 필드 등 일반적인 텍스트에 사용합니다.
+- **Main Font**: `Pretendard`
+  - 한국어 가독성에 최적화된 본문용 폰트입니다.
+  - Heading과 Body 모두에 적용하여 깔끔하고 현대적인 인상을 줍니다.
+- **English/Number**: `Outfit`
+  - 영문 헤딩이나 숫자에 포인트로 사용하여 세련된 느낌을 더합니다.
 
 ```tsx
 // 사용 예시
-<h1 className="font-heading text-4xl font-bold">제목</h1>
-<p className="font-sans text-base">본문 내용입니다.</p>
+<h1 className="font-heading text-4xl font-bold">Calreview</h1>
+<p className="font-sans text-base">체험단 리뷰 관리의 새로운 기준</p>
 ```
 
 ## 2. 색상 시스템 (Color System)
 
 Tailwind CSS v4 변수 기반으로 정의되어 있으며, HSL 값을 사용하여 테마 확장이 용이합니다.
 
-### Primary (주요 색상)
-- **Primary**: `hsl(221.2 83.2% 53.3%)` (Blue-600)
-  - 브랜드 아이덴티티, 주요 버튼, 활성 상태
-- **Primary Foreground**: `hsl(210 40% 98%)` (White)
+### Primary (주요 색상) - Rose Coral Theme
+- **Primary**: `hsl(350 89% 60%)` (Rose Coral)
+  - 브랜드 아이덴티티, 주요 버튼, 강조 텍스트
+  - 20-40대 여성 타겟의 생동감 있고 따뜻한 분위기
+- **Primary Foreground**: `hsl(0 0% 100%)` (White)
+
+### Secondary (보조 색상)
+- **Secondary**: `hsl(30 33% 98%)` (Warm Cream)
+  - 배경색, 카드 배경, 부드러운 분위기 조성
 
 ### Neutral (무채색)
 - **Background**: `hsl(0 0% 100%)` (White)
@@ -56,7 +60,10 @@ Tailwind CSS v4 변수 기반으로 정의되어 있으며, HSL 값을 사용하
 콘텐츠를 담는 컨테이너로, 부드러운 그림자와 테두리를 가집니다.
 
 - **Structure**: `Card` > `CardHeader` > `CardTitle` + `CardDescription` > `CardContent` > `CardFooter`
-- **Style**: 둥근 모서리(`rounded-xl`), 미세한 테두리(`border`), 부드러운 그림자(`shadow-sm`)
+- **Style**:
+  - 둥근 모서리: `rounded-xl` (12px)
+  - 효과: `hover:shadow-md`, `hover:-translate-y-1` (Hover Lift Effect)
+  - 테두리: 미세한 `border`와 부드러운 `shadow-sm`
 
 ```tsx
 <Card>
