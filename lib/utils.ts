@@ -17,11 +17,42 @@ export function formatDate(date: Date | string): string {
 }
 
 /**
- * D-day 계산
+ * D-day 계산 (숫자 반환)
  */
 export function getDday(targetDate: Date | string): number {
     const target = typeof targetDate === 'string' ? new Date(targetDate) : targetDate
     const today = new Date()
     const diff = target.getTime() - today.getTime()
     return Math.ceil(diff / (1000 * 60 * 60 * 24))
+}
+
+/**
+ * D-day 계산 (문자열 형식 반환: "D-0", "D-1", "D+1" 등)
+ */
+export function calculateDday(deadline: string): string {
+  try {
+    const deadlineDate = new Date(deadline);
+    // Invalid date 체크
+    if (isNaN(deadlineDate.getTime())) {
+      return "";
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    deadlineDate.setHours(0, 0, 0, 0);
+
+    const diffTime = deadlineDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // NaN 체크
+    if (isNaN(diffDays)) {
+      return "";
+    }
+
+    if (diffDays === 0) return "D-0";
+    if (diffDays > 0) return `D-${diffDays}`;
+    return `D+${Math.abs(diffDays)}`;
+  } catch {
+    return "";
+  }
 }

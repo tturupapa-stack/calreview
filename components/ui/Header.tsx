@@ -7,7 +7,7 @@ export function Header() {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <span className="text-xl font-heading font-bold tracking-tight text-primary transition-colors group-hover:text-primary/80">
-            Calreview
+            Cally
           </span>
         </Link>
         <nav className="flex items-center gap-6">

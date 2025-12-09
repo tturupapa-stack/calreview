@@ -1,24 +1,8 @@
 import { createClient } from "@/lib/supabase-server";
 import { NextRequest, NextResponse } from "next/server";
 import { parseSearchQuery } from "@/lib/search-parser";
-
-function calculateDday(deadline: string): string {
-  try {
-    const deadlineDate = new Date(deadline);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    deadlineDate.setHours(0, 0, 0, 0);
-
-    const diffTime = deadlineDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return "D-0";
-    if (diffDays > 0) return `D-${diffDays}`;
-    return `D+${Math.abs(diffDays)}`;
-  } catch {
-    return "";
-  }
-}
+import { calculateDday } from "@/lib/utils";
+import { DEADLINE_KEYWORDS_MAP, TYPE_KEYWORDS_MAP } from "@/constants/mappings";
 
 export async function GET(request: NextRequest) {
   try {
@@ -112,26 +96,13 @@ export async function GET(request: NextRequest) {
           remainingQuery = remainingQuery.replace(new RegExp(parsedQuery.category, "gi"), "").trim();
         }
         if (parsedQuery?.deadline) {
-          const deadlineMap: Record<string, string[]> = {
-            deadline: ["마감임박"],
-            this_week: ["이번주"],
-            next_week: ["다음주"],
-            this_month: ["이번달"],
-            today: ["오늘"],
-            tomorrow: ["내일"],
-          };
-          const keywords = deadlineMap[parsedQuery.deadline] || [];
+          const keywords = DEADLINE_KEYWORDS_MAP[parsedQuery.deadline] || [];
           for (const keyword of keywords) {
             remainingQuery = remainingQuery.replace(new RegExp(keyword, "gi"), "").trim();
           }
         }
         if (parsedQuery?.type) {
-          const typeMap: Record<string, string> = {
-            visit: "방문형",
-            delivery: "배송형",
-            reporter: "기자단",
-          };
-          const keyword = typeMap[parsedQuery.type];
+          const keyword = TYPE_KEYWORDS_MAP[parsedQuery.type];
           if (keyword) {
             remainingQuery = remainingQuery.replace(new RegExp(keyword, "gi"), "").trim();
           }
@@ -277,7 +248,6 @@ export async function GET(request: NextRequest) {
     query = query.range(offset, offset + limit - 1);
 
     const { data, error, count } = await query;
-    console.log("[API Debug] Count:", count, "Error:", error?.message);
 
     if (error) {
       console.error("Supabase 쿼리 오류:", error);
@@ -288,7 +258,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Supabase 데이터를 Campaign 타입에 맞게 변환
-    const campaigns = (data || []).map((item: any) => ({
+    type CampaignRow = {
+      id: string;
+      application_deadline: string | null;
+      region: string | null;
+      thumbnail_url: string | null;
+      [key: string]: unknown;
+    };
+    const campaigns = (data || []).map((item: CampaignRow) => ({
       ...item,
       // 표시용 필드 매핑
       deadline: item.application_deadline

@@ -23,14 +23,24 @@ const SiteLogoUrl: Record<string, string> = {
 };
 
 // Logo specific visual adjustments (Optical Sizing)
-const LogoStyle: Record<string, { scale: number; translateY: number }> = {
-    seoulouba: { scale: 1.0, translateY: 0 }, // Reset scale to avoid overwhelming text
+const LogoStyle: Record<string, { scale: number; translateY: number; removeBg?: boolean }> = {
+    seoulouba: { scale: 0.8, translateY: 0 }, // 20% 크기 감소
     reviewplace: { scale: 1.0, translateY: 0 }, // Reset scale
     modooexperience: { scale: 1.1, translateY: 1 },
     reviewnote: { scale: 1.0, translateY: 0 },
     dinnerqueen: { scale: 1.0, translateY: 0 },
     pavlovu: { scale: 1.0, translateY: 0 },
     gangnam: { scale: 1.0, translateY: 0 },
+};
+
+// 흰색 배경이 있는 로고 목록 (배경 제거 필요)
+const LogosWithWhiteBg: Record<string, boolean> = {
+    dinnerqueen: true,
+    modooexperience: true,
+    pavlovu: true,
+    reviewplace: true,
+    seoulouba: true,
+    // 필요에 따라 추가/제거 가능
 };
 
 export function SiteLogo({ site, siteName, className = "", size = 24 }: SiteLogoProps) {
@@ -49,6 +59,8 @@ export function SiteLogo({ site, siteName, className = "", size = 24 }: SiteLogo
         );
     }
 
+    const hasWhiteBg = LogosWithWhiteBg[site] || false;
+
     return (
         <div
             className={`relative inline-flex items-center justify-start ${className}`}
@@ -64,7 +76,12 @@ export function SiteLogo({ site, siteName, className = "", size = 24 }: SiteLogo
                     height: '100%',
                     width: 'auto',
                     transform: `scale(${style.scale}) translateY(${style.translateY}px)`,
-                    transformOrigin: 'left center'
+                    transformOrigin: 'left center',
+                    // 흰색 배경 제거: multiply 모드는 흰색을 투명하게 만듦
+                    ...(hasWhiteBg && {
+                        mixBlendMode: 'multiply',
+                        filter: 'contrast(1.1) brightness(1.05)',
+                    })
                 }}
                 onError={() => setError(true)}
                 unoptimized

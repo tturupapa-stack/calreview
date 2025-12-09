@@ -22,11 +22,21 @@ def inspect():
         data = json.loads(next_data.string)
         page_props = data.get('props', {}).get('pageProps', {})
         
-        if 'premiums' in page_props and len(page_props['premiums']) > 0:
-            print("\nSample Item (premiums[0]):")
-            item = page_props['premiums'][0]
-            import pprint
-            pprint.pprint(item)
+        items = []
+        if 'premiums' in page_props:
+            items.extend(page_props['premiums'])
+        if 'recents' in page_props:
+            items.extend(page_props['recents'])
+            
+        print(f"\nTotal items found: {len(items)}")
+        
+        print("\nSample Items (First 20):")
+        for i, item in enumerate(items[:20]):
+            cat_title = item.get('category', {}).get('title')
+            title = item.get('title')
+            city = item.get('city')
+            sido = item.get('sido', {}).get('name')
+            print(f"[{i+1}] Title: {title} | Cat: {cat_title} | Loc: {city} {sido}")
     else:
         print("\n__NEXT_DATA__ script not found.")
 

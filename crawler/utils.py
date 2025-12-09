@@ -134,11 +134,11 @@ def _campaign_to_supabase_dict(campaign: Campaign) -> dict:
     # 3. 타입이 없는 경우 추론
     else:
         # 지역명 기반 추론
-        if std_region == "배송" or campaign.location == "배송":
+        if std_region in ["배송", "재택"] or campaign.location in ["배송", "재택"]:
             campaign_type = "delivery"
         # 생활 카테고리는 지역 유무로 판단
         elif std_category == "생활":
-            if not std_region or std_region == "배송":
+            if not std_region or std_region in ["배송", "재택"]:
                 campaign_type = "delivery"
             else:
                 campaign_type = "visit"

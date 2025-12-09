@@ -1,6 +1,6 @@
 "use client";
 
-import { Instagram, Youtube, FileText, Video, MonitorPlay } from "lucide-react";
+import { ChannelIcon } from "@/components/ui/ChannelIcon";
 import { SiteLogo } from "@/components/ui/SiteLogo";
 
 import Image from "next/image";
@@ -27,17 +27,6 @@ const TypeLabelMap: Record<string, string> = {
   visit: "방문",
   delivery: "배송",
   "기자단": "기자단",
-};
-
-const ChannelIconMap: Record<string, any> = {
-  "블로그": FileText,
-  "인스타": Instagram,
-  "유튜브": Youtube,
-  "릴스": Instagram,
-  "쇼츠": Youtube,
-  "틱톡": Video,
-  "클립": MonitorPlay,
-  "기자단": FileText,
 };
 
 export function CampaignCard({ campaign }: CampaignCardProps) {
@@ -137,10 +126,16 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
   const regionText = campaign.region || campaign.location || "";
 
   // 채널 정보 파싱 (쉼표로 구분된 경우 처리)
-  const channels = (campaign.channel || "")
+  let channels = (campaign.channel || "")
     .split(",")
     .map(c => c.trim())
     .filter(c => c.length > 0);
+
+  // Filter out "블로그" if "인스타그램" is present (User request: "Instagram but has Blog icon attached")
+  // This handles cases where ReviewPlace or others tag both but Instagram is the primary focus.
+  if (channels.some(c => c.includes("인스타그램") || c.includes("인스타"))) {
+    channels = channels.filter(c => !c.includes("블로그"));
+  }
 
   return (
     <div className="group bg-white rounded-xl border border-border/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
@@ -178,29 +173,16 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
               <SiteLogo
                 site={campaign.source}
                 siteName={SiteNameMap[campaign.source] || campaign.source}
-                size={24} // Slightly larger for better visibility
+                size={24}
               />
 
               {/* 채널 아이콘 표시 */}
               <div className="flex gap-1">
-                {channels.map((ch, idx) => {
-                  // 포함 관계 매핑 (예: "블로그"가 포함되면 FileText)
-                  let IconComponent = null;
-                  for (const [key, Icon] of Object.entries(ChannelIconMap)) {
-                    if (ch.includes(key)) {
-                      IconComponent = Icon;
-                      break;
-                    }
-                  }
-
-                  if (!IconComponent) return null;
-
-                  return (
-                    <div key={idx} className="text-gray-400" title={ch}>
-                      <IconComponent size={14} />
-                    </div>
-                  );
-                })}
+                {channels.map((ch, idx) => (
+                  <div key={idx} title={ch}>
+                    <ChannelIcon channel={ch} size={18} />
+                  </div>
+                ))}
               </div>
             </div>
 

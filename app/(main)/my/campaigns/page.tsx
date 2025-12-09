@@ -91,14 +91,30 @@ export default function MyCampaignsPage() {
         // 전체 신청 목록 조회
         const response = await fetch("/api/applications");
         if (!response.ok) {
-          throw new Error("신청 목록을 불러올 수 없습니다.");
+          let errorMessage = "신청 목록을 불러올 수 없습니다.";
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorMessage;
+          } catch (e) {
+            errorMessage = `서버 오류 (${response.status}): ${response.statusText}`;
+          }
+          throw new Error(errorMessage);
         }
 
         const data = await response.json();
         setApplications(data.applications || []);
-      } catch (error) {
+      } catch (error: any) {
         console.error("데이터 조회 오류:", error);
-        alert("데이터를 불러오는 중 오류가 발생했습니다.");
+        const errorMessage = error instanceof Error 
+          ? error.message 
+          : error?.message || "데이터를 불러오는 중 오류가 발생했습니다.";
+        
+        // 네트워크 에러인 경우 더 명확한 메시지 제공
+        if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
+          alert("네트워크 연결을 확인해주세요. 서버가 실행 중인지 확인하세요.");
+        } else {
+          alert(errorMessage);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -167,15 +183,19 @@ export default function MyCampaignsPage() {
     }
 
     setProcessingId(applicationId);
+    
     try {
+      // 선정 처리이므로 항상 "selected" 상태로 설정
       const updateData: any = {
-        status: app.status === "bookmarked" ? "selected" : app.status,
+        status: "selected",
         review_deadline: reviewDeadline,
       };
 
       if (visitDate) {
         updateData.visit_date = visitDate;
       }
+
+      console.log("[클라이언트] 선정 처리 데이터:", updateData);
 
       const response = await fetch(`/api/applications/${applicationId}`, {
         method: "PATCH",
@@ -185,11 +205,36 @@ export default function MyCampaignsPage() {
         body: JSON.stringify(updateData),
       });
 
-      const data = await response.json();
+      // Response는 한 번만 읽을 수 있으므로 먼저 텍스트로 읽기
+      const responseText = await response.text();
 
       if (!response.ok) {
-        throw new Error(data.error || "선정 처리 중 오류가 발생했습니다.");
+        let errorMessage = "선정 처리 중 오류가 발생했습니다.";
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          // JSON 파싱 실패 시 상태 텍스트 사용
+          errorMessage = `서버 오류 (${response.status}): ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
+
+      // 성공한 경우에만 JSON 파싱
+      const data = JSON.parse(responseText);
+
+      console.log("[클라이언트] API 응답:", data);
+
+      // 캘린더 이벤트 ID 확인 (안전하게 처리)
+      const hasCalendarEvents = !!(data?.application?.calendar_visit_event_id || data?.application?.calendar_deadline_event_id);
+      const calendarErrors: string[] = Array.isArray(data?.calendarInfo?.errors) ? data.calendarInfo.errors : [];
+      
+      console.log("[클라이언트] 캘린더 이벤트 ID:", {
+        visitEventId: data?.application?.calendar_visit_event_id,
+        deadlineEventId: data?.application?.calendar_deadline_event_id,
+        hasCalendarEvents: !!hasCalendarEvents,
+        calendarErrors,
+      });
 
       // 목록 새로고침
       const refreshResponse = await fetch("/api/applications");
@@ -201,10 +246,31 @@ export default function MyCampaignsPage() {
       setEditingId(null);
       setVisitDate("");
       setReviewDeadline("");
-      alert("✓ 선정 처리되었습니다." + (isCalendarConnected ? " 구글 캘린더에 등록되었습니다." : ""));
+      
+      // 캘린더 등록 여부에 따른 메시지
+      let calendarMessage = "";
+      if (hasCalendarEvents) {
+        calendarMessage = " 구글 캘린더에 등록되었습니다.";
+      } else if (isCalendarConnected) {
+        if (calendarErrors && calendarErrors.length > 0) {
+          calendarMessage = `\n\n구글 캘린더 등록 실패:\n${calendarErrors.join("\n")}`;
+        } else {
+          calendarMessage = "\n\n구글 캘린더 등록 실패 (서버 로그 확인 필요)";
+        }
+      }
+      alert("✓ 선정 처리되었습니다." + calendarMessage);
     } catch (error: any) {
       console.error("선정 처리 오류:", error);
-      alert(error.message || "선정 처리 중 오류가 발생했습니다.");
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : error?.message || "선정 처리 중 오류가 발생했습니다.";
+      
+      // 네트워크 에러인 경우 더 명확한 메시지 제공
+      if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
+        alert("네트워크 연결을 확인해주세요. 서버가 실행 중인지 확인하세요.");
+      } else {
+        alert(errorMessage);
+      }
     } finally {
       setProcessingId(null);
     }

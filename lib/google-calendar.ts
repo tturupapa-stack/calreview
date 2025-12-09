@@ -1,13 +1,28 @@
 import { google } from "googleapis";
 
+function getGoogleCalendarEnv() {
+  const clientId = process.env.GOOGLE_CALENDAR_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CALENDAR_CLIENT_SECRET;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+  if (!clientId || !clientSecret || !supabaseUrl) {
+    throw new Error(
+      'Missing Google Calendar environment variables. Please check GOOGLE_CALENDAR_CLIENT_ID, GOOGLE_CALENDAR_CLIENT_SECRET, and NEXT_PUBLIC_SUPABASE_URL.'
+    );
+  }
+
+  return { clientId, clientSecret, redirectUri: `${supabaseUrl}/api/auth/google-calendar/callback` };
+}
+
 /**
  * Google Calendar API 클라이언트 생성
  */
 export function createCalendarClient(refreshToken: string) {
+  const { clientId, clientSecret, redirectUri } = getGoogleCalendarEnv();
   const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CALENDAR_CLIENT_ID,
-    process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
-    process.env.NEXT_PUBLIC_SUPABASE_URL + "/api/auth/google-calendar/callback"
+    clientId,
+    clientSecret,
+    redirectUri
   );
 
   oauth2Client.setCredentials({
@@ -34,6 +49,13 @@ export async function createCalendarEvent(
     };
   }
 ): Promise<string> {
+  try {
+    console.log("[구글 캘린더 API] 이벤트 생성 시작:", {
+      summary: options.summary,
+      startDate: options.startDate,
+      endDate: options.endDate,
+    });
+
   const calendar = createCalendarClient(refreshToken);
 
   const event = {
@@ -57,12 +79,27 @@ export async function createCalendarEvent(
     },
   };
 
+    console.log("[구글 캘린더 API] 이벤트 데이터:", JSON.stringify(event, null, 2));
+
   const response = await calendar.events.insert({
     calendarId: "primary",
     requestBody: event,
   });
 
-  return response.data.id || "";
+    const eventId = response.data.id || "";
+    console.log("[구글 캘린더 API] 이벤트 생성 성공:", eventId);
+    return eventId;
+  } catch (error: any) {
+    console.error("[구글 캘린더 API] 이벤트 생성 오류:", error);
+    if (error.response) {
+      console.error("[구글 캘린더 API] 응답 상태:", error.response.status);
+      console.error("[구글 캘린더 API] 응답 데이터:", error.response.data);
+    }
+    if (error.message) {
+      console.error("[구글 캘린더 API] 에러 메시지:", error.message);
+    }
+    throw error;
+  }
 }
 
 /**
@@ -81,7 +118,15 @@ export async function updateCalendarEvent(
 ): Promise<void> {
   const calendar = createCalendarClient(refreshToken);
 
-  const event: any = {};
+  type CalendarEventUpdate = {
+    summary?: string;
+    description?: string;
+    start?: { dateTime: string; timeZone: string };
+    end?: { dateTime: string; timeZone: string };
+    location?: string;
+  };
+
+  const event: CalendarEventUpdate = {};
   if (options.summary) event.summary = options.summary;
   if (options.description !== undefined) event.description = options.description;
   if (options.startDate) {

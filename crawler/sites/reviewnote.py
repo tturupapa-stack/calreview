@@ -145,7 +145,7 @@ def _extract_campaigns_from_page_props(page_props: dict) -> list[Campaign]:
                 if category:
                     if category in ["맛집", "뷰티", "여행", "숙박", "문화"]:
                         campaign_type = "visit"
-                    elif category in ["제품", "디지털", "생활", "식품", "도서", "유아동", "패션", "반려동물", "기타", "재택"]:
+                    elif category in ["제품", "디지털", "생활", "식품", "도서", "유아동", "패션", "반려동물", "재택"]:
                         campaign_type = "delivery"
                     elif "기자단" in category or "기자단" in title:
                         campaign_type = "reporter"

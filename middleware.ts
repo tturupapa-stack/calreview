@@ -1,14 +1,28 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+function getSupabaseEnv() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !anonKey) {
+    throw new Error(
+      'Missing Supabase environment variables. Please check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.'
+    );
+  }
+
+  return { url, anonKey };
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
 
+  const { url, anonKey } = getSupabaseEnv();
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    anonKey,
     {
       cookies: {
         get(name: string) {
@@ -52,10 +66,7 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // 세션 새로고침
-  await supabase.auth.getUser();
-
-  // 보호된 라우트 체크
+  // 세션 새로고침 및 보호된 라우트 체크
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -72,7 +83,12 @@ export async function middleware(request: NextRequest) {
 
   // 로그인 페이지는 누구나 접근 가능 (리다이렉트 제거)
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/search", request.url));
+  }
+
+  // 루트 페이지 접속 시 로그인된 유저는 /search로 리다이렉트
+  if (request.nextUrl.pathname === "/" && user) {
+    return NextResponse.redirect(new URL("/search", request.url));
   }
 
   return supabaseResponse;

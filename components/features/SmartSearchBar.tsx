@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { parseSearchQuery } from "@/lib/search-parser";
+import { DEADLINE_DISPLAY_MAP, TYPE_DISPLAY_MAP } from "@/constants/mappings";
 
 interface SmartSearchBarProps {
   onSearch: (query: string) => void;
@@ -23,23 +24,10 @@ export function SmartSearchBar({ onSearch, initialQuery = "" }: SmartSearchBarPr
       if (parsed.region) info.push(`지역: ${parsed.region}`);
       if (parsed.category) info.push(`카테고리: ${parsed.category}`);
       if (parsed.deadline) {
-        const deadlineMap: Record<string, string> = {
-          deadline: "마감임박",
-          this_week: "이번주",
-          next_week: "다음주",
-          this_month: "이번달",
-          today: "오늘",
-          tomorrow: "내일",
-        };
-        info.push(`마감일: ${deadlineMap[parsed.deadline] || parsed.deadline}`);
+        info.push(`마감일: ${DEADLINE_DISPLAY_MAP[parsed.deadline] || parsed.deadline}`);
       }
       if (parsed.type) {
-        const typeMap: Record<string, string> = {
-          visit: "방문형",
-          delivery: "배송형",
-          reporter: "기자단",
-        };
-        info.push(`유형: ${typeMap[parsed.type] || parsed.type}`);
+        info.push(`유형: ${TYPE_DISPLAY_MAP[parsed.type] || parsed.type}`);
       }
       if (parsed.channel) info.push(`채널: ${parsed.channel}`);
       setParsedInfo(info);

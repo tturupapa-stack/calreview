@@ -1,10 +1,10 @@
-# 🎨 캘리뷰 디자인 시스템 (Calreview Design System)
+# 🎨 Cally 디자인 시스템 (Cally Design System)
 
-이 문서는 캘리뷰 프로젝트의 UI/UX 일관성을 유지하기 위한 디자인 가이드라인입니다.
+이 문서는 Cally 프로젝트의 UI/UX 일관성을 유지하기 위한 디자인 가이드라인입니다.
 
 ## 1. 타이포그래피 (Typography)
 
-캘리뷰는 가독성과 심미성을 위해 다음 두 가지 폰트를 사용합니다.
+Cally는 가독성과 심미성을 위해 다음 두 가지 폰트를 사용합니다.
 
 - **Main Font**: `Pretendard`
   - 한국어 가독성에 최적화된 본문용 폰트입니다.
@@ -14,7 +14,7 @@
 
 ```tsx
 // 사용 예시
-<h1 className="font-heading text-4xl font-bold">Calreview</h1>
+<h1 className="font-heading text-4xl font-bold">Cally</h1>
 <p className="font-sans text-base">체험단 리뷰 관리의 새로운 기준</p>
 ```
 

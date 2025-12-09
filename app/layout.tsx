@@ -15,8 +15,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "캘리뷰 - 체험단 통합 검색",
-  description: "여러 체험단 사이트를 한 곳에서 검색하고, 당첨 시 구글 캘린더에 자동으로 일정을 등록해주는 서비스",
+  title: "Cally - 체험단 통합 검색",
+  description: "여러 체험단 사이트를 한 곳에서 검색하고, 당첨 시 구글 캘린더에 자동으로 일정을 등록해주는 Cally 서비스",
 };
 
 export default function RootLayout({

@@ -4,7 +4,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-center md:text-left">
-            <h3 className="font-heading font-bold text-lg text-primary">Calreview</h3>
+            <h3 className="font-heading font-bold text-lg text-primary">Cally</h3>
             <p className="text-sm text-gray-500 mt-1">
               Find the perfect campaign for your influence.
             </p>
@@ -16,7 +16,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-border/40 mt-8 pt-8 text-center text-xs text-gray-400">
-          © 2024 Calreview. All rights reserved.
+          © 2024 Cally. All rights reserved.
         </div>
       </div>
     </footer>
