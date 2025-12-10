@@ -1,11 +1,12 @@
 import importlib
 import json
 import os
+import argparse
 from datetime import datetime, timezone
 from typing import Dict, List
 
 from crawler.models import Campaign
-from crawler.utils import logger, save_campaigns_to_supabase
+from crawler.utils import logger, save_campaigns_to_supabase, get_existing_source_ids
 
 # 크롤링할 사이트 모듈 목록
 # 레뷰(revu)는 목록 열람 시 로그인이 필요하므로 현재는 제외
@@ -100,13 +101,27 @@ def cleanup_expired_campaigns() -> None:
         logger.warning("마감 캠페인 정리 중 오류 (무시하고 계속): %s", e)
 
 
-def main(save_json: bool = True) -> None:
-    """전체 크롤러 실행.
+def main(save_json: bool = True, mode: str = "auto") -> None:
+    """
+    전체 크롤러 실행.
 
-    각 사이트 크롤링 결과를 모아 필요 시 JSON 파일로 저장한다.
+    `mode` 옵션:
+    - "auto": campaigns 테이블이 비어있으면 "full", 아니면 "incremental"
+    - "full": 모든 페이지를 크롤링
+    - "incremental": 이미 Supabase에 존재하는 캠페인은 건너뜀
     """
 
-    logger.info("=== 전체 크롤링 시작 ===")
+    # auto 모드: campaigns 테이블 상태에 따라 자동 결정
+    if mode == "auto":
+        existing_ids = get_existing_source_ids()
+        if len(existing_ids) == 0:
+            mode = "full"
+            logger.info("campaigns 테이블이 비어있음 -> full 모드로 실행")
+        else:
+            mode = "incremental"
+            logger.info("campaigns 테이블에 %d개 캠페인 존재 -> incremental 모드로 실행", len(existing_ids))
+
+    logger.info("=== 전체 크롤링 시작 (mode=%s) ===", mode)
     
     # 마감된 캠페인 정리
     cleanup_expired_campaigns()
@@ -118,6 +133,13 @@ def main(save_json: bool = True) -> None:
         all_campaigns.extend(campaigns)
 
     logger.info("전체 사이트 합계: %d개 캠페인 수집", len(all_campaigns))
+
+    # 차등 크롤링: 기존 ID와 겹치는 캠페인 제거
+    if mode == "incremental":
+        existing_ids = get_existing_source_ids()
+        before = len(all_campaigns)
+        all_campaigns = [c for c in all_campaigns if (c.site_name, _campaign_to_supabase_dict(c)["source_id"]) not in existing_ids]
+        logger.info("차등 필터링: %d -> %d (새로운 캠페인 %d개)", before, len(all_campaigns), len(all_campaigns))
 
     # Supabase에 저장
     if all_campaigns:
@@ -149,5 +171,8 @@ def main(save_json: bool = True) -> None:
 
 
 if __name__ == "__main__":
-    main()
-
+    parser = argparse.ArgumentParser(description="Run crawler")
+    parser.add_argument("--mode", choices=["auto", "full", "incremental"], default="auto",
+                        help="auto: auto-detect (full if empty, incremental if not); full: crawl all pages; incremental: skip already stored campaigns")
+    args = parser.parse_args()
+    main(save_json=True, mode=args.mode)
