@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import Dict, List
 
 from crawler.models import Campaign
-from crawler.utils import logger, save_campaigns_to_supabase, get_existing_source_ids
+from crawler.utils import logger, save_campaigns_to_supabase, get_existing_source_ids, _campaign_to_supabase_dict
 
 # 크롤링할 사이트 모듈 목록
 # 레뷰(revu)는 목록 열람 시 로그인이 필요하므로 현재는 제외
