@@ -38,8 +38,8 @@ def normalize_category(site_name: str, raw_category: Optional[str], title: str) 
     # 3. 타이틀 기반 세부 키워드 매핑 (Raw Category가 '제품'='배송' 등으로 뭉뚱그려져 있을 때를 대비해 상위로 이동)
     # 방문형, 기자단, 또는 카테고리가 없는 경우 타이틀 키워드로 추론
     
-    # 뷰티 키워드 (+ 스파, 마사지)
-    beauty_keywords = ["헤어", "네일", "속눈썹", "에스테틱", "왁싱", "피부", "미용실", "뷰티", "펌", "염색", "스파", "마사지", "피부관리"]
+    # 뷰티 키워드 (+ 스파, 마사지, 메이크업)
+    beauty_keywords = ["헤어", "네일", "속눈썹", "에스테틱", "왁싱", "피부", "미용실", "뷰티", "펌", "염색", "스파", "마사지", "피부관리", "메이크업", "눈썹", "모발"]
     if any(k in title_norm for k in beauty_keywords):
         return "뷰티"
         
@@ -79,10 +79,24 @@ def normalize_category(site_name: str, raw_category: Optional[str], title: str) 
         return "반려동물"
     if "재택" in title_norm:
         return "재택"
+    
+    # 가구/인테리어 키워드 (생활)
+    if any(k in title_norm for k in ["가구", "소파", "침대", "매트리스", "식탁", "의자", "책상", "인테리어", "조명", "이불"]):
+        return "생활"
+        
+    # 주방용품/텀블러 (생활)
+    if any(k in title_norm for k in ["텀블러", "보틀", "컵", "주방", "식기", "냄비", "후라이팬"]):
+        return "생활"
 
     # 생활/여가 키워드
     life_keywords = ["운동", "pt", "필라테스", "요가", "헬스", "클래스", "청소", "이사", "생활", "바레", "유도", "태권도", "주짓수", "댄스", "무용", "짐", "체육관", "골프", "누수", "마사지", "네일", "왁싱"]
     if any(k in title_norm for k in life_keywords):
+        return "생활"
+
+    # [기자단] 예외 처리: 상위 특정 키워드(뷰티, 여행 등)에 걸리지 않았는데 '기자단'이면
+    # '맛집-기자단'인지 '기타-기자단'인지 애매하므로, 포괄적인 '생활'로 분류하여 '맛집' 쏠림 방지
+    # (단, 식당 이름만 있는 경우 생활로 빠질 수 있으나, 가구/제품 등이 맛집으로 가는 것보다는 나음)
+    if "기자단" in title_norm:
         return "생활"
 
     # 4. 일반/광범위 Raw 카테고리 매핑 (타이틀에서 특정하지 못한 경우)

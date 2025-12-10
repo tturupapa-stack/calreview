@@ -125,29 +125,33 @@ def _campaign_to_supabase_dict(campaign: Campaign) -> dict:
     std_region = normalize_region(campaign.location)
 
     # type 필드 매핑
+    campaign_type = None
+    # 0. 기자단 키워드 (최우선 - 크롤러가 방문형으로 잘못 분류한 경우 수정)
+    if "기자단" in campaign.title:
+        campaign_type = "reporter"
     # 1. 강력한 카테고리 기반 강제 (크롤러가 잘못 지정한 경우 수정)
-    if std_category in ["디지털", "식품", "도서", "유아동", "패션", "반려동물", "배송", "재택"]:
+    elif std_category in ["디지털", "식품", "도서", "유아동", "패션", "반려동물", "배송", "재택"]:
+        campaign_type = "delivery"
+    # 1.5 지역 기반 강력 강제 (전국/배송/재택 등은 무조건 배송형)
+    elif std_region in ["배송", "재택", "전국"] or campaign.location in ["배송", "재택", "전국"]:
         campaign_type = "delivery"
     # 2. 크롤러가 지정한 타입이 있으면 우선 사용
     elif campaign.type:
         campaign_type = campaign.type
     # 3. 타입이 없는 경우 추론
     else:
-        # 지역명 기반 추론
-        if std_region in ["배송", "재택"] or campaign.location in ["배송", "재택"]:
+        # 지역명 기반 추론 ('전국'도 배송형으로 간주)
+        if std_region in ["배송", "재택", "전국"] or campaign.location in ["배송", "재택", "전국"]:
             campaign_type = "delivery"
         # 생활 카테고리는 지역 유무로 판단
         elif std_category == "생활":
-            if not std_region or std_region in ["배송", "재택"]:
+            if not std_region or std_region in ["배송", "재택", "전국"]:
                 campaign_type = "delivery"
             else:
                 campaign_type = "visit"
         # 나머지 방문형 카테고리
         elif std_category in ["맛집", "뷰티", "여행", "문화"]:
             campaign_type = "visit"
-        # 기자단 키워드
-        elif "기자단" in campaign.title:
-            campaign_type = "reporter"
         else:
             campaign_type = None
     
@@ -218,3 +222,18 @@ def save_campaigns_to_supabase(campaigns: Sequence[Campaign]) -> None:
         raise
 
 
+
+def get_existing_source_ids() -> set:
+    """Return a set of (source, source_id) tuples already stored in Supabase.
+    Used for incremental crawling to skip duplicates.
+    """
+    client = get_supabase_client()
+    if client is None:
+        return set()
+    try:
+        res = client.table("campaigns").select("source,source_id").execute()
+        data = res.data or []
+        return {(item["source"], item["source_id"]) for item in data}
+    except Exception as e:
+        logger.error(f"Failed to fetch existing source IDs: {e}")
+        return set()

@@ -162,33 +162,40 @@ def _parse_card(card, fixed_type: str, fixed_category: str) -> Campaign | None:
         return None
 
 
-def _crawl_category(ct1: str, ct2: str | None, c_type: str, c_cat: str) -> List[Campaign]:
+def _crawl_category(ct1: str, ct2: str | None, c_type: str, c_cat: str, max_pages: int = 3) -> List[Campaign]:
     """특정 카테고리 페이지 크롤링"""
-    url = f"{BASE_URL}/pr/"
-    params = {"ct1": ct1}
-    if ct2:
-        params["ct2"] = ct2
-        
     campaigns = []
-    try:
-        res = requests.get(url, params=params, headers={
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }, timeout=10)
-        res.raise_for_status()
-        
-        soup = BeautifulSoup(res.text, "html.parser")
-        cards = soup.select("#cmp_list div.item")
-        
-        logger.info(f"[리뷰플레이스] {c_cat} ({ct1}/{ct2}) - {len(cards)}개 발견")
-        
-        for card in cards:
-            c = _parse_card(card, c_type, c_cat)
-            if c:
-                campaigns.append(c)
-                
-    except Exception as e:
-        logger.error(f"[리뷰플레이스] 요청 실패 ({ct1}, {ct2}): {e}")
-        
+    
+    for page in range(1, max_pages + 1):
+        url = f"{BASE_URL}/pr/"
+        params = {"ct1": ct1, "page": page}
+        if ct2:
+            params["ct2"] = ct2
+            
+        try:
+            res = requests.get(url, params=params, headers={
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }, timeout=10)
+            res.raise_for_status()
+            
+            soup = BeautifulSoup(res.text, "html.parser")
+            cards = soup.select("#cmp_list div.item")
+            
+            if not cards:
+                logger.debug(f"[리뷰플레이스] {c_cat} Page:{page} - 게시물 없음")
+                break
+            
+            logger.info(f"[리뷰플레이스] {c_cat} ({ct1}/{ct2}) Page:{page} - {len(cards)}개 발견")
+            
+            for card in cards:
+                c = _parse_card(card, c_type, c_cat)
+                if c:
+                    campaigns.append(c)
+                    
+        except Exception as e:
+            logger.error(f"[리뷰플레이스] 요청 실패 ({ct1}, {ct2}) Page {page}: {e}")
+            break
+            
     return campaigns
 
 

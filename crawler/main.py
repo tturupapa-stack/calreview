@@ -2,6 +2,7 @@ import importlib
 import json
 import os
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from typing import Dict, List
 
@@ -141,6 +142,9 @@ def main(save_json: bool = True, mode: str = "auto") -> None:
         all_campaigns = [c for c in all_campaigns if (c.site_name, _campaign_to_supabase_dict(c)["source_id"]) not in existing_ids]
         logger.info("차등 필터링: %d -> %d (새로운 캠페인 %d개)", before, len(all_campaigns), len(all_campaigns))
 
+    # 배치 처리: 리뷰 기간이 없는 캠페인들의 상세 페이지 크롤링
+    all_campaigns = enrich_review_deadlines_batch(all_campaigns, max_workers=5)
+
     # Supabase에 저장
     if all_campaigns:
         try:
@@ -168,6 +172,80 @@ def main(save_json: bool = True, mode: str = "auto") -> None:
         logger.info("크롤링 결과 JSON 저장 완료: %s", output_path)
 
     logger.info("=== 전체 크롤링 종료 ===")
+
+
+def enrich_review_deadlines_batch(campaigns: List[Campaign], max_workers: int = 5) -> List[Campaign]:
+    """리뷰 기간이 없는 캠페인들의 상세 페이지를 배치로 크롤링하여 리뷰 기간 정보를 추가.
+    
+    Args:
+        campaigns: 리뷰 기간 정보를 추가할 캠페인 리스트
+        max_workers: 병렬 처리할 최대 워커 수
+    
+    Returns:
+        리뷰 기간 정보가 추가된 캠페인 리스트
+    """
+    from crawler.utils_detail import extract_detail_info
+    
+    # 리뷰 기간이 없는 캠페인만 필터링
+    campaigns_to_enrich = [c for c in campaigns if c.review_deadline_days is None]
+    
+    if not campaigns_to_enrich:
+        logger.info("리뷰 기간 정보가 필요한 캠페인이 없습니다.")
+        return campaigns
+    
+    logger.info("리뷰 기간 정보 추가를 위해 %d개 캠페인의 상세 페이지 크롤링 시작...", len(campaigns_to_enrich))
+    
+    def enrich_single_campaign(campaign: Campaign) -> tuple[Campaign, bool]:
+        """단일 캠페인의 리뷰 기간 정보를 추가."""
+        try:
+            info = extract_detail_info(campaign.url, campaign.site_name)
+            review_deadline_days = info.get("review_deadline_days")
+            
+            if review_deadline_days:
+                # Campaign 객체는 불변(immutable)이므로 새 객체 생성
+                return Campaign(
+                    title=campaign.title,
+                    url=campaign.url,
+                    site_name=campaign.site_name,
+                    category=campaign.category,
+                    deadline=campaign.deadline,
+                    location=campaign.location,
+                    image_url=campaign.image_url,
+                    channel=campaign.channel,
+                    type=campaign.type,
+                    review_deadline_days=review_deadline_days,
+                ), True
+            else:
+                return campaign, False
+        except Exception as e:
+            logger.warning("[%s] 리뷰 기간 정보 추가 실패: %s (URL: %s)", campaign.site_name, e, campaign.url)
+            return campaign, False
+    
+    # 캠페인을 URL로 인덱싱하여 빠른 조회 가능하도록
+    campaign_dict = {c.url: c for c in campaigns}
+    enriched_count = 0
+    
+    # 병렬 처리로 상세 페이지 크롤링
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_campaign = {
+            executor.submit(enrich_single_campaign, c): c 
+            for c in campaigns_to_enrich
+        }
+        
+        for future in as_completed(future_to_campaign):
+            campaign = future_to_campaign[future]
+            try:
+                enriched_campaign, success = future.result()
+                campaign_dict[enriched_campaign.url] = enriched_campaign
+                if success:
+                    enriched_count += 1
+            except Exception as e:
+                logger.warning("[%s] 리뷰 기간 정보 추가 중 예외 발생: %s", campaign.site_name, e)
+    
+    logger.info("리뷰 기간 정보 추가 완료: %d/%d개 성공", enriched_count, len(campaigns_to_enrich))
+    
+    # 원래 순서 유지하면서 업데이트된 캠페인 반환
+    return [campaign_dict.get(c.url, c) for c in campaigns]
 
 
 if __name__ == "__main__":

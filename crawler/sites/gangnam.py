@@ -155,32 +155,39 @@ def _parse_card(card, fixed_type: str, fixed_category: str) -> Campaign | None:
         return None
 
 
-def _crawl_category(cat_id: int, c_type: str, c_cat: str) -> List[Campaign]:
+def _crawl_category(cat_id: int, c_type: str, c_cat: str, max_pages: int = 3) -> List[Campaign]:
     """특정 카테고리 ID 크롤링"""
-    # 강남맛집은 ?ca=ID 파라미터 사용
-    url = f"{BASE_URL}/cp/?ca={cat_id}"
     campaigns = []
     
-    try:
-        res = requests.get(url, headers={
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }, timeout=10)
-        res.raise_for_status()
+    for page in range(1, max_pages + 1):
+        # 강남맛집은 ?ca=ID&page=N 파라미터 사용
+        url = f"{BASE_URL}/cp/?ca={cat_id}&page={page}"
         
-        soup = BeautifulSoup(res.text, "html.parser")
-        # 리스트 아이템 선택자
-        cards = soup.select("li.list_item")
-        
-        logger.info("[강남맛집] %s (%s) - %d개 발견", c_cat, c_type, len(cards))
-        
-        for card in cards:
-            c = _parse_card(card, c_type, c_cat)
-            if c:
-                campaigns.append(c)
-                
-    except Exception as e:
-        logger.error(f"[강남맛집] 카테고리 {cat_id} 크롤링 실패: {e}")
-        
+        try:
+            res = requests.get(url, headers={
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }, timeout=10)
+            res.raise_for_status()
+            
+            soup = BeautifulSoup(res.text, "html.parser")
+            # 리스트 아이템 선택자
+            cards = soup.select("li.list_item")
+            
+            if not cards:
+                logger.debug(f"[강남맛집] {c_cat} ID:{cat_id} Page:{page} - 게시물 없음")
+                break
+            
+            logger.info(f"[강남맛집] {c_cat} ({c_type}) Page:{page} - {len(cards)}개 발견")
+            
+            for card in cards:
+                c = _parse_card(card, c_type, c_cat)
+                if c:
+                    campaigns.append(c)
+                    
+        except Exception as e:
+            logger.error(f"[강남맛집] 카테고리 {cat_id} Page {page} 크롤링 실패: {e}")
+            break
+            
     return campaigns
 
 

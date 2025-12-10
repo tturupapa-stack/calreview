@@ -180,13 +180,8 @@ def _parse_campaign_element(card) -> Campaign | None:
             image_url = None
             logger.warning("디너의여왕 이미지 URL 추출 실패: url=%s", url)
 
-        # 리뷰 기간 추출
-        try:
-            from crawler.utils_detail import extract_detail_info
-            info = extract_detail_info(url, "dinnerqueen")
-            review_deadline_days = info.get("review_deadline_days")
-        except Exception:
-            review_deadline_days = None
+        # 리뷰 기간 추출 (배치 처리로 이동 - 여기서는 None으로 설정)
+        review_deadline_days = None
         
         if category == "배송" or (category and "제품" in category):
              location = "배송"

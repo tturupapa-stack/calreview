@@ -124,31 +124,38 @@ def _parse_card(card, fixed_type: str, fixed_category: str) -> Campaign | None:
         logger.error(f"파블로 파싱 에러: {e}")
         return None
 
-def _crawl_category(cat_id: str, c_type: str, c_cat: str) -> List[Campaign]:
+def _crawl_category(cat_id: str, c_type: str, c_cat: str, max_pages: int = 3) -> List[Campaign]:
     campaigns = []
-    # url pattern: review_campaign_list.php?category_id=...
+    # url pattern: review_campaign_list.php?category_id=...&page=...
     url = f"{BASE_URL}/review_campaign_list.php"
-    params = {"category_id": cat_id}
     
-    try:
-        res = requests.get(url, params=params, headers={
-             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }, timeout=10)
-        res.raise_for_status()
+    for page in range(1, max_pages + 1):
+        params = {"category_id": cat_id, "page": page}
         
-        soup = BeautifulSoup(res.text, "html.parser")
-        cards = soup.select(".box")
-        
-        logger.info(f"[파블로] {c_cat} ({cat_id}) - {len(cards)}개 발견")
-        
-        for card in cards:
-            c = _parse_card(card, c_type, c_cat)
-            if c:
-                campaigns.append(c)
-                
-    except Exception as e:
-        logger.error(f"[파블로] 요청 실패 ({cat_id}): {e}")
-        
+        try:
+            res = requests.get(url, params=params, headers={
+                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }, timeout=10)
+            res.raise_for_status()
+            
+            soup = BeautifulSoup(res.text, "html.parser")
+            cards = soup.select(".box")
+            
+            if not cards:
+                logger.debug(f"[파블로] {c_cat} Page:{page} - 게시물 없음")
+                break
+            
+            logger.info(f"[파블로] {c_cat} ({cat_id}) Page:{page} - {len(cards)}개 발견")
+            
+            for card in cards:
+                c = _parse_card(card, c_type, c_cat)
+                if c:
+                    campaigns.append(c)
+                    
+        except Exception as e:
+            logger.error(f"[파블로] 요청 실패 ({cat_id}) Page {page}: {e}")
+            break
+            
     return campaigns
 
 def crawl() -> List[Campaign]:
