@@ -91,10 +91,16 @@ function LoginButton({ provider, disabled = false }: { provider: "google" | "nav
     }
 
     // 구글 로그인은 Supabase OAuth 사용
+    // 현재 origin을 사용 (프로덕션/개발 환경 모두 자동 감지)
+    const redirectUrl = `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: provider as Provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: redirectUrl,
+        queryParams: {
+          // Supabase가 Site URL 대신 이 redirectTo를 사용하도록 강제
+          redirect_to: redirectUrl,
+        },
       },
     });
 

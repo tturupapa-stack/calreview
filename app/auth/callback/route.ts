@@ -44,6 +44,8 @@ export async function GET(request: NextRequest) {
   }
 
   // 로그인 성공 후 메인 페이지로 리다이렉트
-  return NextResponse.redirect(new URL("/", requestUrl.origin));
+  // 현재 요청의 origin을 사용 (프로덕션/개발 환경 모두 지원)
+  const redirectUrl = new URL("/", requestUrl.origin);
+  return NextResponse.redirect(redirectUrl);
 }
 
