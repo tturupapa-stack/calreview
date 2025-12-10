@@ -148,15 +148,13 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         onClick={!hasValidUrl ? (e) => e.preventDefault() : undefined}
       >
         {/* 이미지 */}
-        <div className="relative w-full h-48 bg-gray-200">
+        <div className="relative w-full h-48 bg-gray-200 overflow-hidden">
           {imageUrl && !imageError ? (
-            <Image
+            <img
               src={imageUrl}
               alt={campaign.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              unoptimized
+              className="w-full h-full object-cover"
+              loading="lazy"
               onError={() => {
                 console.error("이미지 로드 실패:", imageUrl);
                 setImageError(true);
