@@ -33,6 +33,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
+  const [imageError, setImageError] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -148,7 +149,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
       >
         {/* 이미지 */}
         <div className="relative w-full h-48 bg-gray-200">
-          {imageUrl ? (
+          {imageUrl && !imageError ? (
             <Image
               src={imageUrl}
               alt={campaign.title}
@@ -156,6 +157,10 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
               className="object-cover"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               unoptimized
+              onError={() => {
+                console.error("이미지 로드 실패:", imageUrl);
+                setImageError(true);
+              }}
             />
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground">
