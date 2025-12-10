@@ -1,6 +1,6 @@
 # 캘리뷰 개발 진행 상황
 
-> 최종 업데이트: 2025-12-08 (디자인 리뉴얼 & 상세 지역 필터 구현)
+> 최종 업데이트: 2025-12-19 (프로덕션 배포 완료 & 보안 업데이트)
 
 ## 📊 전체 진행률
 
@@ -12,9 +12,9 @@
 - **Phase 5**: 신청/당첨 관리 ⏸️ 0%
 - **Phase 6**: 프리미엄 기능 ⏸️ 0%
 - **Phase 7**: 테스트 & QA ⏸️ 0%
-- **Phase 8**: 배포 & 런칭 ⏸️ 0%
+- **Phase 8**: 배포 & 런칭 ✅ 100%
 
-**전체 진행률**: 약 45%
+**전체 진행률**: 약 50%
 
 ---
 
@@ -89,6 +89,18 @@
 - [x] **페이지 디자인 리뉴얼**
   - [x] 랜딩 페이지 (`/`): 히어로 섹션, 그라디언트 배경, 기능 소개 그리드 디자인 
 
+### Phase 8: 배포 & 런칭 (완료)
+- [x] **프로덕션 배포 완료**
+  - [x] Vercel 프로덕션 환경 설정
+  - [x] 환경 변수 설정 (Supabase, OAuth, Google Calendar)
+  - [x] Next.js 이미지 도메인 설정 (phinf.pstatic.net 추가)
+  - [x] 프로덕션 빌드 및 배포 성공
+- [x] **보안 업데이트**
+  - [x] Next.js 16.0.6 → 16.0.7 (CVE-2025-66478 패치)
+  - [x] eslint-config-next 업데이트
+- [x] **배포 URL**
+  - 프로덕션: https://calreview-kq7ob9xia-tturupapas-projects.vercel.app
+
 ---
 
 ## 📝 주요 파일 구조
@@ -126,12 +138,13 @@
 
 ## 🔧 기술 스택 현황
 
-- ✅ Next.js 14 (App Router)
-- ✅ Tailwind CSS
+- ✅ Next.js 16.0.7 (App Router, 보안 패치 적용)
+- ✅ Tailwind CSS v4
 - ✅ TypeScript
 - ✅ Supabase (Auth, PostgreSQL)
 - ✅ Python (BeautifulSoup, requests)
 - ✅ GitHub Actions
+- ✅ Vercel (프로덕션 배포)
 - ⏸️ Google Calendar API (Phase 6)
 - ⏸️ 토스페이먼츠 (Phase 6)
 - ⏸️ Resend (Phase 6)
@@ -154,11 +167,23 @@
      - ⏸️ 자연어 검색 입력 UI 구현 필요
      - ⏸️ 자주 찾는 태그 컴포넌트 구현 필요
 
+3. **프로덕션 모니터링** (Phase 8 후속 작업)
+   - 프로덕션 환경 안정성 확인
+   - 성능 모니터링 및 최적화
+   - 사용자 피드백 수집
+
 ---
 
 ## 🐛 알려진 이슈
 
 - 없음
+
+## 🚀 배포 정보
+
+- **프로덕션 URL**: https://calreview-kq7ob9xia-tturupapas-projects.vercel.app
+- **배포 플랫폼**: Vercel
+- **빌드 상태**: ✅ 성공
+- **보안 상태**: ✅ 최신 패치 적용 (Next.js 16.0.7)
 
 ---
 
