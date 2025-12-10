@@ -124,8 +124,9 @@ def _parse_card(card, fixed_type: str, fixed_category: str) -> Campaign | None:
         logger.error(f"파블로 파싱 에러: {e}")
         return None
 
-def _crawl_category(cat_id: str, c_type: str, c_cat: str, max_pages: int = 3) -> List[Campaign]:
+def _crawl_category(cat_id: str, c_type: str, c_cat: str, max_pages: int = 20) -> List[Campaign]:
     campaigns = []
+    empty_page_count = 0  # 연속 빈 페이지 카운트
     # url pattern: review_campaign_list.php?category_id=...&page=...
     url = f"{BASE_URL}/review_campaign_list.php"
     
@@ -142,8 +143,13 @@ def _crawl_category(cat_id: str, c_type: str, c_cat: str, max_pages: int = 3) ->
             cards = soup.select(".box")
             
             if not cards:
-                logger.debug(f"[파블로] {c_cat} Page:{page} - 게시물 없음")
-                break
+                empty_page_count += 1
+                if empty_page_count >= 2:  # 연속 2페이지가 비어있으면 종료
+                    logger.debug(f"[파블로] {c_cat} - 연속 빈 페이지로 크롤링 종료 (page {page})")
+                    break
+                continue
+            else:
+                empty_page_count = 0  # 게시물이 있으면 카운트 리셋
             
             logger.info(f"[파블로] {c_cat} ({cat_id}) Page:{page} - {len(cards)}개 발견")
             
@@ -154,7 +160,9 @@ def _crawl_category(cat_id: str, c_type: str, c_cat: str, max_pages: int = 3) ->
                     
         except Exception as e:
             logger.error(f"[파블로] 요청 실패 ({cat_id}) Page {page}: {e}")
-            break
+            empty_page_count += 1
+            if empty_page_count >= 2:
+                break
             
     return campaigns
 

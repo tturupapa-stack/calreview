@@ -162,9 +162,10 @@ def _parse_card(card, fixed_type: str, fixed_category: str) -> Campaign | None:
         return None
 
 
-def _crawl_category(ct1: str, ct2: str | None, c_type: str, c_cat: str, max_pages: int = 3) -> List[Campaign]:
+def _crawl_category(ct1: str, ct2: str | None, c_type: str, c_cat: str, max_pages: int = 20) -> List[Campaign]:
     """특정 카테고리 페이지 크롤링"""
     campaigns = []
+    empty_page_count = 0  # 연속 빈 페이지 카운트
     
     for page in range(1, max_pages + 1):
         url = f"{BASE_URL}/pr/"
@@ -182,8 +183,13 @@ def _crawl_category(ct1: str, ct2: str | None, c_type: str, c_cat: str, max_page
             cards = soup.select("#cmp_list div.item")
             
             if not cards:
-                logger.debug(f"[리뷰플레이스] {c_cat} Page:{page} - 게시물 없음")
-                break
+                empty_page_count += 1
+                if empty_page_count >= 2:  # 연속 2페이지가 비어있으면 종료
+                    logger.debug(f"[리뷰플레이스] {c_cat} - 연속 빈 페이지로 크롤링 종료 (page {page})")
+                    break
+                continue
+            else:
+                empty_page_count = 0  # 게시물이 있으면 카운트 리셋
             
             logger.info(f"[리뷰플레이스] {c_cat} ({ct1}/{ct2}) Page:{page} - {len(cards)}개 발견")
             
@@ -194,7 +200,9 @@ def _crawl_category(ct1: str, ct2: str | None, c_type: str, c_cat: str, max_page
                     
         except Exception as e:
             logger.error(f"[리뷰플레이스] 요청 실패 ({ct1}, {ct2}) Page {page}: {e}")
-            break
+            empty_page_count += 1
+            if empty_page_count >= 2:
+                break
             
     return campaigns
 

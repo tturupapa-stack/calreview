@@ -202,11 +202,12 @@ def _parse_campaign_element(card) -> Campaign | None:
         return None
 
 
-def crawl(max_pages: int = 5) -> List[Campaign]:
+def crawl(max_pages: int = 20) -> List[Campaign]:
     """디너의여왕 크롤링 로직."""
 
     logger.info("디너의여왕 크롤링 시작")
     campaigns: list[Campaign] = []
+    empty_page_count = 0  # 연속 빈 페이지 카운트
 
     for page in range(1, max_pages + 1):
         try:
@@ -222,6 +223,15 @@ def crawl(max_pages: int = 5) -> List[Campaign]:
             cards = soup.select("#taste_list div.qz-dq-card, div.qz-dq-card")
             logger.info("디너의여왕 %s 에서 %d개 카드 발견", url, len(cards))
 
+            if not cards:
+                empty_page_count += 1
+                if empty_page_count >= 2:  # 연속 2페이지가 비어있으면 종료
+                    logger.info("디너의여왕: 연속 빈 페이지로 크롤링 종료 (page %d)", page)
+                    break
+                continue
+            else:
+                empty_page_count = 0  # 게시물이 있으면 카운트 리셋
+
             for card in cards:
                 campaign = _parse_campaign_element(card)
                 if campaign:
@@ -233,7 +243,9 @@ def crawl(max_pages: int = 5) -> List[Campaign]:
                         logger.debug("디너의여왕 카드 파싱 실패: href=%s", link_el.get("href"))
         except Exception as e:  # pragma: no cover
             logger.error("디너의여왕 페이지 %d 크롤링 중 오류: %s", page, e)
-            break
+            empty_page_count += 1
+            if empty_page_count >= 2:
+                break
 
     logger.info("디너의여왕 총 %d개 캠페인 수집", len(campaigns))
     logger.info("디너의여왕 크롤링 완료")
