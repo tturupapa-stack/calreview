@@ -3,7 +3,6 @@
 import { ChannelIcon } from "@/components/ui/ChannelIcon";
 import { SiteLogo } from "@/components/ui/SiteLogo";
 
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
