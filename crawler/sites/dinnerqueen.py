@@ -138,17 +138,47 @@ def _parse_campaign_element(card) -> Campaign | None:
         channel = "/".join(channel_list) if channel_list else "블로그"
 
         # 메인 이미지: 카드 상단 이미지 태그
-        img_el = card.select_one(".qz-dq-card__link__img img")
-        src = img_el.get("src") if img_el else None
+        # 여러 셀렉터 패턴 시도 (HTML 구조 변경 대응)
+        img_el = None
+        possible_selectors = [
+            ".qz-dq-card__link__img img",
+            "a.qz-dq-card__link img",
+            ".qz-dq-card img",
+            "img[src]",
+        ]
+        
+        for selector in possible_selectors:
+            img_el = card.select_one(selector)
+            if img_el:
+                break
+        
+        src = None
+        if img_el:
+            # src 속성 먼저 확인
+            src = img_el.get("src")
+            # lazy loading 이미지인 경우 data-src 확인
+            if not src or src.startswith("data:"):
+                src = img_el.get("data-src") or img_el.get("data-lazy-src")
+            # srcset에서도 추출 시도
+            if not src:
+                srcset = img_el.get("srcset")
+                if srcset:
+                    # srcset="url1 1x, url2 2x" 형태에서 첫 번째 URL 추출
+                    src = srcset.split(",")[0].strip().split()[0]
+        
         if src:
             if src.startswith("//"):
                 image_url = "https:" + src
             elif src.startswith("/"):
                 image_url = BASE_URL + src
-            else:
+            elif src.startswith("http"):
                 image_url = src
+            else:
+                image_url = BASE_URL + "/" + src
+            logger.debug("디너의여왕 이미지 URL 추출 성공: %s", image_url)
         else:
             image_url = None
+            logger.warning("디너의여왕 이미지 URL 추출 실패: url=%s", url)
 
         # 리뷰 기간 추출
         try:
@@ -177,7 +207,7 @@ def _parse_campaign_element(card) -> Campaign | None:
         return None
 
 
-def crawl(max_pages: int = 1) -> List[Campaign]:
+def crawl(max_pages: int = 5) -> List[Campaign]:
     """디너의여왕 크롤링 로직."""
 
     logger.info("디너의여왕 크롤링 시작")
@@ -185,8 +215,8 @@ def crawl(max_pages: int = 1) -> List[Campaign]:
 
     for page in range(1, max_pages + 1):
         try:
-            # 맛집 전체 목록 페이지 (페이지네이션 구조 확인 전까지 page는 미사용)
-            url = f"{BASE_URL}{LIST_PATH}"
+            # 맛집 전체 목록 페이지
+            url = f"{BASE_URL}{LIST_PATH}&page={page}"
             res = requests.get(url, timeout=10)
             res.raise_for_status()
 

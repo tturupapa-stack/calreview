@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "dinnerqueen.net",
+      },
+      {
+        protocol: "https",
         hostname: "gangnam-review.net",
       },
       {
