@@ -16,7 +16,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-border/40 mt-8 pt-8 text-center text-xs text-gray-400">
-          © 2024 Cally. All rights reserved.
+          © 2025 Cally. All rights reserved.
         </div>
       </div>
     </footer>
