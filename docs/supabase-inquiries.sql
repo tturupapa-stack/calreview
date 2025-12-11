@@ -46,3 +46,6 @@ CREATE POLICY "Users can view own inquiries"
 
 -- 관리자는 모든 문의 조회 가능 (service_role 사용)
 -- 실제 관리자 권한은 애플리케이션 레벨에서 처리
+
+-- 관리자가 문의를 업데이트할 수 있도록 정책 추가 (service_role 사용)
+-- RLS는 애플리케이션 레벨에서 관리자 권한 체크 후 service_role로 접근
