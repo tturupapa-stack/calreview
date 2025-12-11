@@ -11,7 +11,8 @@ export async function GET(request: NextRequest) {
   }
 
   // 로컬 개발 환경과 프로덕션 환경에 따라 redirect_uri 설정
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  // 환경 변수에서 줄바꿈/공백 제거
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").trim().replace(/\n/g, "");
   const redirectUri = `${baseUrl}/api/auth/naver/callback`;
   
   // 네이버 OAuth 인증 URL 생성

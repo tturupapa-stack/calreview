@@ -37,7 +37,8 @@ export async function GET(request: NextRequest) {
   
   try {
     // 1. 네이버 Access Token 발급
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // 환경 변수에서 줄바꿈/공백 제거
+    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").trim().replace(/\n/g, "");
     const redirectUri = `${baseUrl}/api/auth/naver/callback`;
     
     const tokenResponse = await fetch("https://nid.naver.com/oauth2.0/token", {
