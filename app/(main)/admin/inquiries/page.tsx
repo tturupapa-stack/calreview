@@ -69,11 +69,21 @@ export default function AdminInquiriesPage() {
       }
 
       // 관리자 권한 체크 API 호출
-      const response = await fetch("/api/admin/check");
-      const { isAdmin } = await response.json();
+      try {
+        const response = await fetch("/api/admin/check");
+        if (!response.ok) {
+          throw new Error("관리자 권한 체크 실패");
+        }
+        const { isAdmin } = await response.json();
 
-      if (!isAdmin) {
-        toast.error("관리자 권한이 필요합니다");
+        if (!isAdmin) {
+          toast.error("관리자 권한이 필요합니다");
+          router.push("/");
+          return;
+        }
+      } catch (error) {
+        console.error("관리자 권한 체크 오류:", error);
+        toast.error("관리자 권한 확인 중 오류가 발생했습니다");
         router.push("/");
         return;
       }

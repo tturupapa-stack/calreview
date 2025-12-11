@@ -111,6 +111,8 @@ export function ContactForm({ inquiryTypes }: ContactFormProps) {
           throw new Error("파일 업로드 실패: " + uploadError.message);
         }
 
+        // Public URL 생성 (비공개 버킷이므로 signed URL 필요할 수 있음)
+        // 일단 publicUrl을 사용하되, 나중에 signed URL로 변경 가능
         const {
           data: { publicUrl },
         } = supabase.storage.from("inquiries").getPublicUrl(filePath);
