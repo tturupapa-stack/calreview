@@ -24,7 +24,7 @@ Supabase Auth는 Dashboard에 설정된 **Site URL**을 기본값으로 사용�
 
 **Site URL** 필드에 프로덕션 URL 입력:
 ```
-https://calreview-kq7ob9xia-tturupapas-projects.vercel.app
+https://cally.kr
 ```
 
 ### 4. Redirect URLs 추가
@@ -32,7 +32,7 @@ https://calreview-kq7ob9xia-tturupapas-projects.vercel.app
 **Redirect URLs** 섹션에 다음 URL들을 추가:
 
 ```
-https://calreview-kq7ob9xia-tturupapas-projects.vercel.app/auth/callback
+https://cally.kr/auth/callback
 http://localhost:3000/auth/callback
 ```
 
