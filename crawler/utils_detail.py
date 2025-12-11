@@ -232,20 +232,46 @@ def _extract_pavlovu_review_days(soup: BeautifulSoup) -> Optional[int]:
     return _extract_generic_review_days(soup)
 
 def _extract_generic_review_days(soup: BeautifulSoup) -> Optional[int]:
-    """일반적인 리뷰 기간 추출 로직 (텍스트 패턴 매칭)."""
+    """일반적인 리뷰 기간 추출 로직 (텍스트 패턴 매칭).
+    
+    다양한 패턴을 시도:
+    1. "리뷰 기간: 14일" 형식
+    2. 날짜 범위 형식 (YYYY.MM.DD ~ YYYY.MM.DD)
+    3. "리뷰" 키워드 근처의 날짜 범위
+    """
+    from datetime import datetime
+    
     try:
         text = soup.get_text()
-        # 날짜 범위 패턴: YYYY.MM.DD ~ YYYY.MM.DD
-        # "리뷰" 키워드 근처의 날짜 탐색
         
-        # 간단하게 텍스트 전체에서 "리뷰" & "기간"이 있는 줄의 날짜 파싱
+        # 패턴 1: "리뷰 기간: 14일", "리뷰 작성 기간: 7일" 등의 직접적인 일수 표시
+        patterns_days = [
+            r"리뷰\s*기간[:\s]*(\d+)\s*일",
+            r"리뷰\s*작성\s*기간[:\s]*(\d+)\s*일",
+            r"리뷰\s*마감[:\s]*(\d+)\s*일",
+            r"리뷰\s*등록\s*기간[:\s]*(\d+)\s*일",
+            r"(\d+)\s*일\s*이내\s*리뷰",
+            r"리뷰\s*기간[:\s]*(\d+)",
+        ]
+        
+        for pattern in patterns_days:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                days = int(match.group(1))
+                if _validate_review_deadline_days(days):
+                    logger.debug("Generic 리뷰 기간 추출 성공 (일수 패턴): %d일", days)
+                    return days
+        
+        # 패턴 2: 날짜 범위 형식 - "리뷰" 키워드가 있는 줄에서 찾기
         lines = text.split('\n')
-        for line in lines:
-            if "리뷰" in line and "기간" in line:
-                # 12.09 ~ 12.22 또는 2023.12.09 ~ 2023.12.22
-                match = re.search(r"(\d{2,4})\.(\d{1,2})\.(\d{1,2})\s*~\s*(\d{2,4})\.(\d{1,2})\.(\d{1,2})", line)
+        for i, line in enumerate(lines):
+            if "리뷰" in line:
+                # 현재 줄과 앞뒤 2줄까지 확인 (총 5줄)
+                search_text = '\n'.join(lines[max(0, i-2):min(len(lines), i+3)])
+                
+                # YYYY.MM.DD ~ YYYY.MM.DD 형식
+                match = re.search(r"(\d{2,4})\.(\d{1,2})\.(\d{1,2})\s*[~–-]\s*(\d{2,4})\.(\d{1,2})\.(\d{1,2})", search_text)
                 if match:
-                    from datetime import datetime
                     y1, m1, d1 = map(int, match.group(1, 2, 3))
                     y2, m2, d2 = map(int, match.group(4, 5, 6))
                     
@@ -253,13 +279,66 @@ def _extract_generic_review_days(soup: BeautifulSoup) -> Optional[int]:
                     if y1 < 100: y1 += 2000
                     if y2 < 100: y2 += 2000
                     
+                    try:
+                        start = datetime(y1, m1, d1)
+                        end = datetime(y2, m2, d2)
+                        diff = (end - start).days
+                        if _validate_review_deadline_days(diff):
+                            logger.debug("Generic 리뷰 기간 추출 성공 (날짜 범위): %d일", diff)
+                            return diff
+                    except ValueError:
+                        pass
+                
+                # MM.DD ~ MM.DD 형식 (연도 없음)
+                match = re.search(r"(\d{1,2})\.(\d{1,2})\s*[~–-]\s*(\d{1,2})\.(\d{1,2})", search_text)
+                if match:
+                    m1, d1 = int(match.group(1)), int(match.group(2))
+                    m2, d2 = int(match.group(3)), int(match.group(4))
+                    
+                    curr_year = datetime.now().year
+                    year1 = curr_year
+                    year2 = curr_year if m2 >= m1 else curr_year + 1
+                    
+                    try:
+                        start = datetime(year1, m1, d1)
+                        end = datetime(year2, m2, d2)
+                        diff = (end - start).days
+                        if _validate_review_deadline_days(diff):
+                            logger.debug("Generic 리뷰 기간 추출 성공 (MM.DD 범위): %d일", diff)
+                            return diff
+                    except ValueError:
+                        pass
+        
+        # 패턴 3: 전체 텍스트에서 날짜 범위 찾기 (리뷰 키워드 없이도)
+        # "리뷰 등록 기간 2023.12.09 ~ 2023.12.22" 같은 형식
+        date_range_patterns = [
+            r"리뷰\s*등록\s*기간\s*(\d{2,4})\.(\d{1,2})\.(\d{1,2})\s*[~–-]\s*(\d{2,4})\.(\d{1,2})\.(\d{1,2})",
+            r"리뷰\s*기간\s*(\d{2,4})\.(\d{1,2})\.(\d{1,2})\s*[~–-]\s*(\d{2,4})\.(\d{1,2})\.(\d{1,2})",
+        ]
+        
+        for pattern in date_range_patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                y1, m1, d1 = map(int, match.group(1, 2, 3))
+                y2, m2, d2 = map(int, match.group(4, 5, 6))
+                
+                curr_year = datetime.now().year
+                if y1 < 100: y1 += 2000
+                if y2 < 100: y2 += 2000
+                
+                try:
                     start = datetime(y1, m1, d1)
                     end = datetime(y2, m2, d2)
                     diff = (end - start).days
-                    if diff > 0:
+                    if _validate_review_deadline_days(diff):
+                        logger.debug("Generic 리뷰 기간 추출 성공 (전체 텍스트): %d일", diff)
                         return diff
-    except Exception:
-        pass
+                except ValueError:
+                    pass
+                    
+    except Exception as e:
+        logger.debug("Generic 리뷰 기간 추출 실패: %s", e)
+    
     return None
 
 def _extract_reviewnote_review_days(soup: BeautifulSoup) -> Optional[int]:

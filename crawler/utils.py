@@ -14,11 +14,27 @@ from crawler.region import normalize_region
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
 
 # 로깅 설정
+import sys
+log_dir = os.path.join(os.path.dirname(__file__), "..", "crawler", "logs")
+os.makedirs(log_dir, exist_ok=True)
+log_file = os.path.join(log_dir, f"crawler_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+
+# 기존 핸들러가 있으면 제거 (중복 방지)
+root_logger = logging.getLogger()
+if root_logger.handlers:
+    root_logger.handlers.clear()
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler(log_file, encoding='utf-8'),
+        logging.StreamHandler(sys.stdout)  # 콘솔에도 출력
+    ],
+    force=True  # 기존 설정 덮어쓰기
 )
 logger = logging.getLogger("Crawler")
+logger.info("크롤러 로그 파일: %s", log_file)
 
 
 def get_supabase_client() -> Optional[Client]:
