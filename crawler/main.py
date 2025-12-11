@@ -143,7 +143,8 @@ def main(save_json: bool = True, mode: str = "auto") -> None:
         logger.info("차등 필터링: %d -> %d (새로운 캠페인 %d개)", before, len(all_campaigns), len(all_campaigns))
 
     # 배치 처리: 리뷰 기간이 없는 캠페인들의 상세 페이지 크롤링
-    all_campaigns = enrich_review_deadlines_batch(all_campaigns, max_workers=5)
+    # 병렬 처리 워커 수 증가 (더 빠른 처리)
+    all_campaigns = enrich_review_deadlines_batch(all_campaigns, max_workers=10)
 
     # Supabase에 저장
     if all_campaigns:

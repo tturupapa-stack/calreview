@@ -104,34 +104,57 @@ def extract_detail_info(url: str, site_name: str, max_retries: int = 2) -> Dict[
     # 재시도 로직
     for attempt in range(max_retries + 1):
         try:
-            # 타임아웃 30초로 증가 (서울오빠 등 느린 사이트 대비)
-            res = requests.get(url, headers=headers, timeout=30)
+            # 타임아웃 45초로 증가 (느린 사이트 대비)
+            res = requests.get(url, headers=headers, timeout=45)
             res.raise_for_status()
             
             soup = BeautifulSoup(res.text, "html.parser")
             
+            # 사이트별 리뷰 기간 추출
+            review_days = None
             if site_name == "reviewnote":
-                result["review_deadline_days"] = _extract_reviewnote_review_days(soup)
+                review_days = _extract_reviewnote_review_days(soup)
             elif site_name == "dinnerqueen":
-                result["review_deadline_days"] = _extract_dinnerqueen_review_days(soup)
+                review_days = _extract_dinnerqueen_review_days(soup)
             elif site_name == "gangnam":
-                result["review_deadline_days"] = _extract_gangnam_review_days(soup)
+                review_days = _extract_gangnam_review_days(soup)
             elif site_name == "reviewplace":
-                result["review_deadline_days"] = _extract_reviewplace_review_days(soup)
+                review_days = _extract_reviewplace_review_days(soup)
             elif site_name == "seoulouba":
-                return _extract_seoulouba_detail(soup)
+                detail_result = _extract_seoulouba_detail(soup)
+                return detail_result
             elif site_name == "modooexperience":
-                result["review_deadline_days"] = _extract_modoo_review_days(soup)
+                review_days = _extract_modoo_review_days(soup)
             elif site_name == "pavlovu":
-                result["review_deadline_days"] = _extract_pavlovu_review_days(soup)
+                review_days = _extract_pavlovu_review_days(soup)
+            
+            result["review_deadline_days"] = review_days
+            
+            # 리뷰 기간 추출 성공 시 로그
+            if review_days:
+                logger.debug("[%s] 리뷰 기간 추출 성공: %d일 (URL: %s)", site_name, review_days, url)
+            else:
+                logger.debug("[%s] 리뷰 기간 정보 없음 (URL: %s)", site_name, url)
             
             # 성공 시 즉시 반환
             return result
             
+        except requests.exceptions.Timeout as e:
+            if attempt < max_retries:
+                logger.debug("[%s] 상세 페이지 타임아웃 (재시도 %d/%d): %s (URL: %s)", 
+                           site_name, attempt + 1, max_retries, e, url)
+                # 타임아웃 시 대기 시간 추가
+                import time
+                time.sleep(2)
+                continue
+            else:
+                logger.warning("[%s] 상세 페이지 타임아웃 최종 실패: %s (URL: %s)", site_name, e, url)
         except requests.exceptions.RequestException as e:
             if attempt < max_retries:
                 logger.debug("[%s] 상세 페이지 요청 실패 (재시도 %d/%d): %s (URL: %s)", 
                            site_name, attempt + 1, max_retries, e, url)
+                import time
+                time.sleep(1)  # 재시도 전 대기
                 continue
             else:
                 logger.warning("[%s] 상세 페이지 요청 최종 실패: %s (URL: %s)", site_name, e, url)
