@@ -165,4 +165,119 @@ describe("Calendar Integration Flow", () => {
             })
         );
     });
+
+    it("should handle invalid grant error by disconnecting calendar", async () => {
+        // 1. Setup Mock Supabase Client
+        const mockSupabase = {
+            auth: {
+                getUser: jest.fn().mockResolvedValue({
+                    data: { user: { id: "user-123" } },
+                    error: null,
+                }),
+            },
+            from: jest.fn((table) => {
+                if (table === "applications") {
+                    return {
+                        select: jest.fn().mockReturnThis(),
+                        eq: jest.fn().mockReturnThis(),
+                        single: jest.fn().mockImplementation(() => {
+                            return Promise.resolve({
+                                data: {
+                                    user_id: "user-123",
+                                    visit_date: null,
+                                    review_deadline: null,
+                                    calendar_visit_event_id: null,
+                                    calendar_deadline_event_id: null,
+                                },
+                                error: null,
+                            });
+                        }),
+                        update: jest.fn().mockImplementation(() => {
+                            return {
+                                eq: jest.fn().mockReturnThis(),
+                                select: jest.fn().mockReturnThis(),
+                                single: jest.fn().mockResolvedValue({
+                                    data: {
+                                        id: "app-123",
+                                        status: "selected",
+                                        calendar_visit_event_id: null,
+                                        calendar_deadline_event_id: null,
+                                        campaigns: {
+                                            id: "camp-123",
+                                            title: "Test Campaign",
+                                            source_url: "http://example.com",
+                                            region: "Seoul",
+                                        }
+                                    },
+                                    error: null
+                                })
+                            }
+                        })
+                    };
+                }
+                if (table === "users") {
+                    // Start with connected calendar
+                    return {
+                        select: jest.fn().mockReturnThis(),
+                        eq: jest.fn().mockReturnThis(),
+                        single: jest.fn().mockResolvedValue({
+                            data: {
+                                google_calendar_connected: true,
+                                google_refresh_token: "invalid-token",
+                            },
+                            error: null,
+                        }),
+                        update: jest.fn().mockImplementation((updates) => {
+                            // Check if disconnecting
+                            expect(updates).toEqual({
+                                google_calendar_connected: false,
+                                google_refresh_token: null,
+                            });
+                            return { eq: jest.fn().mockReturnThis() };
+                        })
+                    };
+                }
+                return {
+                    select: jest.fn().mockReturnThis(),
+                    eq: jest.fn().mockReturnThis(),
+                    single: jest.fn().mockResolvedValue({ data: {}, error: null }),
+                    update: jest.fn().mockReturnThis(),
+                };
+            }),
+        };
+
+        const mockCreateClient = createClient as jest.Mock;
+        mockCreateClient.mockResolvedValue(mockSupabase);
+
+        const mockCreateCalendarEvent = createCalendarEvent as jest.Mock;
+        // Simulate auth error
+        mockCreateCalendarEvent.mockRejectedValue({
+            code: 401,
+            message: "invalid_grant"
+        });
+
+        // 2. Mock Request
+        const req = new NextRequest("http://localhost/api/applications/app-123", {
+            method: "PATCH",
+            body: JSON.stringify({
+                status: "selected",
+                visit_date: "2024-12-25",
+            }),
+        });
+
+        const params = Promise.resolve({ id: "app-123" });
+
+        // 3. Execute Handler
+        const response = await PATCH(req, { params });
+        const json = await response.json();
+
+        // 4. Assertions
+        expect(response.status).toBe(200);
+        expect(json.success).toBe(true);
+        // Should contain the specific error message
+        expect(json.calendarInfo.errors).toContain("구글 캘린더 연결이 만료되었습니다. 설정에서 다시 연결해주세요.");
+
+        // Verify user update was called (assertion inside mockSupabase logic above, but good to check call count)
+        expect(mockSupabase.from).toHaveBeenCalledWith("users");
+    });
 });

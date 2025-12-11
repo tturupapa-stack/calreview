@@ -105,10 +105,10 @@ export default function MyCampaignsPage() {
         setApplications(data.applications || []);
       } catch (error: any) {
         console.error("데이터 조회 오류:", error);
-        const errorMessage = error instanceof Error 
-          ? error.message 
+        const errorMessage = error instanceof Error
+          ? error.message
           : error?.message || "데이터를 불러오는 중 오류가 발생했습니다.";
-        
+
         // 네트워크 에러인 경우 더 명확한 메시지 제공
         if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
           alert("네트워크 연결을 확인해주세요. 서버가 실행 중인지 확인하세요.");
@@ -183,7 +183,7 @@ export default function MyCampaignsPage() {
     }
 
     setProcessingId(applicationId);
-    
+
     try {
       // 선정 처리이므로 항상 "selected" 상태로 설정
       const updateData: any = {
@@ -228,7 +228,7 @@ export default function MyCampaignsPage() {
       // 캘린더 이벤트 ID 확인 (안전하게 처리)
       const hasCalendarEvents = !!(data?.application?.calendar_visit_event_id || data?.application?.calendar_deadline_event_id);
       const calendarErrors: string[] = Array.isArray(data?.calendarInfo?.errors) ? data.calendarInfo.errors : [];
-      
+
       console.log("[클라이언트] 캘린더 이벤트 ID:", {
         visitEventId: data?.application?.calendar_visit_event_id,
         deadlineEventId: data?.application?.calendar_deadline_event_id,
@@ -246,7 +246,7 @@ export default function MyCampaignsPage() {
       setEditingId(null);
       setVisitDate("");
       setReviewDeadline("");
-      
+
       // 캘린더 등록 여부에 따른 메시지
       let calendarMessage = "";
       if (hasCalendarEvents) {
@@ -258,13 +258,13 @@ export default function MyCampaignsPage() {
           calendarMessage = "\n\n구글 캘린더 등록 실패 (서버 로그 확인 필요)";
         }
       }
-      alert("✓ 선정 처리되었습니다." + calendarMessage);
+      alert("✓ 선정 처리되었습니다 (v2 check)." + calendarMessage);
     } catch (error: any) {
       console.error("선정 처리 오류:", error);
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : error?.message || "선정 처리 중 오류가 발생했습니다.";
-      
+
       // 네트워크 에러인 경우 더 명확한 메시지 제공
       if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
         alert("네트워크 연결을 확인해주세요. 서버가 실행 중인지 확인하세요.");
@@ -421,8 +421,8 @@ export default function MyCampaignsPage() {
             <button
               onClick={() => setViewMode("list")}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === "list"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
+                ? "bg-blue-600 text-white"
+                : "text-gray-700 hover:bg-gray-100"
                 }`}
             >
               <svg className="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -433,8 +433,8 @@ export default function MyCampaignsPage() {
             <button
               onClick={() => setViewMode("calendar")}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === "calendar"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
+                ? "bg-blue-600 text-white"
+                : "text-gray-700 hover:bg-gray-100"
                 }`}
             >
               <svg className="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -488,8 +488,8 @@ export default function MyCampaignsPage() {
               <button
                 onClick={() => setStatusFilter("bookmarked")}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${statusFilter === "bookmarked"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-700 hover:bg-gray-100"
                   }`}
               >
                 북마크
@@ -500,8 +500,8 @@ export default function MyCampaignsPage() {
               <button
                 onClick={() => setStatusFilter("applied")}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${statusFilter === "applied"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-700 hover:bg-gray-100"
                   }`}
               >
                 신청중
@@ -512,8 +512,8 @@ export default function MyCampaignsPage() {
               <button
                 onClick={() => setStatusFilter("selected")}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${statusFilter === "selected"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-700 hover:bg-gray-100"
                   }`}
               >
                 선정됨
@@ -524,8 +524,8 @@ export default function MyCampaignsPage() {
               <button
                 onClick={() => setStatusFilter("completed")}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${statusFilter === "completed"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-700 hover:bg-gray-100"
                   }`}
               >
                 완료
@@ -576,12 +576,12 @@ export default function MyCampaignsPage() {
                             </Link>
                             <span
                               className={`px-3 py-1 rounded-full text-xs font-medium ${app.status === "bookmarked"
-                                  ? "bg-blue-100 text-blue-700"
-                                  : app.status === "applied"
-                                    ? "bg-yellow-100 text-yellow-700"
-                                    : app.status === "selected"
-                                      ? "bg-green-100 text-green-700"
-                                      : "bg-gray-100 text-gray-700"
+                                ? "bg-blue-100 text-blue-700"
+                                : app.status === "applied"
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : app.status === "selected"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-gray-100 text-gray-700"
                                 }`}
                             >
                               {app.status === "bookmarked" && "북마크"}
@@ -634,10 +634,10 @@ export default function MyCampaignsPage() {
                                 <div className="p-3 bg-orange-50 border border-orange-200 rounded-md">
                                   <span className="font-medium text-gray-700">리뷰 마감일: </span>
                                   <span className={`font-bold ${calculateDday(app.review_deadline).startsWith("D+")
-                                      ? "text-red-600"
-                                      : calculateDday(app.review_deadline) === "D-0" || calculateDday(app.review_deadline) === "D-1"
-                                        ? "text-orange-600"
-                                        : "text-green-600"
+                                    ? "text-red-600"
+                                    : calculateDday(app.review_deadline) === "D-0" || calculateDday(app.review_deadline) === "D-1"
+                                      ? "text-orange-600"
+                                      : "text-green-600"
                                     }`}>
                                     {calculateDday(app.review_deadline)}
                                   </span>
