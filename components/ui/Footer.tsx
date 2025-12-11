@@ -12,7 +12,7 @@ export function Footer() {
           <div className="flex gap-6 text-sm text-gray-500">
             <a href="#" className="hover:text-primary transition-colors">이용약관</a>
             <a href="#" className="hover:text-primary transition-colors">개인정보처리방침</a>
-            <a href="#" className="hover:text-primary transition-colors">문의하기</a>
+            <a href="/contact" className="hover:text-primary transition-colors">문의하기</a>
           </div>
         </div>
         <div className="border-t border-border/40 mt-8 pt-8 text-center text-xs text-gray-400">

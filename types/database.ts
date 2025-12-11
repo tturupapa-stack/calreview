@@ -200,6 +200,59 @@ export interface Database {
                     created_at?: string
                 }
             }
+            inquiries: {
+                Row: {
+                    id: string
+                    user_id: string | null
+                    name: string
+                    email: string
+                    phone: string | null
+                    inquiry_type: 'general' | 'technical' | 'partnership' | 'program_request' | 'other'
+                    subject: string
+                    content: string
+                    attachment_url: string | null
+                    attachment_filename: string | null
+                    status: 'pending' | 'in_progress' | 'completed'
+                    admin_response: string | null
+                    admin_response_at: string | null
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id?: string | null
+                    name: string
+                    email: string
+                    phone?: string | null
+                    inquiry_type: 'general' | 'technical' | 'partnership' | 'program_request' | 'other'
+                    subject: string
+                    content: string
+                    attachment_url?: string | null
+                    attachment_filename?: string | null
+                    status?: 'pending' | 'in_progress' | 'completed'
+                    admin_response?: string | null
+                    admin_response_at?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string | null
+                    name?: string
+                    email?: string
+                    phone?: string | null
+                    inquiry_type?: 'general' | 'technical' | 'partnership' | 'program_request' | 'other'
+                    subject?: string
+                    content?: string
+                    attachment_url?: string | null
+                    attachment_filename?: string | null
+                    status?: 'pending' | 'in_progress' | 'completed'
+                    admin_response?: string | null
+                    admin_response_at?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+            }
         }
     }
 }
