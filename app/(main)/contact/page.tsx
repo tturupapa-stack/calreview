@@ -2,6 +2,8 @@
 
 import { ContactForm } from "@/components/features/ContactForm";
 
+// Contact page - Header/Footer are rendered in app/(main)/layout.tsx
+
 const inquiryTypes = [
   { value: "general", label: "일반 문의", icon: "💬" },
   { value: "technical", label: "기술 지원", icon: "🔧" },
