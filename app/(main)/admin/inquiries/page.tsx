@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { Header } from "@/components/ui/Header";
-import { Footer } from "@/components/ui/Footer";
 import { toast } from "react-toastify";
 import Link from "next/link";
 
@@ -194,9 +192,8 @@ export default function AdminInquiriesPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-7xl">
+    <div className="bg-gray-50">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">문의 관리</h1>
           <p className="text-gray-600">사용자 문의 내역을 확인하고 답변할 수 있습니다.</p>
@@ -307,7 +304,6 @@ export default function AdminInquiriesPage() {
             </div>
           )}
         </div>
-      </main>
 
       {/* 상세 모달 */}
       {selectedInquiry && (
@@ -458,8 +454,7 @@ export default function AdminInquiriesPage() {
           </div>
         </div>
       )}
-
-      <Footer />
+      </div>
     </div>
   );
 }
