@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { validateFile, MAX_FILE_SIZE } from "@/constants/file-upload";
 
 const contactSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요").max(50, "이름은 50자 이하여야 합니다"),
@@ -58,19 +59,10 @@ export function ContactForm({ inquiryTypes }: ContactFormProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // 파일 크기 검증 (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("파일 크기는 5MB 이하여야 합니다");
-        e.target.value = ""; // 파일 선택 초기화
-        return;
-      }
-      // 파일 형식 검증
-      const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
-      const allowedExtensions = [".jpg", ".jpeg", ".png", ".pdf", ".hwp"];
-      const fileExtension = "." + file.name.split(".").pop()?.toLowerCase();
-      
-      if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
-        toast.error("jpg, png, pdf, hwp 파일만 업로드 가능합니다");
+      // 파일 검증
+      const validation = validateFile(file);
+      if (!validation.valid) {
+        toast.error(validation.error || "파일 검증에 실패했습니다");
         e.target.value = ""; // 파일 선택 초기화
         return;
       }
@@ -273,7 +265,10 @@ export function ContactForm({ inquiryTypes }: ContactFormProps) {
       {/* 파일 첨부 */}
       <div>
         <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-1">
-          파일 첨부 <span className="text-gray-400 text-xs">(선택, 최대 5MB)</span>
+          파일 첨부{" "}
+          <span className="text-gray-400 text-xs">
+            (선택, 최대 {MAX_FILE_SIZE / (1024 * 1024)}MB)
+          </span>
         </label>
         <input
           id="file"

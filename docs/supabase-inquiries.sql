@@ -25,6 +25,15 @@ CREATE INDEX IF NOT EXISTS inquiries_inquiry_type_idx ON public.inquiries(inquir
 CREATE INDEX IF NOT EXISTS inquiries_status_idx ON public.inquiries(status);
 CREATE INDEX IF NOT EXISTS inquiries_created_at_idx ON public.inquiries(created_at DESC);
 
+-- updated_at 자동 갱신 함수 생성 (없는 경우에만)
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- updated_at 자동 갱신 트리거
 DROP TRIGGER IF EXISTS set_inquiries_updated_at ON public.inquiries;
 CREATE TRIGGER set_inquiries_updated_at

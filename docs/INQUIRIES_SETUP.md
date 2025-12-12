@@ -95,10 +95,11 @@ Supabase Dashboard > Storage에서:
 
 ### 3.1 접근 방법
 - URL: `/admin/inquiries`
-- 관리자 이메일 설정 필요: `.env.local`에 `NEXT_PUBLIC_ADMIN_EMAILS` 추가
+- 관리자 이메일 설정 필요: `.env.local`에 `ADMIN_EMAILS` 추가
   ```
-  NEXT_PUBLIC_ADMIN_EMAILS=admin@example.com,admin2@example.com
+  ADMIN_EMAILS=admin@example.com,admin2@example.com
   ```
+  ⚠️ **보안**: `NEXT_PUBLIC_` 접두사 없이 서버 사이드에서만 사용됩니다.
 
 ### 3.2 기능
 - ✅ 문의 내역 조회 (전체)
