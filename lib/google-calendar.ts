@@ -29,7 +29,44 @@ export function createCalendarClient(refreshToken: string) {
     refresh_token: refreshToken,
   });
 
+  // 토큰 갱신 시 자동 재시도 설정
+  oauth2Client.on("tokens", (tokens) => {
+    if (tokens.refresh_token) {
+      // refresh_token이 새로 발급된 경우 업데이트할 수 있음
+      // 현재는 저장하지 않고, 만료 시 재인증 요구
+    }
+  });
+
   return google.calendar({ version: "v3", auth: oauth2Client });
+}
+
+/**
+ * 인증 오류인지 확인 (토큰 만료 등)
+ */
+export function isAuthenticationError(error: any): boolean {
+  // 401 Unauthorized
+  if (error.code === 401 || error.response?.status === 401) {
+    return true;
+  }
+
+  // invalid_grant 에러 (토큰 만료, 취소 등)
+  if (error.message?.includes('invalid_grant')) {
+    return true;
+  }
+
+  // 응답 데이터에 에러 코드가 있는 경우
+  if (error.response?.data?.error) {
+    const errorCode = error.response.data.error;
+    if (
+      errorCode === 'invalid_grant' ||
+      errorCode === 'invalid_client' ||
+      errorCode === 'unauthorized'
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -116,38 +153,47 @@ export async function updateCalendarEvent(
     location?: string;
   }
 ): Promise<void> {
-  const calendar = createCalendarClient(refreshToken);
+  try {
+    const calendar = createCalendarClient(refreshToken);
 
-  type CalendarEventUpdate = {
-    summary?: string;
-    description?: string;
-    start?: { dateTime: string; timeZone: string };
-    end?: { dateTime: string; timeZone: string };
-    location?: string;
-  };
-
-  const event: CalendarEventUpdate = {};
-  if (options.summary) event.summary = options.summary;
-  if (options.description !== undefined) event.description = options.description;
-  if (options.startDate) {
-    event.start = {
-      dateTime: options.startDate,
-      timeZone: "Asia/Seoul",
+    type CalendarEventUpdate = {
+      summary?: string;
+      description?: string;
+      start?: { dateTime: string; timeZone: string };
+      end?: { dateTime: string; timeZone: string };
+      location?: string;
     };
-  }
-  if (options.endDate) {
-    event.end = {
-      dateTime: options.endDate,
-      timeZone: "Asia/Seoul",
-    };
-  }
-  if (options.location !== undefined) event.location = options.location;
 
-  await calendar.events.patch({
-    calendarId: "primary",
-    eventId: eventId,
-    requestBody: event,
-  });
+    const event: CalendarEventUpdate = {};
+    if (options.summary) event.summary = options.summary;
+    if (options.description !== undefined) event.description = options.description;
+    if (options.startDate) {
+      event.start = {
+        dateTime: options.startDate,
+        timeZone: "Asia/Seoul",
+      };
+    }
+    if (options.endDate) {
+      event.end = {
+        dateTime: options.endDate,
+        timeZone: "Asia/Seoul",
+      };
+    }
+    if (options.location !== undefined) event.location = options.location;
+
+    await calendar.events.patch({
+      calendarId: "primary",
+      eventId: eventId,
+      requestBody: event,
+    });
+  } catch (error: any) {
+    console.error("[구글 캘린더 API] 이벤트 업데이트 오류:", error);
+    if (error.response) {
+      console.error("[구글 캘린더 API] 응답 상태:", error.response.status);
+      console.error("[구글 캘린더 API] 응답 데이터:", error.response.data);
+    }
+    throw error;
+  }
 }
 
 /**
@@ -157,11 +203,20 @@ export async function deleteCalendarEvent(
   refreshToken: string,
   eventId: string
 ): Promise<void> {
-  const calendar = createCalendarClient(refreshToken);
+  try {
+    const calendar = createCalendarClient(refreshToken);
 
-  await calendar.events.delete({
-    calendarId: "primary",
-    eventId: eventId,
-  });
+    await calendar.events.delete({
+      calendarId: "primary",
+      eventId: eventId,
+    });
+  } catch (error: any) {
+    console.error("[구글 캘린더 API] 이벤트 삭제 오류:", error);
+    if (error.response) {
+      console.error("[구글 캘린더 API] 응답 상태:", error.response.status);
+      console.error("[구글 캘린더 API] 응답 데이터:", error.response.data);
+    }
+    throw error;
+  }
 }
 

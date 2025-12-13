@@ -218,9 +218,31 @@ export async function PATCH(
                   }
                 );
                 console.log("[캘린더 등록] 방문일 이벤트 업데이트 성공");
-              } catch (error) {
+              } catch (error: any) {
                 console.error("[캘린더 등록] 방문일 이벤트 업데이트 오류:", error);
-                calendarErrors.push("방문일 일정 업데이트 실패");
+
+                // 인증 오류 확인 (토큰 만료 등)
+                const { isAuthenticationError } = await import("@/lib/google-calendar");
+                const isAuthError = isAuthenticationError(error);
+
+                if (isAuthError) {
+                  console.log("[캘린더 등록] 인증 오류 감지 (방문일 업데이트). 캘린더 연결 해제 처리");
+                  await supabase
+                    .from("users")
+                    .update({
+                      google_calendar_connected: false,
+                      google_refresh_token: null
+                    })
+                    .eq("id", user.id);
+
+                  // 중복 메시지 방지
+                  const errorMessage = "구글 캘린더 연결이 만료되었습니다. 설정에서 다시 연결해주세요.";
+                  if (!calendarErrors.includes(errorMessage)) {
+                    calendarErrors.push(errorMessage);
+                  }
+                } else {
+                  calendarErrors.push("방문일 일정 업데이트 실패");
+                }
               }
             } else {
               // 신규 생성
@@ -248,11 +270,9 @@ export async function PATCH(
               } catch (error: any) {
                 console.error("[캘린더 등록] 방문일 이벤트 생성 오류:", error);
 
-                // 인증 오류 확인 (401, invalid_grant 등)
-                const isAuthError =
-                  error.code === 401 ||
-                  error.response?.status === 401 ||
-                  (error.message && error.message.includes('invalid_grant'));
+                // 인증 오류 확인 (토큰 만료 등)
+                const { isAuthenticationError } = await import("@/lib/google-calendar");
+                const isAuthError = isAuthenticationError(error);
 
                 if (isAuthError) {
                   console.log("[캘린더 등록] 인증 오류 감지. 캘린더 연결 해제 처리");
@@ -263,7 +283,12 @@ export async function PATCH(
                       google_refresh_token: null
                     })
                     .eq("id", user.id);
-                  calendarErrors.push("구글 캘린더 연결이 만료되었습니다. 설정에서 다시 연결해주세요.");
+                  
+                  // 중복 메시지 방지
+                  const errorMessage = "구글 캘린더 연결이 만료되었습니다. 설정에서 다시 연결해주세요.";
+                  if (!calendarErrors.includes(errorMessage)) {
+                    calendarErrors.push(errorMessage);
+                  }
                 } else {
                   const errorCode = error.code || error.response?.status || 'Unknown';
                   const errorMessage = error.message || 'Unknown error';
@@ -300,9 +325,31 @@ export async function PATCH(
                   }
                 );
                 console.log("[캘린더 등록] 리뷰 마감일 이벤트 업데이트 성공");
-              } catch (error) {
+              } catch (error: any) {
                 console.error("[캘린더 등록] 리뷰 마감일 이벤트 업데이트 오류:", error);
-                calendarErrors.push("리뷰 마감일 일정 업데이트 실패");
+
+                // 인증 오류 확인 (토큰 만료 등)
+                const { isAuthenticationError } = await import("@/lib/google-calendar");
+                const isAuthError = isAuthenticationError(error);
+
+                if (isAuthError) {
+                  console.log("[캘린더 등록] 인증 오류 감지 (마감일 업데이트). 캘린더 연결 해제 처리");
+                  await supabase
+                    .from("users")
+                    .update({
+                      google_calendar_connected: false,
+                      google_refresh_token: null
+                    })
+                    .eq("id", user.id);
+
+                  // 중복 메시지 방지
+                  const errorMessage = "구글 캘린더 연결이 만료되었습니다. 설정에서 다시 연결해주세요.";
+                  if (!calendarErrors.includes(errorMessage)) {
+                    calendarErrors.push(errorMessage);
+                  }
+                } else {
+                  calendarErrors.push("리뷰 마감일 일정 업데이트 실패");
+                }
               }
             } else {
               // 신규 생성
@@ -331,12 +378,9 @@ export async function PATCH(
               } catch (error: any) {
                 console.error("[캘린더 등록] 리뷰 마감일 이벤트 생성 오류:", error);
 
-                // 인증 오류 확인 (401, invalid_grant 등)
-                // 이미 위에서 처리했는지 확인 필요하지만, 독립적으로 실패할 수도 있으므로 중복 체크
-                const isAuthError =
-                  error.code === 401 ||
-                  error.response?.status === 401 ||
-                  (error.message && error.message.includes('invalid_grant'));
+                // 인증 오류 확인 (토큰 만료 등)
+                const { isAuthenticationError } = await import("@/lib/google-calendar");
+                const isAuthError = isAuthenticationError(error);
 
                 if (isAuthError) {
                   console.log("[캘린더 등록] 인증 오류 감지 (마감일). 캘린더 연결 해제 처리");
@@ -349,8 +393,9 @@ export async function PATCH(
                     .eq("id", user.id);
 
                   // 중복 메시지 방지
-                  if (!calendarErrors.includes("구글 캘린더 연결이 만료되었습니다. 설정에서 다시 연결해주세요.")) {
-                    calendarErrors.push("구글 캘린더 연결이 만료되었습니다. 설정에서 다시 연결해주세요.");
+                  const errorMessage = "구글 캘린더 연결이 만료되었습니다. 설정에서 다시 연결해주세요.";
+                  if (!calendarErrors.includes(errorMessage)) {
+                    calendarErrors.push(errorMessage);
                   }
                 } else {
                   const errorCode = error.code || error.response?.status || 'Unknown';
