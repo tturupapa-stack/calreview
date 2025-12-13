@@ -43,8 +43,12 @@ def normalize_category(site_name: str, raw_category: Optional[str], title: str) 
     if any(k in title_norm for k in beauty_keywords):
         return "뷰티"
         
-    # 여행/숙박 키워드
-    travel_keywords = ["펜션", "호텔", "풀빌라", "숙박", "캠핑", "글램핑", "여행", "리조트", "스테이", "카라반", "민박", "게스트하우스"]
+    # 여행/숙박/레저 키워드
+    travel_keywords = [
+        "펜션", "호텔", "풀빌라", "숙박", "캠핑", "글램핑", "여행", "리조트", "스테이", "카라반", "민박", "게스트하우스",
+        "테마파크", "놀이공원", "워터파크", "눈썰매", "스키", "스노우", "짚라인", "루지", "레일바이크", "번지", "래프팅",
+        "아쿠아리움", "동물원", "식물원", "수목원", "자연휴양림", "온천", "찜질방", "사우나"
+    ]
     if any(k in title_norm for k in travel_keywords):
         return "여행"
         
