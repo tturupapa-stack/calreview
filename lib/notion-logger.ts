@@ -26,30 +26,38 @@ const TYPE_LABELS: Record<string, string> = {
  * Git 정보를 가져옵니다.
  */
 function getGitInfo() {
+  const defaultInfo = {
+    branch: "unknown",
+    commit: "unknown",
+    author: "unknown",
+    email: "unknown",
+    lastCommitMessage: "",
+  };
+
   try {
-    const branch = execSync("git rev-parse --abbrev-ref HEAD", { encoding: "utf-8" }).trim();
-    const commit = execSync("git rev-parse --short HEAD", { encoding: "utf-8" }).trim();
-    const author = execSync("git config user.name", { encoding: "utf-8" }).trim();
-    const email = execSync("git config user.email", { encoding: "utf-8" }).trim();
+    const branch = execSync("git rev-parse --abbrev-ref HEAD", { encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    const commit = execSync("git rev-parse --short HEAD", { encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    
+    let author = "unknown";
+    let email = "unknown";
+    try {
+      author = execSync("git config user.name", { encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] }).trim() || "unknown";
+      email = execSync("git config user.email", { encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] }).trim() || "unknown";
+    } catch (e) {
+      // Git 설정이 없는 경우 무시
+    }
     
     // 최근 커밋 메시지 가져오기
     let lastCommitMessage = "";
     try {
-      lastCommitMessage = execSync("git log -1 --pretty=%B", { encoding: "utf-8" }).trim();
+      lastCommitMessage = execSync("git log -1 --pretty=%B", { encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] }).trim();
     } catch (e) {
       // 커밋이 없는 경우 무시
     }
     
     return { branch, commit, author, email, lastCommitMessage };
   } catch (error) {
-    console.warn("Git 정보를 가져올 수 없습니다:", error);
-    return {
-      branch: "unknown",
-      commit: "unknown",
-      author: "unknown",
-      email: "unknown",
-      lastCommitMessage: "",
-    };
+    return defaultInfo;
   }
 }
 
