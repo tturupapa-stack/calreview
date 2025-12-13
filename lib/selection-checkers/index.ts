@@ -25,3 +25,4 @@ export function getSelectionChecker(source: string): SelectionChecker | null {
       return null;
   }
 }
+

@@ -36,3 +36,4 @@ cat .env.local | grep -E "NEXT_PUBLIC_GA_ID|CRON_SECRET"
 - `.env.local` 파일은 Git에 커밋하지 마세요 (이미 .gitignore에 포함됨)
 - Vercel에 배포할 때는 Vercel 대시보드에서 환경 변수를 설정하세요
 - `NEXT_PUBLIC_` 접두사가 있는 변수는 클라이언트 사이드에서도 접근 가능합니다
+

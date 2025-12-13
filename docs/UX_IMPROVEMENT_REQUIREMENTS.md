@@ -1340,3 +1340,4 @@ export default function KPIDashboard() {
 - 우선순위는 사용자 영향도와 비즈니스 가치를 기준으로 설정
 - 실제 개발 시 일정 조정 가능
 - 테스트 및 QA 시간은 별도로 고려 필요
+

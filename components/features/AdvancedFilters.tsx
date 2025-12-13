@@ -5,8 +5,8 @@ import { KOREA_REGIONS } from "@/constants/regions";
 import { Button } from "@/components/ui/Button";
 
 export interface Filters {
-  region: string;
-  detailedRegion: string;
+  region: string[];
+  detailedRegion: string[];
   category: string;
   type: string;
   channel: string;
@@ -25,18 +25,80 @@ export function AdvancedFilters({ filters, onFiltersChange, isOpen, onToggle }: 
   const updateFilter = (key: keyof Filters, value: string) => {
     if (key === "region") {
       // 지역 변경 시 상세지역 초기화
-      onFiltersChange({ ...filters, region: value, detailedRegion: "" });
+      onFiltersChange({ ...filters, region: value ? [value] : [], detailedRegion: [] });
     } else {
       onFiltersChange({ ...filters, [key]: value });
     }
   };
 
-  const detailedRegions = filters.region ? KOREA_REGIONS[filters.region] || [] : [];
+  const toggleRegion = (region: string) => {
+    const currentRegions = filters.region || [];
+    const isSelected = currentRegions.includes(region);
+    
+    let newRegions: string[];
+    if (isSelected) {
+      // 선택 해제
+      newRegions = currentRegions.filter(r => r !== region);
+    } else {
+      // 선택 추가
+      newRegions = [...currentRegions, region];
+    }
+    
+    onFiltersChange({ 
+      ...filters, 
+      region: newRegions,
+      detailedRegion: [] // 지역 변경 시 상세지역 초기화
+    });
+  };
+
+  const toggleDetailedRegion = (detailedRegion: string) => {
+    const currentDetailedRegions = filters.detailedRegion || [];
+    const isSelected = currentDetailedRegions.includes(detailedRegion);
+    
+    let newDetailedRegions: string[];
+    if (isSelected) {
+      // 선택 해제
+      newDetailedRegions = currentDetailedRegions.filter(r => r !== detailedRegion);
+    } else {
+      // 선택 추가
+      newDetailedRegions = [...currentDetailedRegions, detailedRegion];
+    }
+    
+    onFiltersChange({ 
+      ...filters, 
+      detailedRegion: newDetailedRegions
+    });
+  };
+
+  const clearAllRegions = () => {
+    onFiltersChange({ 
+      ...filters, 
+      region: [],
+      detailedRegion: []
+    });
+  };
+
+  const clearAllDetailedRegions = () => {
+    onFiltersChange({ 
+      ...filters, 
+      detailedRegion: []
+    });
+  };
+
+  // 선택된 지역별로 상세 지역 그룹화
+  const selectedRegions = filters.region || [];
+  const regionGroups = selectedRegions
+    .filter(region => region !== "배송" && KOREA_REGIONS[region]) // "배송"은 상세 지역 없음
+    .map(region => ({
+      region,
+      detailedRegions: KOREA_REGIONS[region] || []
+    }))
+    .filter(group => group.detailedRegions.length > 0);
 
   // 활성 필터 개수 계산
   const activeFilterCount = [
-    filters.region,
-    filters.detailedRegion,
+    ...(filters.region || []),
+    ...(filters.detailedRegion || []),
     filters.category,
     filters.type,
     filters.channel,
@@ -71,8 +133,8 @@ export function AdvancedFilters({ filters, onFiltersChange, isOpen, onToggle }: 
           <button
             onClick={() => {
               onFiltersChange({
-                region: "",
-                detailedRegion: "",
+                region: [],
+                detailedRegion: [],
                 category: "",
                 type: "",
                 channel: "",
@@ -90,44 +152,133 @@ export function AdvancedFilters({ filters, onFiltersChange, isOpen, onToggle }: 
       {isOpen && (
         <div className="md:bg-white md:rounded-lg md:shadow-sm md:p-6 md:border md:border-border/50">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
-            {/* 지역 선택 (시/도) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                지역
-              </label>
-              <select
-                value={filters.region}
-                onChange={(e) => updateFilter("region", e.target.value)}
-                className="w-full rounded-lg border-border/60 bg-white/50 text-sm py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-              >
-                <option value="">전체</option>
-                {Object.keys(KOREA_REGIONS).map((region) => (
-                  <option key={region} value={region}>
-                    {region}
-                  </option>
-                ))}
-                <option value="배송">배송</option>
-              </select>
+            {/* 지역 선택 (시/도) - 다중 선택 */}
+            <div className="col-span-full">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  지역
+                  {filters.region && filters.region.length > 0 && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      ({filters.region.length}개 선택됨)
+                    </span>
+                  )}
+                </label>
+                {filters.region && filters.region.length > 0 && (
+                  <button
+                    onClick={clearAllRegions}
+                    className="text-xs text-primary hover:text-primary/80 transition-colors"
+                  >
+                    전체 해제
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {Object.keys(KOREA_REGIONS).map((region) => {
+                  const isSelected = filters.region?.includes(region) || false;
+                  return (
+                    <button
+                      key={region}
+                      onClick={() => toggleRegion(region)}
+                      className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-full border flex items-center gap-2 ${
+                        isSelected
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm ring-2 ring-primary/20 scale-105"
+                          : "bg-white text-gray-600 border-border hover:bg-secondary/50 hover:border-border/80 hover:text-foreground"
+                      }`}
+                    >
+                      {isSelected && (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                      {region}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => toggleRegion("배송")}
+                  className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-full border flex items-center gap-2 ${
+                    filters.region?.includes("배송")
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm ring-2 ring-primary/20 scale-105"
+                      : "bg-white text-gray-600 border-border hover:bg-secondary/50 hover:border-border/80 hover:text-foreground"
+                  }`}
+                >
+                  {filters.region?.includes("배송") && (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                  배송
+                </button>
+              </div>
             </div>
 
-            {/* 상세 지역 선택 (구/군) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                상세 지역
-              </label>
-              <select
-                value={filters.detailedRegion || ""}
-                onChange={(e) => updateFilter("detailedRegion", e.target.value)}
-                disabled={!filters.region || detailedRegions.length === 0}
-                className="w-full rounded-lg border-border/60 bg-white/50 text-sm py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all disabled:opacity-50 disabled:bg-gray-100"
-              >
-                <option value="">전체</option>
-                {detailedRegions.map((detail) => (
-                  <option key={detail} value={detail}>
-                    {detail}
-                  </option>
-                ))}
-              </select>
+            {/* 상세 지역 선택 (구/군) - 지역별로 그룹화하여 표시, 다중 선택 */}
+            <div className="col-span-full">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  상세 지역
+                  {filters.detailedRegion && filters.detailedRegion.length > 0 && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      ({filters.detailedRegion.length}개 선택됨)
+                    </span>
+                  )}
+                </label>
+                {filters.detailedRegion && filters.detailedRegion.length > 0 && (
+                  <button
+                    onClick={clearAllDetailedRegions}
+                    className="text-xs text-primary hover:text-primary/80 transition-colors"
+                  >
+                    전체 해제
+                  </button>
+                )}
+              </div>
+              {selectedRegions.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-2">
+                  지역을 먼저 선택해주세요
+                </p>
+              ) : regionGroups.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-2">
+                  선택된 지역에 상세 지역이 없습니다
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {regionGroups.map((group) => (
+                    <div key={group.region} className="border border-border/50 rounded-lg p-4 bg-gray-50/50">
+                      <div className="flex items-center gap-2 mb-3">
+                        <h4 className="text-sm font-semibold text-gray-800">
+                          {group.region}
+                        </h4>
+                        <span className="text-xs text-muted-foreground">
+                          ({group.detailedRegions.length}개)
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {group.detailedRegions.map((detail) => {
+                          const isSelected = filters.detailedRegion?.includes(detail) || false;
+                          return (
+                            <button
+                              key={`${group.region}-${detail}`}
+                              onClick={() => toggleDetailedRegion(detail)}
+                              className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-full border flex items-center gap-2 ${
+                                isSelected
+                                  ? "bg-primary text-primary-foreground border-primary shadow-sm ring-2 ring-primary/20 scale-105"
+                                  : "bg-white text-gray-600 border-border hover:bg-secondary/50 hover:border-border/80 hover:text-foreground"
+                              }`}
+                            >
+                              {isSelected && (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                              {detail}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* 카테고리 선택 (Pill Buttons) */}
@@ -230,3 +381,4 @@ export function AdvancedFilters({ filters, onFiltersChange, isOpen, onToggle }: 
     </div>
   );
 }
+

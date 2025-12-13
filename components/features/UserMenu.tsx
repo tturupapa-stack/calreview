@@ -41,12 +41,7 @@ export function UserMenu() {
 
   if (isLoading) {
     return (
-      <div style={{
-        width: '32px',
-        height: '32px',
-        borderRadius: '50%',
-        backgroundColor: '#e5e7eb'
-      }}></div>
+      <div className="w-8 h-8 rounded-full bg-gray-200"></div>
     );
   }
 
@@ -54,15 +49,7 @@ export function UserMenu() {
     return (
       <a
         href="/login"
-        style={{
-          backgroundColor: '#2563eb',
-          color: 'white',
-          padding: '8px 16px',
-          borderRadius: '6px',
-          fontSize: '14px',
-          fontWeight: '500',
-          textDecoration: 'none'
-        }}
+        className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium no-underline hover:bg-blue-700 transition-colors"
       >
         로그인
       </a>
@@ -71,20 +58,11 @@ export function UserMenu() {
 
   return (
     <div
-      style={{ position: 'relative' }}
+      className="relative"
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
-      <button style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        borderRadius: '9999px',
-        padding: '4px',
-        cursor: 'pointer',
-        border: 'none',
-        background: 'transparent'
-      }}>
+      <button className="flex items-center gap-2 rounded-full p-1 cursor-pointer hover:bg-gray-100 transition-colors">
         {user.user_metadata?.avatar_url ? (
           <Image
             src={user.user_metadata.avatar_url}
@@ -94,87 +72,36 @@ export function UserMenu() {
             className="rounded-full"
           />
         ) : (
-          <div style={{
-            display: 'flex',
-            width: '32px',
-            height: '32px',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '50%',
-            backgroundColor: '#2563eb',
-            color: 'white',
-            fontSize: '14px',
-            fontWeight: '500'
-          }}>
+          <div className="flex w-8 h-8 items-center justify-center rounded-full bg-blue-600 text-white text-sm font-medium">
             {user.user_metadata?.name?.[0] || user.email?.[0] || "U"}
           </div>
         )}
-        <span style={{
-          fontSize: '14px',
-          color: '#374151'
-        }}>
+        <span className="text-sm text-gray-700 max-w-[100px] truncate">
           {user.user_metadata?.name || user.email}
         </span>
       </button>
 
       {isOpen && (
-        <div style={{
-          position: 'absolute',
-          right: 0,
-          top: '100%',
-          paddingTop: '8px',
-          width: '192px',
-          zIndex: 50,
-        }}>
-          <div style={{
-            borderRadius: '6px',
-            backgroundColor: 'white',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #e5e7eb',
-            overflow: 'hidden',
-          }}>
-            <div style={{ padding: '4px 0' }}>
-              <a
-                href="/my/campaigns"
-                style={{
-                  display: 'block',
-                  padding: '8px 16px',
-                  fontSize: '14px',
-                  color: '#374151',
-                  textDecoration: 'none'
-                }}
-              >
-                체험단 관리
-              </a>
-              <a
-                href="/settings"
-                style={{
-                  display: 'block',
-                  padding: '8px 16px',
-                  fontSize: '14px',
-                  color: '#374151',
-                  textDecoration: 'none'
-                }}
-              >
-                설정
-              </a>
-              <button
-                onClick={handleLogout}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '8px 16px',
-                  fontSize: '14px',
-                  color: '#374151',
-                  border: 'none',
-                  background: 'transparent',
-                  cursor: 'pointer'
-                }}
-              >
-                로그아웃
-              </button>
-            </div>
+        <div className="absolute right-0 top-full pt-2 w-48 z-50">
+          <div className="rounded-md bg-white shadow-lg border border-gray-200 overflow-hidden py-1">
+            <a
+              href="/my/campaigns"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline"
+            >
+              체험단 관리
+            </a>
+            <a
+              href="/settings"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline"
+            >
+              설정
+            </a>
+            <button
+              onClick={handleLogout}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 bg-transparent border-none cursor-pointer"
+            >
+              로그아웃
+            </button>
           </div>
         </div>
       )}

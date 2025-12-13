@@ -44,3 +44,4 @@ export function SearchHint({ query, onApplyFilters }: SearchHintProps) {
     </div>
   );
 }
+

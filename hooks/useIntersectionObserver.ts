@@ -42,3 +42,4 @@ export function useIntersectionObserver<T extends HTMLElement = HTMLDivElement>(
 
   return [elementRef, isIntersecting || (triggerOnce && hasTriggered)];
 }
+

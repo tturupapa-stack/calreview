@@ -11,6 +11,7 @@ jest.mock("@/lib/supabase-server", () => ({
 
 jest.mock("@/lib/google-calendar", () => ({
     createCalendarEvent: jest.fn(),
+    isAuthenticationError: jest.fn((err) => err?.code === 401 || err?.message === "invalid_grant"),
 }));
 
 jest.mock("next/server", () => {

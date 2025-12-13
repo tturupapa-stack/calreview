@@ -16,8 +16,8 @@ export function UnifiedSearchBar({ onSearch, initialQuery = "", initialFilters }
   const [query, setQuery] = useState(initialQuery);
   const [appliedFilters, setAppliedFilters] = useState<Filters>(
     initialFilters || {
-      region: "",
-      detailedRegion: "",
+      region: [],
+      detailedRegion: [],
       category: "",
       type: "",
       channel: "",
@@ -31,11 +31,21 @@ export function UnifiedSearchBar({ onSearch, initialQuery = "", initialFilters }
   useEffect(() => {
     const tags: Array<{ key: string; label: string; value: string }> = [];
     
-    if (appliedFilters.region) {
-      tags.push({ key: "region", label: "지역", value: appliedFilters.region });
+    if (appliedFilters.region && appliedFilters.region.length > 0) {
+      // 다중 지역을 하나의 태그로 표시
+      if (appliedFilters.region.length === 1) {
+        tags.push({ key: "region", label: "지역", value: appliedFilters.region[0] });
+      } else {
+        tags.push({ key: "region", label: "지역", value: `${appliedFilters.region.length}개 지역` });
+      }
     }
-    if (appliedFilters.detailedRegion) {
-      tags.push({ key: "detailedRegion", label: "상세지역", value: appliedFilters.detailedRegion });
+    if (appliedFilters.detailedRegion && appliedFilters.detailedRegion.length > 0) {
+      // 다중 상세 지역을 하나의 태그로 표시
+      if (appliedFilters.detailedRegion.length === 1) {
+        tags.push({ key: "detailedRegion", label: "상세지역", value: appliedFilters.detailedRegion[0] });
+      } else {
+        tags.push({ key: "detailedRegion", label: "상세지역", value: `${appliedFilters.detailedRegion.length}개 지역` });
+      }
     }
     if (appliedFilters.category) {
       tags.push({ key: "category", label: "카테고리", value: appliedFilters.category });
@@ -97,8 +107,10 @@ export function UnifiedSearchBar({ onSearch, initialQuery = "", initialFilters }
   const removeFilterTag = (key: keyof Filters) => {
     const newFilters = { ...appliedFilters };
     if (key === "region") {
-      newFilters.region = "";
-      newFilters.detailedRegion = "";
+      newFilters.region = [];
+      newFilters.detailedRegion = [];
+    } else if (key === "detailedRegion") {
+      newFilters.detailedRegion = [];
     } else {
       (newFilters[key] as string) = "";
     }
@@ -109,8 +121,8 @@ export function UnifiedSearchBar({ onSearch, initialQuery = "", initialFilters }
   const clearAll = () => {
     setQuery("");
     const emptyFilters: Filters = {
-      region: "",
-      detailedRegion: "",
+      region: [],
+      detailedRegion: [],
       category: "",
       type: "",
       channel: "",
@@ -129,7 +141,7 @@ export function UnifiedSearchBar({ onSearch, initialQuery = "", initialFilters }
             type="text"
             value={query}
             onChange={handleInputChange}
-            placeholder="예: 강남 이번주 맛집, 마감임박 강원 숙박"
+            placeholder="예: 강남 이번주 맛집, 마감임박 서울 뷰티"
             className="w-full rounded-lg border-gray-300 shadow-sm pl-12 pr-4 py-3 text-lg focus:border-blue-500 focus:ring-blue-500"
           />
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -209,3 +221,4 @@ export function UnifiedSearchBar({ onSearch, initialQuery = "", initialFilters }
     </div>
   );
 }
+

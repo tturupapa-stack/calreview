@@ -88,3 +88,4 @@ export async function updateSitePattern(siteName: string, pattern: Partial<SiteP
 export function getSitePattern(siteName: string): SitePattern | null {
   return SITE_PATTERNS[siteName] || null;
 }
+

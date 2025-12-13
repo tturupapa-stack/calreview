@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { CampaignCard } from "@/components/features/CampaignCard";
 import { UnifiedSearchBar } from "@/components/features/UnifiedSearchBar";
 import { MobileFilterSheet } from "@/components/features/MobileFilterSheet";
@@ -107,26 +108,39 @@ function SitePreviewSection({ siteId, siteName, onMoreClick, shouldLoad }: { sit
 }
 
 export default function SearchPage() {
+  const searchParams = useSearchParams();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [query, setQuery] = useState("");
-  const [filters, setFilters] = useState<Filters>({
-    region: "",
-    detailedRegion: "",
-    category: "",
-    type: "",
-    channel: "",
-    site_name: "",
-    sort: "deadline",
-  });
+  
+  // URL 파라미터에서 초기 필터 읽기
+  const getInitialFilters = (): Filters => {
+    const regionParam = searchParams.get("region");
+    const regions = regionParam ? regionParam.split(",").map(r => r.trim()).filter(Boolean) : [];
+    
+    const detailedRegionParam = searchParams.get("detailed_region");
+    const detailedRegions = detailedRegionParam ? detailedRegionParam.split(",").map(r => r.trim()).filter(Boolean) : [];
+    
+    return {
+      region: regions,
+      detailedRegion: detailedRegions,
+      category: searchParams.get("category") || "",
+      type: searchParams.get("type") || "",
+      channel: searchParams.get("channel") || "",
+      site_name: searchParams.get("site_name") || "",
+      sort: searchParams.get("sort") || "deadline",
+    };
+  };
+  
+  const [query, setQuery] = useState(searchParams.get("q") || "");
+  const [filters, setFilters] = useState<Filters>(getInitialFilters());
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [total, setTotal] = useState(0);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Check if preview mode (no filters active)
-  const isPreviewMode = !query && !filters.region && !filters.detailedRegion && !filters.category && !filters.type && !filters.channel && !filters.site_name && filters.sort === "deadline";
+  const isPreviewMode = !query && (!filters.region || filters.region.length === 0) && (!filters.detailedRegion || filters.detailedRegion.length === 0) && !filters.category && !filters.type && !filters.channel && !filters.site_name && filters.sort === "deadline";
 
   useEffect(() => {
     if (!isPreviewMode) {
@@ -153,8 +167,14 @@ export default function SearchPage() {
       }
       
       // 필터 파라미터 추가 (자연어 검색과 함께 사용 가능)
-      if (filters.region) params.append("region", filters.region);
-      if (filters.detailedRegion) params.append("detailed_region", filters.detailedRegion);
+      if (filters.region && filters.region.length > 0) {
+        // 다중 지역을 쉼표로 구분하여 전달
+        params.append("region", filters.region.join(","));
+      }
+      if (filters.detailedRegion && filters.detailedRegion.length > 0) {
+        // 다중 상세 지역을 쉼표로 구분하여 전달
+        params.append("detailed_region", filters.detailedRegion.join(","));
+      }
       if (filters.category) params.append("category", filters.category);
       if (filters.type) params.append("type", filters.type);
       if (filters.channel) params.append("channel", filters.channel);
@@ -206,8 +226,8 @@ export default function SearchPage() {
   const handleTagClick = (tag: string) => {
     setQuery(tag);
     setFilters({
-      region: "",
-      detailedRegion: "",
+      region: [],
+      detailedRegion: [],
       category: "",
       type: "",
       channel: "",
@@ -303,7 +323,7 @@ export default function SearchPage() {
                   <button
                     onClick={() => {
                       setQuery("");
-                      setFilters({ region: "", detailedRegion: "", category: "", type: "", channel: "", site_name: "", sort: "deadline" });
+                      setFilters({ region: [], detailedRegion: [], category: "", type: "", channel: "", site_name: "", sort: "deadline" });
                     }}
                     className="text-sm text-primary hover:text-primary/80 font-medium transition-colors flex items-center gap-1"
                   >

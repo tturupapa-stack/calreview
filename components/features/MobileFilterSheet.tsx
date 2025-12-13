@@ -39,8 +39,8 @@ export function MobileFilterSheet({ filters, onFiltersChange }: MobileFilterShee
 
   // 활성 필터 개수 계산
   const activeFilterCount = [
-    filters.region,
-    filters.detailedRegion,
+    ...(filters.region || []),
+    ...(filters.detailedRegion || []),
     filters.category,
     filters.type,
     filters.channel,
@@ -104,8 +104,8 @@ export function MobileFilterSheet({ filters, onFiltersChange }: MobileFilterShee
                   variant="outline"
                   onClick={() => {
                     onFiltersChange({
-                      region: "",
-                      detailedRegion: "",
+                      region: [],
+                      detailedRegion: [],
                       category: "",
                       type: "",
                       channel: "",
@@ -131,3 +131,4 @@ export function MobileFilterSheet({ filters, onFiltersChange }: MobileFilterShee
     </>
   );
 }
+

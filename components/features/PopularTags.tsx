@@ -83,16 +83,16 @@ export function PopularTags({ onTagClick }: PopularTagsProps) {
     }
   };
 
-  // 기본 태그 (검색 기록이 없을 때)
+  // 기본 태그 (검색 기록이 없을 때) - 실제 결과가 있는 카테고리만 포함
   const defaultTags = [
     "강남 맛집",
     "이번주 마감임박",
     "서울 뷰티",
     "배송형 제품",
-    "강원 숙박",
     "마감임박",
     "인스타 뷰티",
     "서울 이번주",
+    "경기 여행",
   ];
 
   if (isLoading) {

@@ -11,8 +11,12 @@ export async function GET(request: NextRequest) {
 
     // 자연어 검색 쿼리 또는 일반 필터 파라미터
     const q = searchParams.get("q"); // 자연어 검색
-    const region = searchParams.get("region");
-    const detailedRegion = searchParams.get("detailed_region");
+    const regionParam = searchParams.get("region");
+    // 다중 지역 지원: 쉼표로 구분된 지역 목록
+    const regions = regionParam ? regionParam.split(",").map(r => r.trim()).filter(Boolean) : [];
+    const detailedRegionParam = searchParams.get("detailed_region");
+    // 다중 상세 지역 지원: 쉼표로 구분된 상세 지역 목록
+    const detailedRegions = detailedRegionParam ? detailedRegionParam.split(",").map(r => r.trim()).filter(Boolean) : [];
     const category = searchParams.get("category");
     const type = searchParams.get("type");
     const channel = searchParams.get("channel");
@@ -61,7 +65,12 @@ export async function GET(request: NextRequest) {
       .gte("application_deadline", todayStr); // 오늘 날짜 이후의 게시물만 조회
 
     // 필터 적용 (자연어 검색 결과 우선, 없으면 일반 파라미터 사용)
-    const finalRegion = parsedQuery?.region || region;
+    // 자연어 검색에서 지역이 추출되면 단일 지역 배열로, 아니면 URL 파라미터의 다중 지역 사용
+    const finalRegions = parsedQuery?.region 
+      ? [parsedQuery.region] 
+      : regions.length > 0 
+        ? regions 
+        : [];
     const finalCategory = parsedQuery?.category || category;
     const finalType = parsedQuery?.type || type;
     const finalChannel = parsedQuery?.channel || channel;
@@ -92,6 +101,19 @@ export async function GET(request: NextRequest) {
           remainingQuery = remainingQuery.replace(new RegExp(parsedQuery.region, "gi"), "").trim();
           remainingQuery = remainingQuery.replace(new RegExp(`${parsedQuery.region}시`, "gi"), "").trim();
         }
+        // URL 파라미터의 다중 지역도 제거
+        if (regions.length > 0) {
+          for (const region of regions) {
+            remainingQuery = remainingQuery.replace(new RegExp(region, "gi"), "").trim();
+            remainingQuery = remainingQuery.replace(new RegExp(`${region}시`, "gi"), "").trim();
+          }
+        }
+        // URL 파라미터의 다중 상세 지역도 제거
+        if (detailedRegions.length > 0) {
+          for (const detailedRegion of detailedRegions) {
+            remainingQuery = remainingQuery.replace(new RegExp(detailedRegion, "gi"), "").trim();
+          }
+        }
         if (parsedQuery?.category) {
           remainingQuery = remainingQuery.replace(new RegExp(parsedQuery.category, "gi"), "").trim();
         }
@@ -121,41 +143,62 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    if (finalRegion) {
-      // 시 단위 검색의 경우 더 정확한 매칭
-      // "수원"을 검색하면 "경기 수원", "수원", "수원시" 등이 포함된 것 찾기
-      // "의정부"를 검색하면 "경기 의정부", "의정부", "의정부시" 등이 포함된 것 찾기
-
-      // 시 단위인 경우 (도 이름이 아닌 경우) 더 정확한 매칭
-      const isCityLevel = !["서울", "경기", "인천", "강원", "충남", "충북", "전남", "전북", "경남", "경북", "제주", "전국", "배송"].includes(finalRegion);
-
-      if (isCityLevel) {
-        // 시 단위 검색: "수원" 또는 "수원시" 둘 다 매칭
-        // "경기 수원", "수원", "수원시", "수원시 경기" 등 모두 매칭
-        // ilike("%수원%")는 "경기 수원", "수원", "수원시" 모두 매칭됨
-        query = query.ilike("region", `%${finalRegion}%`);
+    // 다중 지역 필터링 (OR 조건)
+    if (finalRegions.length > 0) {
+      // 여러 지역 중 하나라도 매칭되면 표시
+      const regionConditions = finalRegions.map(region => {
+        // 시 단위인 경우 (도 이름이 아닌 경우) 더 정확한 매칭
+        const isCityLevel = !["서울", "경기", "인천", "강원", "충남", "충북", "전남", "전북", "경남", "경북", "제주", "전국", "배송"].includes(region);
+        
+        if (isCityLevel) {
+          // 시 단위 검색: "수원" 또는 "수원시" 둘 다 매칭
+          return `region.ilike.%${region}%`;
+        } else {
+          // 도 단위 검색
+          return `region.ilike.%${region}%`;
+        }
+      });
+      
+      // OR 조건으로 결합
+      if (regionConditions.length === 1) {
+        query = query.ilike("region", `%${finalRegions[0]}%`);
       } else {
-        // 도 단위 검색: 기존 로직 유지
-        query = query.ilike("region", `%${finalRegion}%`);
+        // Supabase의 or() 메서드를 사용하여 여러 조건을 OR로 결합
+        query = query.or(regionConditions.join(","));
       }
     }
-    if (detailedRegion) {
-      // "시", "구", "군" 접미사 제거
-      let keyword = detailedRegion.replace(/(시|구|군)$/, "");
+    // 다중 상세 지역 필터링 (OR 조건)
+    if (detailedRegions.length > 0) {
+      const detailedRegionConditions = detailedRegions.map(detailedRegion => {
+        // "시", "구", "군" 접미사 제거
+        let keyword = detailedRegion.replace(/(시|구|군)$/, "");
 
-      // 1. 단음절 방지 (중구 -> 중, 동구 -> 동 검색 방지)
-      // 접미사를 제거했는데 1글자가 되면 제거하지 않음 (예: "중구", "서구"는 그대로 검색)
-      if (keyword.length < 2) {
-        keyword = detailedRegion;
-      }
+        // 1. 단음절 방지 (중구 -> 중, 동구 -> 동 검색 방지)
+        // 접미사를 제거했는데 1글자가 되면 제거하지 않음 (예: "중구", "서구"는 그대로 검색)
+        if (keyword.length < 2) {
+          keyword = detailedRegion;
+        }
 
-      // 2. "고양" (지역) vs "고양이" (동물) 구분
-      // 키워드가 "고양"인 경우, 제목 검색 시 "고양이"가 아닌 "고양"만 찾도록 정규식 사용
-      // Postgres 정규식: 고양($|[^이]) -> "고양" 뒤에 끝이거나 "이"가 아닌 문자가 옴
-      if (keyword === "고양") {
-        query = query.or(`region.ilike.%${keyword}%,title.match.고양($|[^이])`);
+        // 2. "고양" (지역) vs "고양이" (동물) 구분
+        if (keyword === "고양") {
+          return `region.ilike.%${keyword}%,title.match.고양($|[^이])`;
+        } else {
+          return `region.ilike.%${keyword}%,title.ilike.%${keyword}%`;
+        }
+      });
+
+      // OR 조건으로 결합
+      if (detailedRegionConditions.length === 1) {
+        const keyword = detailedRegions[0].replace(/(시|구|군)$/, "");
+        const finalKeyword = keyword.length < 2 ? detailedRegions[0] : keyword;
+        if (finalKeyword === "고양") {
+          query = query.or(`region.ilike.%${finalKeyword}%,title.match.고양($|[^이])`);
+        } else {
+          query = query.or(`region.ilike.%${finalKeyword}%,title.ilike.%${finalKeyword}%`);
+        }
       } else {
-        query = query.or(`region.ilike.%${keyword}%,title.ilike.%${keyword}%`);
+        // Supabase의 or() 메서드를 사용하여 여러 조건을 OR로 결합
+        query = query.or(detailedRegionConditions.join(","));
       }
     }
     if (finalCategory) {

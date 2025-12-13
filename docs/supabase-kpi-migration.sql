@@ -150,3 +150,4 @@ CREATE TRIGGER update_user_activity_on_application
 AFTER INSERT OR UPDATE ON public.applications
 FOR EACH ROW
 EXECUTE FUNCTION update_user_last_active_at();
+

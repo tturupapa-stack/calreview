@@ -26,3 +26,4 @@ export function LazySection({ children, onVisible, fallback, className }: LazySe
     </div>
   );
 }
+
