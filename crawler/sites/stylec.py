@@ -211,12 +211,16 @@ def _fetch_api(endpoint: str, params: dict = None) -> list:
         return []
 
 
-def crawl(max_pages: int = 20) -> List[Campaign]:
+def crawl(max_pages: int = 50, include_closing: bool = False) -> List[Campaign]:
     """스타일씨 크롤링 - API 직접 호출 방식.
 
     여러 API 엔드포인트에서 데이터를 수집하여 통합합니다.
+
+    Args:
+        max_pages: 최대 페이지 수 (기본 50페이지)
+        include_closing: 마감임박 캠페인 포함 여부 (기본 False)
     """
-    logger.info("스타일씨 크롤링 시작 (API 방식)")
+    logger.info("스타일씨 크롤링 시작 (API 방식, max_pages=%d)", max_pages)
 
     campaigns: List[Campaign] = []
     seen_urls: Set[str] = set()
@@ -231,25 +235,44 @@ def crawl(max_pages: int = 20) -> List[Campaign]:
             campaigns.append(campaign)
             seen_urls.add(campaign.url)
 
-    # 2. 일반 캠페인 조회 (마감되지 않은 것만)
-    general_items = _fetch_api("/trial", {"include_finish": "false", "limit": 200})
-    logger.info("스타일씨 일반 캠페인: %d개", len(general_items))
+    # 2. 일반 캠페인 페이지별 조회 (마감되지 않은 것만)
+    total_general = 0
+    for page in range(1, max_pages + 1):
+        general_items = _fetch_api("/trial", {"include_finish": "false", "page": page})
 
-    for item in general_items:
-        campaign = _parse_campaign(item)
-        if campaign and campaign.url not in seen_urls:
-            campaigns.append(campaign)
-            seen_urls.add(campaign.url)
+        if not general_items:
+            logger.info("스타일씨 페이지 %d: 결과 없음, 중단", page)
+            break
 
-    # 3. 마감 임박 캠페인 조회 (추가 수집)
-    closing_items = _fetch_api("/trial/closing-trials")
-    logger.info("스타일씨 마감임박 캠페인: %d개", len(closing_items))
+        new_count = 0
+        for item in general_items:
+            campaign = _parse_campaign(item)
+            if campaign and campaign.url not in seen_urls:
+                campaigns.append(campaign)
+                seen_urls.add(campaign.url)
+                new_count += 1
 
-    for item in closing_items:
-        campaign = _parse_campaign(item)
-        if campaign and campaign.url not in seen_urls:
-            campaigns.append(campaign)
-            seen_urls.add(campaign.url)
+        total_general += len(general_items)
+
+        # 새로운 캠페인이 없으면 중단 (중복 페이지)
+        if new_count == 0:
+            logger.info("스타일씨 페이지 %d: 새 캠페인 없음, 중단", page)
+            break
+
+        logger.info("스타일씨 페이지 %d: %d개 중 %d개 신규", page, len(general_items), new_count)
+
+    logger.info("스타일씨 일반 캠페인 총: %d개 조회", total_general)
+
+    # 3. 마감 임박 캠페인 조회 (선택적)
+    if include_closing:
+        closing_items = _fetch_api("/trial/closing-trials")
+        logger.info("스타일씨 마감임박 캠페인: %d개", len(closing_items))
+
+        for item in closing_items:
+            campaign = _parse_campaign(item)
+            if campaign and campaign.url not in seen_urls:
+                campaigns.append(campaign)
+                seen_urls.add(campaign.url)
 
     logger.info("스타일씨 총 %d개 캠페인 수집 완료", len(campaigns))
 
