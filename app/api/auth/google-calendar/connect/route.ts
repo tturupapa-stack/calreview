@@ -39,11 +39,19 @@ export async function GET(request: NextRequest) {
 
     // Redirect URI는 현재 앱의 URL을 사용
     const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const redirectUri = `${origin}/api/auth/google-calendar/callback`;
+    
+    console.log("Google Calendar OAuth 연결 시작:", {
+      origin,
+      redirectUri,
+      hasClientId: !!clientId,
+      clientIdLength: clientId?.length,
+    });
     
     const oauth2Client = new google.auth.OAuth2(
       clientId,
       clientSecret,
-      `${origin}/api/auth/google-calendar/callback`
+      redirectUri
     );
 
     const scopes = [

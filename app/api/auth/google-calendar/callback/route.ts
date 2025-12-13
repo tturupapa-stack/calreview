@@ -27,17 +27,49 @@ export async function GET(request: NextRequest) {
 
     // Redirect URI는 현재 요청의 origin 사용
     const origin = new URL(request.url).origin;
+    const redirectUri = `${origin}/api/auth/google-calendar/callback`;
+    
+    console.log("Google Calendar OAuth 콜백 처리:", {
+      origin,
+      redirectUri,
+      hasClientId: !!clientId,
+      clientIdLength: clientId?.length,
+      hasCode: !!code,
+      hasState: !!state,
+    });
     
     const oauth2Client = new google.auth.OAuth2(
       clientId,
       clientSecret,
-      `${origin}/api/auth/google-calendar/callback`
+      redirectUri
     );
 
     // 인증 코드를 액세스 토큰과 리프레시 토큰으로 교환
-    const { tokens } = await oauth2Client.getToken(code);
+    let tokens;
+    try {
+      const tokenResponse = await oauth2Client.getToken(code);
+      tokens = tokenResponse.tokens;
+    } catch (tokenError: any) {
+      console.error("Google OAuth 토큰 교환 오류:", {
+        error: tokenError,
+        message: tokenError.message,
+        code: tokenError.code,
+        response: tokenError.response?.data,
+      });
+      
+      // 구체적인 오류 타입에 따라 다른 에러 코드 반환
+      if (tokenError.code === 401 || tokenError.message?.includes("invalid_client")) {
+        return redirect("/settings?error=invalid_client");
+      }
+      if (tokenError.message?.includes("redirect_uri_mismatch")) {
+        return redirect("/settings?error=redirect_uri_mismatch");
+      }
+      
+      throw tokenError; // 다른 에러는 catch 블록으로 전달
+    }
 
     if (!tokens.refresh_token) {
+      console.warn("리프레시 토큰을 받지 못했습니다. 사용자가 이미 승인했을 수 있습니다.");
       return redirect("/settings?error=no_refresh_token");
     }
 
@@ -70,7 +102,15 @@ export async function GET(request: NextRequest) {
 
     return redirect("/settings?success=calendar_connected");
   } catch (error: any) {
-    console.error("Google Calendar 콜백 오류:", error);
+    console.error("Google Calendar 콜백 오류:", {
+      error,
+      message: error?.message,
+      code: error?.code,
+      stack: error?.stack,
+      response: error?.response?.data,
+    });
+    
+    // 이미 리다이렉트된 경우가 아니면 에러 리다이렉트
     return redirect("/settings?error=callback_failed");
   }
 }

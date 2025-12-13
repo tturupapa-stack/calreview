@@ -88,6 +88,12 @@ export default function SettingsPage() {
         case "callback_failed":
           errorMessage = "인증 처리 중 오류가 발생했습니다. 다시 시도해주세요.";
           break;
+        case "invalid_client":
+          errorMessage = "Google OAuth 클라이언트 설정 오류입니다. 관리자에게 문의하세요.";
+          break;
+        case "redirect_uri_mismatch":
+          errorMessage = "리디렉션 URI가 일치하지 않습니다. 관리자에게 문의하세요.";
+          break;
         default:
           errorMessage = `오류: ${error}`;
       }
