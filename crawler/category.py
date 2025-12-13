@@ -79,7 +79,7 @@ def normalize_category(site_name: str, raw_category: Optional[str], title: str) 
         return "도서"
     if any(k in title_norm for k in ["유아", "육아", "기저귀", "장난감"]):
         return "유아동"
-    if any(k in title_norm for k in ["반려", "강아지", "고양이", "사료", "간식"]):
+    if any(k in title_norm for k in ["반려", "강아지", "고양이", "사료", "동물병원", "애견", "펫샵", "펫호텔"]):
         return "반려동물"
     if "재택" in title_norm:
         return "재택"
