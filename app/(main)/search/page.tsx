@@ -77,24 +77,27 @@ function SitePreviewSection({ siteId, siteName, onMoreClick }: { siteId: string,
   if (!loading && items.length === 0) return null;
 
   return (
-    <div className="mb-12">
-      <div className="flex justify-between items-center mb-6 border-b pb-2">
-        <h2 className="text-xl font-bold flex items-center gap-2">
-          <SiteLogo site={siteId} size={24} className="mr-1" />
+    <div className="mb-16">
+      <div className="flex justify-between items-center mb-6 pb-3 border-b border-border/50">
+        <h2 className="text-2xl font-bold font-heading flex items-center gap-3">
+          <SiteLogo site={siteId} size={28} className="mr-1" />
           {siteName}
-          <span className="text-sm font-normal text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">마감임박</span>
+          <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">마감임박</span>
         </h2>
         <button
           onClick={() => onMoreClick(siteId)}
-          className="text-sm text-primary hover:text-primary/80 font-medium flex items-center"
+          className="text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1 transition-colors group"
         >
-          더보기 &gt;
+          더보기
+          <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-8">
-          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="flex justify-center py-12">
+          <div className="w-8 h-8 border-3 border-primary/20 border-t-primary rounded-full animate-spin"></div>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -224,14 +227,26 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">체험단 검색</h1>
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold font-heading mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          체험단 검색
+        </h1>
+        <p className="text-muted-foreground">원하는 체험단을 빠르게 찾아보세요</p>
+      </div>
 
-      <SmartSearchBar onSearch={handleSmartSearch} initialQuery={smartQuery} />
-      <PopularTags onTagClick={handleTagClick} />
+      <div className="mb-6">
+        <SmartSearchBar onSearch={handleSmartSearch} initialQuery={smartQuery} />
+      </div>
+      
+      <div className="mb-6">
+        <PopularTags onTagClick={handleTagClick} />
+      </div>
 
       {!smartQuery && (
-        <SearchFilters filters={filters} onFiltersChange={setFilters} />
+        <div className="mb-8">
+          <SearchFilters filters={filters} onFiltersChange={setFilters} />
+        </div>
       )}
 
       {isPreviewMode ? (
@@ -249,26 +264,37 @@ export default function SearchPage() {
         // List View
         <>
           {isLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-block w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-              <p className="mt-2 text-gray-600">로딩 중...</p>
+            <div className="text-center py-16">
+              <div className="inline-block w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+              <p className="mt-4 text-muted-foreground">검색 중...</p>
             </div>
           ) : campaigns.length === 0 ? (
-            <div className="text-center py-12 text-gray-600">
-              검색 결과가 없습니다.
+            <div className="text-center py-16">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+                <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <p className="text-lg font-medium text-foreground mb-2">검색 결과가 없습니다</p>
+              <p className="text-sm text-muted-foreground">다른 검색어나 필터를 시도해보세요</p>
             </div>
           ) : (
             <>
-              <div className="mb-4 text-sm text-gray-600">
-                총 {total}개 중 {campaigns.length}개 표시
+              <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
+                <div className="text-sm text-muted-foreground">
+                  총 <span className="font-semibold text-foreground">{total}</span>개 중 <span className="font-semibold text-foreground">{campaigns.length}</span>개 표시
+                </div>
                 {smartQuery && (
                   <button
                     onClick={() => {
                       setSmartQuery("");
                       setFilters({ region: "", detailedRegion: "", category: "", type: "", channel: "", site_name: "", sort: "deadline" });
                     }}
-                    className="ml-4 text-primary hover:underline"
+                    className="text-sm text-primary hover:text-primary/80 font-medium transition-colors flex items-center gap-1"
                   >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                     검색 초기화
                   </button>
                 )}
@@ -281,13 +307,20 @@ export default function SearchPage() {
               </div>
 
               {hasMore && (
-                <div className="mt-8 text-center">
+                <div className="mt-12 text-center">
                   <button
                     onClick={loadMore}
                     disabled={isLoadingMore}
-                    className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50"
+                    className="px-8 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 hover:shadow-md hover:shadow-primary/25 disabled:opacity-50 transition-all duration-200 active:scale-95"
                   >
-                    {isLoadingMore ? "로딩 중..." : `더 보기 (${total - campaigns.length}개 남음)`}
+                    {isLoadingMore ? (
+                      <span className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        로딩 중...
+                      </span>
+                    ) : (
+                      `더 보기 (${total - campaigns.length}개 남음)`
+                    )}
                   </button>
                 </div>
               )}

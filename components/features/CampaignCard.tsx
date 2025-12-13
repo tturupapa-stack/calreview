@@ -138,7 +138,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
   }
 
   return (
-    <div className="group bg-white rounded-xl border border-border/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+    <div className="group bg-white rounded-xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
       <a
         href={hasValidUrl ? campaign.source_url : undefined}
         target={hasValidUrl ? "_blank" : undefined}
@@ -147,21 +147,24 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         onClick={!hasValidUrl ? (e) => e.preventDefault() : undefined}
       >
         {/* 이미지 */}
-        <div className="relative w-full h-48 bg-gray-200 overflow-hidden">
+        <div className="relative w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
           {imageUrl && !imageError ? (
-            <img
-              src={imageUrl}
-              alt={campaign.title}
-              className="w-full h-full object-cover"
-              loading="lazy"
-              onError={() => {
-                console.error("이미지 로드 실패:", imageUrl);
-                setImageError(true);
-              }}
-            />
+            <>
+              <img
+                src={imageUrl}
+                alt={campaign.title}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                loading="lazy"
+                onError={() => {
+                  console.error("이미지 로드 실패:", imageUrl);
+                  setImageError(true);
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </>
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground">
-              <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-16 h-16 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
@@ -226,14 +229,14 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
       {/* 북마크 버튼 */}
       <div className="px-4 pb-4">
         {isChecking ? (
-          <button disabled className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-400 rounded">
+          <button disabled className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-400 rounded transition-all">
             확인 중...
           </button>
         ) : isBookmarked ? (
           <button
             onClick={handleUnbookmark}
             disabled={isLoading}
-            className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded hover:opacity-90 disabled:opacity-50"
+            className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 hover:shadow-md hover:shadow-primary/25 disabled:opacity-50 transition-all duration-200 active:scale-95"
           >
             {isLoading ? "처리 중..." : "북마크됨"}
           </button>
@@ -241,7 +244,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           <button
             onClick={handleBookmark}
             disabled={isLoading}
-            className="w-full px-3 py-2 text-sm bg-secondary text-foreground rounded hover:bg-secondary/80 disabled:opacity-50"
+            className="w-full px-3 py-2 text-sm bg-secondary text-foreground rounded-md hover:bg-secondary/80 hover:shadow-sm disabled:opacity-50 transition-all duration-200 active:scale-95"
           >
             {isLoading ? "처리 중..." : "북마크"}
           </button>

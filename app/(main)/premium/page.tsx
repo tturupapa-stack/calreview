@@ -52,7 +52,7 @@ export default function PremiumPage() {
           <div className="bg-gradient-to-br from-primary/5 to-secondary rounded-2xl shadow-xl p-10 border-2 border-primary/20">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-3">
-                캘리뷰의 모든 기능
+                Cally의 모든 기능
               </h2>
               <p className="text-gray-600">
                 체험단 관리에 필요한 모든 것
