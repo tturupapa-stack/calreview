@@ -352,6 +352,11 @@ export function AdvancedFilters({ filters, onFiltersChange, isOpen, onToggle }: 
               >
                 <option value="">전체</option>
                 <option value="stylec">스타일씨</option>
+                <option value="modan">모두의체험단</option>
+                <option value="myinfluencer">마이인플루언서</option>
+                <option value="chuble">츄블</option>
+                <option value="real_review">리얼리뷰</option>
+                <option value="dinodan">디노단</option>
               </select>
             </div>
 
