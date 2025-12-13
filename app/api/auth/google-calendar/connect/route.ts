@@ -22,12 +22,27 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // 환경 변수 확인
+    const clientId = process.env.GOOGLE_CALENDAR_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CALENDAR_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+      console.error("Google Calendar 환경 변수 누락:", {
+        hasClientId: !!clientId,
+        hasClientSecret: !!clientSecret,
+      });
+      return NextResponse.json(
+        { error: "Google Calendar 설정이 올바르지 않습니다. 관리자에게 문의하세요." },
+        { status: 500 }
+      );
+    }
+
     // Redirect URI는 현재 앱의 URL을 사용
     const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     
     const oauth2Client = new google.auth.OAuth2(
-      process.env.GOOGLE_CALENDAR_CLIENT_ID,
-      process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
+      clientId,
+      clientSecret,
       `${origin}/api/auth/google-calendar/callback`
     );
 

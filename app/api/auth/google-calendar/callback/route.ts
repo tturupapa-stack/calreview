@@ -16,12 +16,21 @@ export async function GET(request: NextRequest) {
       return redirect("/settings?error=missing_params");
     }
 
+    // 환경 변수 확인
+    const clientId = process.env.GOOGLE_CALENDAR_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CALENDAR_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+      console.error("Google Calendar 환경 변수 누락");
+      return redirect("/settings?error=config_error");
+    }
+
     // Redirect URI는 현재 요청의 origin 사용
     const origin = new URL(request.url).origin;
     
     const oauth2Client = new google.auth.OAuth2(
-      process.env.GOOGLE_CALENDAR_CLIENT_ID,
-      process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
+      clientId,
+      clientSecret,
       `${origin}/api/auth/google-calendar/callback`
     );
 
