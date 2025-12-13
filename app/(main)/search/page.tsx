@@ -274,26 +274,9 @@ export default function SearchPage() {
       </div>
 
       {isPreviewMode ? (
-        // Dashboard View with Lazy Loading
+        // Dashboard View
         <div className="mt-8">
-          {/* 초기 로드: 상위 3개 사이트만 */}
-          <SitePreviewSection siteId="seoulouba" siteName="서울오빠" onMoreClick={handleMoreClick} shouldLoad={true} />
-          <SitePreviewSection siteId="reviewplace" siteName="리뷰플레이스" onMoreClick={handleMoreClick} shouldLoad={true} />
-          <SitePreviewSection siteId="reviewnote" siteName="리뷰노트" onMoreClick={handleMoreClick} shouldLoad={true} />
-          
-          {/* 지연 로드: 나머지 사이트들 */}
-          <LazySection>
-            <SitePreviewSection siteId="dinnerqueen" siteName="디너의여왕" onMoreClick={handleMoreClick} shouldLoad={true} />
-          </LazySection>
-          <LazySection>
-            <SitePreviewSection siteId="modooexperience" siteName="모두의체험단" onMoreClick={handleMoreClick} shouldLoad={true} />
-          </LazySection>
-          <LazySection>
-            <SitePreviewSection siteId="pavlovu" siteName="파블로체험단" onMoreClick={handleMoreClick} shouldLoad={true} />
-          </LazySection>
-          <LazySection>
-            <SitePreviewSection siteId="gangnam" siteName="강남맛집" onMoreClick={handleMoreClick} shouldLoad={true} />
-          </LazySection>
+          <SitePreviewSection siteId="stylec" siteName="스타일씨" onMoreClick={handleMoreClick} shouldLoad={true} />
         </div>
       ) : (
         // List View

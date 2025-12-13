@@ -10,8 +10,22 @@ from crawler.models import Campaign
 from crawler.category import normalize_category
 from crawler.region import normalize_region
 
-# 로컬 실행 시 사용할 .env.local 로드 (없어도 에러는 발생시키지 않음)
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
+# 로컬 실행 시 사용할 .env 파일 로드 (여러 경로 시도)
+# 1. 프로젝트 루트의 .env.local
+# 2. 프로젝트 루트의 .env
+# 3. 현재 디렉토리의 .env
+project_root = os.path.join(os.path.dirname(__file__), "..")
+env_paths = [
+    os.path.join(project_root, ".env.local"),
+    os.path.join(project_root, ".env"),
+    os.path.join(os.getcwd(), ".env.local"),
+    os.path.join(os.getcwd(), ".env"),
+]
+
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        load_dotenv(env_path, override=False)  # override=False: 이미 설정된 변수는 덮어쓰지 않음
+        break
 
 # 로깅 설정
 import sys
@@ -49,12 +63,47 @@ def get_supabase_client() -> Optional[Client]:
     
     if not url or not key:
         logger.warning("Supabase 환경 변수가 설정되지 않았습니다. (로컬 크롤링만 수행)")
+        if not url:
+            logger.warning("  - NEXT_PUBLIC_SUPABASE_URL가 설정되지 않았습니다.")
+        if not key:
+            logger.warning("  - SUPABASE_SERVICE_ROLE_KEY가 설정되지 않았습니다.")
+            logger.warning("    Supabase Dashboard > Settings > API에서 service_role key를 복사하여")
+            logger.warning("    .env.local 파일에 설정하세요. (자세한 가이드: docs/SUPABASE_API_KEY_SETUP.md)")
+        return None
+    
+    # placeholder 값 체크
+    placeholder_patterns = [
+        "your_supabase_service_role_key",
+        "your_supabase_project_url",
+        "your-",
+        "placeholder",
+    ]
+    
+    if any(pattern in key for pattern in placeholder_patterns):
+        logger.error("SUPABASE_SERVICE_ROLE_KEY가 placeholder 값입니다!")
+        logger.error("Supabase Dashboard > Settings > API에서 실제 service_role key를 복사하여")
+        logger.error(".env.local 파일에 설정하세요. (자세한 가이드: docs/SUPABASE_API_KEY_SETUP.md)")
+        return None
+    
+    if len(key) < 100:
+        logger.warning("SUPABASE_SERVICE_ROLE_KEY가 너무 짧습니다 (길이: %d자).", len(key))
+        logger.warning("실제 service_role key는 200자 이상의 JWT 토큰입니다.")
+        logger.warning("Supabase Dashboard에서 올바른 키를 확인하세요.")
         return None
         
     try:
-        return create_client(url, key)
+        client = create_client(url, key)
+        # 연결 테스트 (간단한 쿼리)
+        try:
+            client.table("campaigns").select("id").limit(1).execute()
+            logger.debug("Supabase 연결 성공")
+        except Exception as test_e:
+            logger.warning("Supabase 연결 테스트 실패: %s", test_e)
+            logger.warning("API 키가 올바른지 확인하세요.")
+        return client
     except Exception as e:  # pragma: no cover - 외부 의존성 예외
         logger.error(f"Supabase 연결 실패: {e}")
+        logger.error("URL과 API 키를 확인하세요.")
         return None
 
 
@@ -145,15 +194,15 @@ def _campaign_to_supabase_dict(campaign: Campaign) -> dict:
     # 0. 기자단 키워드 (최우선 - 크롤러가 방문형으로 잘못 분류한 경우 수정)
     if "기자단" in campaign.title:
         campaign_type = "reporter"
-    # 1. 강력한 카테고리 기반 강제 (크롤러가 잘못 지정한 경우 수정)
-    elif std_category in ["디지털", "식품", "도서", "유아동", "패션", "반려동물", "배송", "재택"]:
-        campaign_type = "delivery"
-    # 1.5 지역 기반 강력 강제 (전국/배송/재택 등은 무조건 배송형)
-    elif std_region in ["배송", "재택", "전국"] or campaign.location in ["배송", "재택", "전국"]:
-        campaign_type = "delivery"
-    # 2. 크롤러가 지정한 타입이 있으면 우선 사용
+    # 1. 크롤러가 명시적으로 타입을 지정한 경우 우선 사용 (stylec 등 API 기반 사이트)
     elif campaign.type:
         campaign_type = campaign.type
+    # 2. 강력한 카테고리 기반 강제 (크롤러가 타입을 지정하지 않은 경우)
+    elif std_category in ["디지털", "식품", "도서", "유아동", "패션", "반려동물", "배송", "재택"]:
+        campaign_type = "delivery"
+    # 2.5 지역 기반 강력 강제 (전국/배송/재택 등은 무조건 배송형)
+    elif std_region in ["배송", "재택", "전국"] or campaign.location in ["배송", "재택", "전국"]:
+        campaign_type = "delivery"
     # 3. 타입이 없는 경우 추론
     else:
         # 지역명 기반 추론 ('전국'도 배송형으로 간주)

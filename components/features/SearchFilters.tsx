@@ -142,13 +142,7 @@ export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) 
             className="w-full rounded-lg border-border/60 bg-white/50 text-sm py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           >
             <option value="">전체</option>
-            <option value="seoulouba">서울오빠</option>
-            <option value="reviewplace">리뷰플레이스</option>
-            <option value="reviewnote">리뷰노트</option>
-            <option value="dinnerqueen">디너의여왕</option>
-            <option value="modooexperience">모두의체험단</option>
-            <option value="pavlovu">파블로체험단</option>
-            <option value="gangnam">강남맛집</option>
+            <option value="stylec">스타일씨</option>
           </select>
         </div>
 

@@ -11,14 +11,33 @@ from crawler.utils import logger, save_campaigns_to_supabase, get_existing_sourc
 
 # 크롤링할 사이트 모듈 목록
 # 레뷰(revu)는 목록 열람 시 로그인이 필요하므로 현재는 제외
+# 
+# ⚠️ 리스크 관리: robots.txt 위반 사이트는 크롤링 중단
+# - reviewnote: /campaigns/ 경로 금지
+# - reviewplace: /pr 경로 금지  
+# - seoulouba: 전체 경로 금지 (루트만 허용)
+# - modooexperience: /campaign.php 경로 금지
+# 
+# ✅ 법적 리스크 검토 완료 사이트 (2025년 1월)
+# - stylec, modan, myinfluencer, chuble, real_review, dinodan: robots.txt 및 이용약관 확인 완료
+# 
+# 🧪 테스트 모드: 한 사이트씩 확인 후 다음 사이트로 진행
+# 현재 테스트 중: stylec
 SITES = [
-    "reviewnote",
-    "dinnerqueen",
-    "gangnam",
-    "reviewplace",
-    "seoulouba",
-    "modooexperience",
-    "pavlovu",
+    # "reviewnote",  # 🔴 중단: robots.txt 위반 (/campaigns/ 금지)
+    # "dinnerqueen",  # 🔴 중단
+    # "gangnam",  # 🔄 대체됨
+    # "reviewplace",  # 🔴 중단: robots.txt 위반 (/pr 금지)
+    # "seoulouba",  # 🔴 중단: robots.txt 위반 (전체 금지)
+    # "modooexperience",  # 🔴 중단: robots.txt 위반 (/campaign.php 금지)
+    # "pavlovu",  # 🔄 대체됨
+    # ✅ 새로운 사이트 (법적 리스크 검토 완료)
+    "stylec",  # 스타일씨 - ✅ API 방식
+    # "modan",  # 모두의체험단 - 대기
+    # "myinfluencer",  # 마이인플루언서 - 대기
+    # "chuble",  # 츄블 - 대기
+    # "real_review",  # 리얼리뷰 - 대기
+    # "dinodan",  # 디노단 - 대기
 ]
 
 
