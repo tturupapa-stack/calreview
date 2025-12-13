@@ -144,9 +144,34 @@ def _extract_location(title: str) -> str | None:
 
 
 def _clean_title(title: str) -> str:
-    """제목에서 대괄호 태그 제거."""
-    # [네이버 블로그], [쿠팡], [전국] 등 제거
-    cleaned = re.sub(r"\[[^\]]+\]\s*", "", title).strip()
+    """제목에서 플랫폼/채널 태그만 제거 (상호명은 유지)."""
+    # 제거할 태그 패턴 (플랫폼, 채널, 지역 등)
+    remove_patterns = [
+        r"\[네이버\s*블로그[^\]]*\]",  # [네이버 블로그], [네이버블로그/12월3주] 등
+        r"\[네이버\s*클립[^\]]*\]",
+        r"\[인스타그램[^\]]*\]",
+        r"\[인스타\s*릴스[^\]]*\]",
+        r"\[유튜브[^\]]*\]",
+        r"\[유튜브\s*쇼츠[^\]]*\]",
+        r"\[틱톡[^\]]*\]",
+        r"\[쿠팡[^\]]*\]",  # [쿠팡], [쿠팡 리뷰], [쿠팡 구매평] 등
+        r"\[스마트스토어[^\]]*\]",
+        r"\[스스[^\]]*\]",
+        r"\[blog[^\]]*\]",
+        r"\[미션형\s*체험단[^\]]*\]",
+        r"\[현금캐시백[^\]]*\]",
+        r"\[현금페이백[^\]]*\]",
+        r"\[푸드앳홈[^\]]*\]",
+        r"\[방문\s*포장[^\]]*\]",
+        r"\[1만캐시\s*지급[^\]]*\]",
+    ]
+
+    cleaned = title
+    for pattern in remove_patterns:
+        cleaned = re.sub(pattern, "", cleaned, flags=re.IGNORECASE)
+
+    # 연속 공백 정리
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
     return cleaned if cleaned else title
 
 
