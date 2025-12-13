@@ -70,6 +70,7 @@ export function UnifiedSearchBar({ onSearch, initialQuery = "", initialFilters }
         modooexperience: "모두의체험단",
         pavlovu: "파블로체험단",
         gangnam: "강남맛집",
+        stylec: "스타일씨",
       };
       tags.push({ key: "site_name", label: "사이트", value: siteMap[appliedFilters.site_name] || appliedFilters.site_name });
     }
@@ -91,7 +92,18 @@ export function UnifiedSearchBar({ onSearch, initialQuery = "", initialFilters }
       // 추출된 필터와 기존 필터 병합
       const mergedFilters: Filters = {
         ...appliedFilters,
-        ...extractedFilters,
+        // region/detailedRegion은 string -> string[] 변환 필요
+        region: extractedFilters.region
+          ? [extractedFilters.region]
+          : appliedFilters.region,
+        detailedRegion: extractedFilters.detailedRegion
+          ? [extractedFilters.detailedRegion]
+          : appliedFilters.detailedRegion,
+        category: extractedFilters.category || appliedFilters.category,
+        type: extractedFilters.type || appliedFilters.type,
+        channel: extractedFilters.channel || appliedFilters.channel,
+        site_name: extractedFilters.site_name || appliedFilters.site_name,
+        sort: appliedFilters.sort,
       };
       
       setAppliedFilters(mergedFilters);
