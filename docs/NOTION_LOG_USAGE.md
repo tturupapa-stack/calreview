@@ -62,7 +62,12 @@ npm run notion:log "관리자 권한 체크 로직 개선" -- --type fix --detai
    npm run notion:log "작업 내용" -- --type fix
    ```
 
-3. 스크립트가 일지 내용을 생성하면, AI가 MCP를 통해 Notion에 자동으로 추가합니다.
+3. 스크립트가 일지 내용을 생성하면, AI에게 "이 내용을 Notion 개발일지 페이지에 추가해줘"라고 요청하면 MCP를 통해 자동으로 추가됩니다.
+
+## Notion 페이지 정보
+
+- **개발일지 페이지**: https://www.notion.so/2c850ca9d0b5806d84f8c5eee134c0e6
+- **페이지 ID**: `2c850ca9-d0b5-806d-84f8-c5eee134c0e6`
 
 ## 예시
 
