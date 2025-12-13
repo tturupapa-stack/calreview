@@ -32,7 +32,13 @@ export async function GET(request: NextRequest) {
       GOOGLE_CALENDAR_CLIENT_SECRET: !!process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
       NEXT_PUBLIC_SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
       NEXT_PUBLIC_APP_URL: !!process.env.NEXT_PUBLIC_APP_URL,
+      ADMIN_EMAILS: !!process.env.ADMIN_EMAILS,
+      NEXT_PUBLIC_ADMIN_EMAILS: !!process.env.NEXT_PUBLIC_ADMIN_EMAILS,
     };
+
+    // 관리자 이메일 목록 확인 (디버깅용)
+    const { getAdminEmails } = await import("@/lib/admin-utils");
+    const adminEmails = getAdminEmails();
 
     const missingEnvVars = Object.entries(envStatus)
       .filter(([_, exists]) => !exists)
@@ -42,6 +48,7 @@ export async function GET(request: NextRequest) {
       status: missingEnvVars.length === 0 ? "ok" : "missing_vars",
       envStatus,
       missingEnvVars,
+      adminEmailsCount: adminEmails.length,
       message:
         missingEnvVars.length === 0
           ? "모든 필수 환경 변수가 설정되어 있습니다."
