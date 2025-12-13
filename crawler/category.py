@@ -54,7 +54,7 @@ def normalize_category(site_name: str, raw_category: Optional[str], title: str) 
         
     # 문화/스튜디오 키워드
     # 문화/스튜디오 키워드
-    culture_keywords = ["공방", "전시", "연극", "뮤지컬", "영화", "책방", "스냅", "사진", "촬영", "웨딩", "스튜디오", "프롤로그", "문화"]
+    culture_keywords = ["공방", "전시", "연극", "뮤지컬", "영화", "책방", "스냅", "사진", "촬영", "웨딩", "스튜디오", "프롤로그", "문화", "팝업스토어", "팝업"]
     
     # 예외: "마라공방" 등 음식점 이름에 "공방"이 들어가는 경우 제외
     triggered_culture = False
