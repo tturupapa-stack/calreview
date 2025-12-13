@@ -148,6 +148,10 @@ def _parse_campaign(item: dict) -> Campaign | None:
         else:
             campaign_type = None  # utils.py에서 추론
 
+        # 리뷰 등록 기간 (enroll_dday: 리뷰 마감까지 남은 일수)
+        enroll_dday = item.get("enroll_dday")
+        review_deadline_days = int(enroll_dday) if enroll_dday is not None else None
+
         return Campaign(
             title=title,
             url=url,
@@ -158,7 +162,7 @@ def _parse_campaign(item: dict) -> Campaign | None:
             image_url=image_url,
             channel=channel,
             type=campaign_type,
-            review_deadline_days=None,
+            review_deadline_days=review_deadline_days,
         )
 
     except Exception as e:
