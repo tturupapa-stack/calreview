@@ -3,6 +3,7 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastProvider } from "@/components/providers/ToastProvider";
+import { AnalyticsProvider } from "@/components/providers/AnalyticsProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${outfit.variable} antialiased font-sans bg-background text-foreground`}
       >
+        <AnalyticsProvider />
         <ToastProvider>
           {children}
         </ToastProvider>

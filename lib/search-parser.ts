@@ -255,3 +255,100 @@ export function parseSearchQuery(query: string): ParsedSearchQuery {
   return result;
 }
 
+/**
+ * 검색 쿼리에서 필터를 추출하고 자연어 부분만 반환
+ */
+export interface ExtractedFilters {
+  region?: string;
+  detailedRegion?: string;
+  category?: string;
+  type?: string;
+  channel?: string;
+  site_name?: string;
+  deadline?: string;
+}
+
+export interface FilterExtractionResult {
+  filters: ExtractedFilters;
+  cleanQuery: string; // 필터 키워드가 제거된 자연어 검색어
+}
+
+/**
+ * 검색 쿼리에서 필터를 추출하고 자연어 부분만 남김
+ */
+export function extractFiltersFromQuery(query: string): FilterExtractionResult {
+  const parsed = parseSearchQuery(query);
+  const filters: ExtractedFilters = {};
+  let cleanQuery = query;
+
+  // 필터 추출
+  if (parsed.region) {
+    filters.region = parsed.region;
+    // 지역 키워드 제거
+    const regionKeywords = [
+      ...Object.keys(REGION_KEYWORDS),
+      ...Object.values(REGION_KEYWORDS).flat(),
+      ...Object.keys(CITY_KEYWORDS),
+      ...Object.values(CITY_KEYWORDS),
+    ];
+    for (const keyword of regionKeywords) {
+      const regex = new RegExp(keyword, 'gi');
+      cleanQuery = cleanQuery.replace(regex, '').trim();
+    }
+  }
+
+  if (parsed.category) {
+    filters.category = parsed.category;
+    // 카테고리 키워드 제거
+    const categoryKeywords = [
+      ...Object.keys(CATEGORY_KEYWORDS),
+      ...Object.values(CATEGORY_KEYWORDS).flat(),
+    ];
+    for (const keyword of categoryKeywords) {
+      const regex = new RegExp(keyword, 'gi');
+      cleanQuery = cleanQuery.replace(regex, '').trim();
+    }
+  }
+
+  if (parsed.deadline) {
+    filters.deadline = parsed.deadline;
+    // 마감일 키워드 제거
+    const deadlineKeywords = Object.keys(DEADLINE_KEYWORDS);
+    for (const keyword of deadlineKeywords) {
+      const regex = new RegExp(keyword, 'gi');
+      cleanQuery = cleanQuery.replace(regex, '').trim();
+    }
+  }
+
+  if (parsed.type) {
+    filters.type = parsed.type;
+    // 유형 키워드 제거
+    const typeKeywords = Object.keys(TYPE_KEYWORDS);
+    for (const keyword of typeKeywords) {
+      const regex = new RegExp(keyword, 'gi');
+      cleanQuery = cleanQuery.replace(regex, '').trim();
+    }
+  }
+
+  if (parsed.channel) {
+    filters.channel = parsed.channel;
+    // 채널 키워드 제거
+    const channelKeywords = [
+      ...Object.keys(CHANNEL_KEYWORDS),
+      ...Object.values(CHANNEL_KEYWORDS).flat(),
+    ];
+    for (const keyword of channelKeywords) {
+      const regex = new RegExp(keyword, 'gi');
+      cleanQuery = cleanQuery.replace(regex, '').trim();
+    }
+  }
+
+  // 연속된 공백 정리
+  cleanQuery = cleanQuery.replace(/\s+/g, ' ').trim();
+
+  return {
+    filters,
+    cleanQuery,
+  };
+}
+

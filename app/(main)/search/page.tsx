@@ -2,60 +2,56 @@
 
 import { useEffect, useState } from "react";
 import { CampaignCard } from "@/components/features/CampaignCard";
-import { SearchFilters } from "@/components/features/SearchFilters";
-import { SmartSearchBar } from "@/components/features/SmartSearchBar";
+import { UnifiedSearchBar } from "@/components/features/UnifiedSearchBar";
+import { MobileFilterSheet } from "@/components/features/MobileFilterSheet";
+import { AdvancedFilters, type Filters } from "@/components/features/AdvancedFilters";
 import { PopularTags } from "@/components/features/PopularTags";
+import { LazySection } from "@/components/features/LazySection";
 import { SiteLogo } from "@/components/ui/SiteLogo";
 import type { Campaign } from "@/types/campaign";
 
-function SitePreviewSection({ siteId, siteName, onMoreClick }: { siteId: string, siteName: string, onMoreClick: (siteId: string) => void }) {
+function SitePreviewSection({ siteId, siteName, onMoreClick, shouldLoad }: { siteId: string, siteName: string, onMoreClick: (siteId: string) => void, shouldLoad: boolean }) {
   const [items, setItems] = useState<Campaign[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   useEffect(() => {
+    if (!shouldLoad || hasLoaded) return;
+
     const fetchPreview = async () => {
+      setLoading(true);
       try {
-        // Parallel fetches to ensure diversity
-        const [resFood, resBeauty, resTravel, resLife, resGeneral] = await Promise.all([
-          fetch(`/api/campaigns?site_name=${siteId}&category=맛집&limit=1&sort=deadline`),
-          fetch(`/api/campaigns?site_name=${siteId}&category=뷰티&limit=1&sort=deadline`),
-          fetch(`/api/campaigns?site_name=${siteId}&category=여행&limit=1&sort=deadline`),
-          fetch(`/api/campaigns?site_name=${siteId}&category=생활&limit=1&sort=deadline`),
-          fetch(`/api/campaigns?site_name=${siteId}&limit=10&sort=deadline`) // Fallback
-        ]);
+        // 단일 API 호출로 최대 20개 가져와서 클라이언트에서 카테고리별로 선별
+        const res = await fetch(`/api/campaigns?site_name=${siteId}&limit=20&sort=deadline`);
+        
+        if (!res.ok) {
+          throw new Error('Failed to fetch campaigns');
+        }
 
-        const getItems = async (res: Response) => res.ok ? (await res.json()).campaigns || [] : [];
+        const data = await res.json();
+        const allCampaigns: Campaign[] = data.campaigns || [];
 
-        const [food, beauty, travel, life, general] = await Promise.all([
-          getItems(resFood),
-          getItems(resBeauty),
-          getItems(resTravel),
-          getItems(resLife),
-          getItems(resGeneral)
-        ]);
-
-        // Prioritize distinct categories
+        // 카테고리별로 1개씩 선별
+        const categoryPriority = ['맛집', '뷰티', '여행', '생활', '식품', '패션', '디지털'];
         const combined: Campaign[] = [];
         const seenIds = new Set<string>();
+        const usedCategories = new Set<string>();
 
-        const addUnique = (items: Campaign[]) => {
-          for (const item of items) {
-            if (!seenIds.has(item.id)) {
-              combined.push(item);
-              seenIds.add(item.id);
-              break; // Take only 1 from this specific category fetch
-            }
+        // 우선순위 카테고리부터 선별
+        for (const category of categoryPriority) {
+          const item = allCampaigns.find(
+            (c) => c.category === category && !seenIds.has(c.id)
+          );
+          if (item) {
+            combined.push(item);
+            seenIds.add(item.id);
+            usedCategories.add(category);
+            if (combined.length >= 4) break;
           }
-        };
+        }
 
-        // 1. Add guaranteed distinct items (if exist)
-        addUnique(food);
-        addUnique(beauty);
-        addUnique(travel);
-        addUnique(life);
-
-        // 2. Fill remaining slots from general list (up to 4 total)
-        for (const item of general) {
+        // 나머지는 아무 카테고리나 채우기
+        for (const item of allCampaigns) {
           if (combined.length >= 4) break;
           if (!seenIds.has(item.id)) {
             combined.push(item);
@@ -64,7 +60,7 @@ function SitePreviewSection({ siteId, siteName, onMoreClick }: { siteId: string,
         }
 
         setItems(combined);
-
+        setHasLoaded(true);
       } catch (e) {
         console.error(e);
       } finally {
@@ -72,7 +68,7 @@ function SitePreviewSection({ siteId, siteName, onMoreClick }: { siteId: string,
       }
     };
     fetchPreview();
-  }, [siteId]);
+  }, [siteId, shouldLoad, hasLoaded]);
 
   if (!loading && items.length === 0) return null;
 
@@ -114,8 +110,8 @@ export default function SearchPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [smartQuery, setSmartQuery] = useState("");
-  const [filters, setFilters] = useState({
+  const [query, setQuery] = useState("");
+  const [filters, setFilters] = useState<Filters>({
     region: "",
     detailedRegion: "",
     category: "",
@@ -127,9 +123,10 @@ export default function SearchPage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [total, setTotal] = useState(0);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Check if preview mode (no filters active)
-  const isPreviewMode = !smartQuery && !filters.region && !filters.detailedRegion && !filters.category && !filters.type && !filters.channel && !filters.site_name && filters.sort === "deadline";
+  const isPreviewMode = !query && !filters.region && !filters.detailedRegion && !filters.category && !filters.type && !filters.channel && !filters.site_name && filters.sort === "deadline";
 
   useEffect(() => {
     if (!isPreviewMode) {
@@ -138,7 +135,7 @@ export default function SearchPage() {
     } else {
       setIsLoading(false);
     }
-  }, [filters, smartQuery, isPreviewMode]);
+  }, [filters, query, isPreviewMode]);
 
   const fetchCampaigns = async (pageNum: number, append: boolean = false) => {
     if (append) {
@@ -150,16 +147,18 @@ export default function SearchPage() {
     try {
       const params = new URLSearchParams();
 
-      if (smartQuery) {
-        params.append("q", smartQuery);
-      } else {
-        if (filters.region) params.append("region", filters.region);
-        if (filters.detailedRegion) params.append("detailed_region", filters.detailedRegion);
-        if (filters.category) params.append("category", filters.category);
-        if (filters.type) params.append("type", filters.type);
-        if (filters.channel) params.append("channel", filters.channel);
-        if (filters.site_name) params.append("site_name", filters.site_name);
+      // 자연어 검색어가 있으면 q 파라미터로 전달
+      if (query) {
+        params.append("q", query);
       }
+      
+      // 필터 파라미터 추가 (자연어 검색과 함께 사용 가능)
+      if (filters.region) params.append("region", filters.region);
+      if (filters.detailedRegion) params.append("detailed_region", filters.detailedRegion);
+      if (filters.category) params.append("category", filters.category);
+      if (filters.type) params.append("type", filters.type);
+      if (filters.channel) params.append("channel", filters.channel);
+      if (filters.site_name) params.append("site_name", filters.site_name);
 
       if (filters.sort) params.append("sort", filters.sort);
       params.append("page", pageNum.toString());
@@ -196,25 +195,16 @@ export default function SearchPage() {
 
   const handleMoreClick = (siteId: string) => {
     setFilters(prev => ({ ...prev, site_name: siteId }));
+    setIsFiltersOpen(true);
   };
 
-  const handleSmartSearch = (query: string) => {
-    setSmartQuery(query);
-    if (query) {
-      setFilters({
-        region: "",
-        detailedRegion: "",
-        category: "",
-        type: "",
-        channel: "",
-        site_name: "",
-        sort: "deadline",
-      });
-    }
+  const handleUnifiedSearch = (searchQuery: string, searchFilters: Filters) => {
+    setQuery(searchQuery);
+    setFilters(searchFilters);
   };
 
   const handleTagClick = (tag: string) => {
-    setSmartQuery(tag);
+    setQuery(tag);
     setFilters({
       region: "",
       detailedRegion: "",
@@ -236,29 +226,54 @@ export default function SearchPage() {
       </div>
 
       <div className="mb-6">
-        <SmartSearchBar onSearch={handleSmartSearch} initialQuery={smartQuery} />
+        <UnifiedSearchBar 
+          onSearch={handleUnifiedSearch} 
+          initialQuery={query}
+          initialFilters={filters}
+        />
       </div>
       
       <div className="mb-6">
         <PopularTags onTagClick={handleTagClick} />
       </div>
 
-      {!smartQuery && (
-        <div className="mb-8">
-          <SearchFilters filters={filters} onFiltersChange={setFilters} />
-        </div>
-      )}
+      {/* 모바일: 바텀 시트, 데스크톱: 접기/펼치기 */}
+      <div className="md:hidden">
+        <MobileFilterSheet
+          filters={filters}
+          onFiltersChange={setFilters}
+        />
+      </div>
+      <div className="hidden md:block">
+        <AdvancedFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          isOpen={isFiltersOpen}
+          onToggle={() => setIsFiltersOpen(!isFiltersOpen)}
+        />
+      </div>
 
       {isPreviewMode ? (
-        // Dashboard View
+        // Dashboard View with Lazy Loading
         <div className="mt-8">
-          <SitePreviewSection siteId="seoulouba" siteName="서울오빠" onMoreClick={handleMoreClick} />
-          <SitePreviewSection siteId="reviewplace" siteName="리뷰플레이스" onMoreClick={handleMoreClick} />
-          <SitePreviewSection siteId="reviewnote" siteName="리뷰노트" onMoreClick={handleMoreClick} />
-          <SitePreviewSection siteId="dinnerqueen" siteName="디너의여왕" onMoreClick={handleMoreClick} />
-          <SitePreviewSection siteId="modooexperience" siteName="모두의체험단" onMoreClick={handleMoreClick} />
-          <SitePreviewSection siteId="pavlovu" siteName="파블로체험단" onMoreClick={handleMoreClick} />
-          <SitePreviewSection siteId="gangnam" siteName="강남맛집" onMoreClick={handleMoreClick} />
+          {/* 초기 로드: 상위 3개 사이트만 */}
+          <SitePreviewSection siteId="seoulouba" siteName="서울오빠" onMoreClick={handleMoreClick} shouldLoad={true} />
+          <SitePreviewSection siteId="reviewplace" siteName="리뷰플레이스" onMoreClick={handleMoreClick} shouldLoad={true} />
+          <SitePreviewSection siteId="reviewnote" siteName="리뷰노트" onMoreClick={handleMoreClick} shouldLoad={true} />
+          
+          {/* 지연 로드: 나머지 사이트들 */}
+          <LazySection>
+            <SitePreviewSection siteId="dinnerqueen" siteName="디너의여왕" onMoreClick={handleMoreClick} shouldLoad={true} />
+          </LazySection>
+          <LazySection>
+            <SitePreviewSection siteId="modooexperience" siteName="모두의체험단" onMoreClick={handleMoreClick} shouldLoad={true} />
+          </LazySection>
+          <LazySection>
+            <SitePreviewSection siteId="pavlovu" siteName="파블로체험단" onMoreClick={handleMoreClick} shouldLoad={true} />
+          </LazySection>
+          <LazySection>
+            <SitePreviewSection siteId="gangnam" siteName="강남맛집" onMoreClick={handleMoreClick} shouldLoad={true} />
+          </LazySection>
         </div>
       ) : (
         // List View
@@ -284,10 +299,10 @@ export default function SearchPage() {
                 <div className="text-sm text-muted-foreground">
                   총 <span className="font-semibold text-foreground">{total}</span>개 중 <span className="font-semibold text-foreground">{campaigns.length}</span>개 표시
                 </div>
-                {smartQuery && (
+                {(query || Object.values(filters).some(v => v && v !== "deadline")) && (
                   <button
                     onClick={() => {
-                      setSmartQuery("");
+                      setQuery("");
                       setFilters({ region: "", detailedRegion: "", category: "", type: "", channel: "", site_name: "", sort: "deadline" });
                     }}
                     className="text-sm text-primary hover:text-primary/80 font-medium transition-colors flex items-center gap-1"

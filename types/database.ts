@@ -23,6 +23,8 @@ export interface Database {
                     google_calendar_connected: boolean
                     google_refresh_token: string | null
                     notification_email: boolean
+                    naver_session_cookies: string | null
+                    last_active_at: string | null
                     created_at: string
                     updated_at: string
                 }
@@ -55,6 +57,8 @@ export interface Database {
                     google_calendar_connected?: boolean
                     google_refresh_token?: string | null
                     notification_email?: boolean
+                    naver_session_cookies?: string | null
+                    last_active_at?: string | null
                     created_at?: string
                     updated_at?: string
                 }
@@ -134,6 +138,8 @@ export interface Database {
                     reminder_d3_sent: boolean
                     reminder_d1_sent: boolean
                     notes: string | null
+                    auto_detected: boolean
+                    detected_at: string | null
                     created_at: string
                     updated_at: string
                 }
@@ -149,6 +155,8 @@ export interface Database {
                     reminder_d3_sent?: boolean
                     reminder_d1_sent?: boolean
                     notes?: string | null
+                    auto_detected?: boolean
+                    detected_at?: string | null
                     created_at?: string
                     updated_at?: string
                 }
@@ -164,8 +172,92 @@ export interface Database {
                     reminder_d3_sent?: boolean
                     reminder_d1_sent?: boolean
                     notes?: string | null
+                    auto_detected?: boolean
+                    detected_at?: string | null
                     created_at?: string
                     updated_at?: string
+                }
+            }
+            kpi_metrics: {
+                Row: {
+                    id: string
+                    date: string
+                    mau: number
+                    dau: number
+                    retention_rate_7d: number
+                    avg_session_duration: number
+                    calendar_sync_rate: number
+                    avg_bookmarks_per_user: number
+                    search_to_detail_ctr: number
+                    detail_to_bookmark_ctr: number
+                    bookmark_to_selection_ctr: number
+                    original_site_click_rate: number
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    date: string
+                    mau?: number
+                    dau?: number
+                    retention_rate_7d?: number
+                    avg_session_duration?: number
+                    calendar_sync_rate?: number
+                    avg_bookmarks_per_user?: number
+                    search_to_detail_ctr?: number
+                    detail_to_bookmark_ctr?: number
+                    bookmark_to_selection_ctr?: number
+                    original_site_click_rate?: number
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    date?: string
+                    mau?: number
+                    dau?: number
+                    retention_rate_7d?: number
+                    avg_session_duration?: number
+                    calendar_sync_rate?: number
+                    avg_bookmarks_per_user?: number
+                    search_to_detail_ctr?: number
+                    detail_to_bookmark_ctr?: number
+                    bookmark_to_selection_ctr?: number
+                    original_site_click_rate?: number
+                    created_at?: string
+                    updated_at?: string
+                }
+            }
+            review_deadline_feedback: {
+                Row: {
+                    id: string
+                    application_id: string
+                    campaign_source: string
+                    calculated_deadline: string
+                    actual_deadline: string | null
+                    was_correct: boolean | null
+                    user_notes: string | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    application_id: string
+                    campaign_source: string
+                    calculated_deadline: string
+                    actual_deadline?: string | null
+                    was_correct?: boolean | null
+                    user_notes?: string | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    application_id?: string
+                    campaign_source?: string
+                    calculated_deadline?: string
+                    actual_deadline?: string | null
+                    was_correct?: boolean | null
+                    user_notes?: string | null
+                    created_at?: string
                 }
             }
             payments: {

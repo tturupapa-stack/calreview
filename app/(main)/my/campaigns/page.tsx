@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Calendar } from "@/components/features/Calendar";
+import { CheckSelectionButton } from "@/components/features/CheckSelectionButton";
+import { calculateReviewDeadlineString, estimateSelectionDate } from "@/lib/review-deadline-calculator";
+import type { Campaign } from "@/types/campaign";
 
 interface Application {
   id: string;
@@ -14,6 +17,8 @@ interface Application {
   review_deadline: string | null;
   calendar_visit_event_id: string | null;
   calendar_deadline_event_id: string | null;
+  auto_detected: boolean;
+  detected_at: string | null;
   created_at: string;
   campaigns: {
     id: string;
@@ -63,63 +68,63 @@ export default function MyCampaignsPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+  const fetchData = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-        setCurrentUser(user);
+      setCurrentUser(user);
 
-        if (!user) {
-          setIsLoading(false);
-          return;
-        }
-
-        // 사용자 정보 조회
-        const { data: userData } = await supabase
-          .from("users")
-          .select("google_calendar_connected")
-          .eq("id", user.id)
-          .single();
-
-        if (userData) {
-          setIsCalendarConnected(userData.google_calendar_connected || false);
-        }
-
-        // 전체 신청 목록 조회
-        const response = await fetch("/api/applications");
-        if (!response.ok) {
-          let errorMessage = "신청 목록을 불러올 수 없습니다.";
-          try {
-            const errorData = await response.json();
-            errorMessage = errorData.error || errorMessage;
-          } catch (e) {
-            errorMessage = `서버 오류 (${response.status}): ${response.statusText}`;
-          }
-          throw new Error(errorMessage);
-        }
-
-        const data = await response.json();
-        setApplications(data.applications || []);
-      } catch (error: any) {
-        console.error("데이터 조회 오류:", error);
-        const errorMessage = error instanceof Error
-          ? error.message
-          : error?.message || "데이터를 불러오는 중 오류가 발생했습니다.";
-
-        // 네트워크 에러인 경우 더 명확한 메시지 제공
-        if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
-          alert("네트워크 연결을 확인해주세요. 서버가 실행 중인지 확인하세요.");
-        } else {
-          alert(errorMessage);
-        }
-      } finally {
+      if (!user) {
         setIsLoading(false);
+        return;
       }
-    };
 
+      // 사용자 정보 조회
+      const { data: userData } = await supabase
+        .from("users")
+        .select("google_calendar_connected")
+        .eq("id", user.id)
+        .single();
+
+      if (userData) {
+        setIsCalendarConnected(userData.google_calendar_connected || false);
+      }
+
+      // 전체 신청 목록 조회
+      const response = await fetch("/api/applications");
+      if (!response.ok) {
+        let errorMessage = "신청 목록을 불러올 수 없습니다.";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = `서버 오류 (${response.status}): ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      setApplications(data.applications || []);
+    } catch (error: any) {
+      console.error("데이터 조회 오류:", error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : error?.message || "데이터를 불러오는 중 오류가 발생했습니다.";
+
+      // 네트워크 에러인 경우 더 명확한 메시지 제공
+      if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
+        alert("네트워크 연결을 확인해주세요. 서버가 실행 중인지 확인하세요.");
+      } else {
+        alert(errorMessage);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [supabase, router]);
 
@@ -145,28 +150,19 @@ export default function MyCampaignsPage() {
     // 기존 값이 있으면 로드
     setVisitDate(app.visit_date || "");
 
-    // 리뷰 마감일 자동 계산
+    // 리뷰 마감일 자동 계산 (개선된 계산기 사용)
     if (app.review_deadline) {
       setReviewDeadline(app.review_deadline);
-    } else if (app.campaigns.review_deadline_days && app.campaigns.application_deadline) {
-      // 선정일 = 신청 마감일 + 1일
-      const selectionDate = new Date(app.campaigns.application_deadline);
-      selectionDate.setDate(selectionDate.getDate() + 1);
-
-      // 리뷰 마감일 = 선정일 + 리뷰 기간
-      const reviewDeadlineDate = new Date(selectionDate);
-      reviewDeadlineDate.setDate(reviewDeadlineDate.getDate() + app.campaigns.review_deadline_days);
-
-      setReviewDeadline(reviewDeadlineDate.toISOString().split("T")[0]);
-    } else if (app.campaigns.review_deadline_days) {
-      // application_deadline 없으면 오늘 기준
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const deadline = new Date(today);
-      deadline.setDate(deadline.getDate() + app.campaigns.review_deadline_days);
-      setReviewDeadline(deadline.toISOString().split("T")[0]);
     } else {
-      setReviewDeadline("");
+      // 새로운 계산기 사용 (필요한 필드만 포함)
+      const calculatedDeadline = calculateReviewDeadlineString({
+        ...app.campaigns,
+        source_id: app.campaigns.id,
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } as Campaign);
+      setReviewDeadline(calculatedDeadline);
     }
   };
 
@@ -614,6 +610,25 @@ export default function MyCampaignsPage() {
                             )}
                           </div>
 
+                          {/* 자동 당첨 확인 표시 */}
+                          {app.status === "selected" && app.auto_detected && (
+                            <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                              <div className="flex items-center gap-2">
+                                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="text-sm font-medium text-blue-800">
+                                  자동 당첨 확인됨
+                                </span>
+                                {app.detected_at && (
+                                  <span className="text-xs text-blue-600 ml-auto">
+                                    {new Date(app.detected_at).toLocaleDateString("ko-KR")}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
                           {/* 방문일/리뷰 마감일 정보 (선정된 경우) */}
                           {app.status === "selected" && (
                             <div className="mb-3 space-y-2">
@@ -742,31 +757,45 @@ export default function MyCampaignsPage() {
                             /* 액션 버튼 */
                             <div className="flex gap-2 flex-wrap">
                               {app.status === "bookmarked" && (
-                                <button
-                                  onClick={() => handleSelectClick(app.id)}
-                                  disabled={(() => {
-                                    if (!app.campaigns.application_deadline) return false;
-                                    const deadline = new Date(app.campaigns.application_deadline);
-                                    const today = new Date();
-                                    deadline.setHours(0, 0, 0, 0);
-                                    today.setHours(0, 0, 0, 0);
-                                    return today < deadline;
-                                  })()}
-                                  className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                                  title={(() => {
-                                    if (!app.campaigns.application_deadline) return "선정 처리";
-                                    const deadline = new Date(app.campaigns.application_deadline);
-                                    const today = new Date();
-                                    deadline.setHours(0, 0, 0, 0);
-                                    today.setHours(0, 0, 0, 0);
-                                    if (today < deadline) {
-                                      return "신청 마감일 이후에 선정 가능합니다";
-                                    }
-                                    return "선정 처리";
-                                  })()}
-                                >
-                                  선정
-                                </button>
+                                <>
+                                  {/* 당첨 확인 버튼 */}
+                                  <div className="w-full sm:w-auto">
+                                    <CheckSelectionButton
+                                      applicationId={app.id}
+                                      campaignTitle={app.campaigns.title}
+                                      applicationDeadline={app.campaigns.application_deadline}
+                                      onSuccess={() => {
+                                        // 당첨 확인 성공 시 목록 새로고침
+                                        fetchData();
+                                      }}
+                                    />
+                                  </div>
+                                  <button
+                                    onClick={() => handleSelectClick(app.id)}
+                                    disabled={(() => {
+                                      if (!app.campaigns.application_deadline) return false;
+                                      const deadline = new Date(app.campaigns.application_deadline);
+                                      const today = new Date();
+                                      deadline.setHours(0, 0, 0, 0);
+                                      today.setHours(0, 0, 0, 0);
+                                      return today < deadline;
+                                    })()}
+                                    className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title={(() => {
+                                      if (!app.campaigns.application_deadline) return "선정 처리";
+                                      const deadline = new Date(app.campaigns.application_deadline);
+                                      const today = new Date();
+                                      deadline.setHours(0, 0, 0, 0);
+                                      today.setHours(0, 0, 0, 0);
+                                      if (today < deadline) {
+                                        return "신청 마감일 이후에 선정 가능합니다";
+                                      }
+                                      return "선정 처리";
+                                    })()}
+                                  >
+                                    수동 선정
+                                  </button>
+                                </>
                               )}
                               {app.status === "applied" && (
                                 <button

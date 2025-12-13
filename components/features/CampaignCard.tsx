@@ -6,6 +6,7 @@ import { SiteLogo } from "@/components/ui/SiteLogo";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { events } from "@/lib/analytics";
 import type { Campaign } from "@/types/campaign";
 
 interface CampaignCardProps {
@@ -85,6 +86,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
 
       if (!response.ok) throw new Error("북마크 추가 실패");
       setIsBookmarked(true);
+      events.bookmark_add(campaign.id);
     } catch (error: any) {
       alert(error.message || "북마크 추가 중 오류가 발생했습니다.");
     } finally {
@@ -112,6 +114,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
 
       if (!deleteResponse.ok) throw new Error("북마크 해제 실패");
       setIsBookmarked(false);
+      events.bookmark_remove(campaign.id);
     } catch (error: any) {
       alert(error.message || "북마크 해제 중 오류가 발생했습니다.");
     } finally {
@@ -144,7 +147,14 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         target={hasValidUrl ? "_blank" : undefined}
         rel={hasValidUrl ? "noopener noreferrer" : undefined}
         className={hasValidUrl ? "block" : "block cursor-not-allowed opacity-75"}
-        onClick={!hasValidUrl ? (e) => e.preventDefault() : undefined}
+        onClick={(e) => {
+          if (!hasValidUrl) {
+            e.preventDefault();
+            return;
+          }
+          // 원본 사이트 클릭 추적
+          events.original_site_click(campaign.id, campaign.source || "");
+        }}
       >
         {/* 이미지 */}
         <div className="relative w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
