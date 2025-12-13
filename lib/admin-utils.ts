@@ -7,7 +7,8 @@
  * @returns 관리자 이메일 배열 (소문자로 정규화됨)
  */
 export function getAdminEmails(): string[] {
-  const adminEmailsRaw = process.env.ADMIN_EMAILS || "";
+  // ADMIN_EMAILS 또는 NEXT_PUBLIC_ADMIN_EMAILS 모두 확인 (하위 호환성)
+  const adminEmailsRaw = process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "";
   return adminEmailsRaw
     .split(",")
     .map((email) => email.trim().replace(/\n/g, ""))
