@@ -15,6 +15,65 @@ from crawler.utils import clean_text, logger
 BASE_URL = "https://www.stylec.co.kr"
 API_HOST = "https://api2.stylec.co.kr:6439/v1"
 
+# 카테고리 ID → 표준 카테고리 매핑
+# tr_it_cate_id의 앞 3자리 또는 전체를 기준으로 매핑
+CATEGORY_MAP = {
+    # 제품 카테고리 (10xxxx)
+    "101": "패션",       # 패션의류/잡화, 가방, 안경
+    "102": "뷰티",       # 뷰티, 화장품, 클렌저
+    "103": "반려동물",   # 반려동물용품
+    "104": "디지털",     # 가전디지털, 프린터, 전자기기
+    "105": "유아동",     # 출산/유아동
+    "106": "식품",       # 식품
+    "107": "도서",       # 도서/음반/DVD
+    "109": "생활",       # 홈인테리어, 가구
+    "110": "생활",       # 교육, 학습
+    "112": "생활",       # 생활용품
+    "111": "식품",       # 건강기능식품, 영양제
+    "113": "생활",       # 기타 생활용품
+    "114": "생활",       # 스포츠/레저 용품
+    "116": "생활",       # 문구, 캐릭터
+    "117": "생활",       # 사무용품
+    "199": "생활",       # 기타 제품
+
+    # 방문형 카테고리 (20xxxxxxx)
+    "108": "생활",       # 차량용품
+    "201": "맛집",       # 배달/편의점/맛집
+    "202010": "뷰티",    # 뷰티 방문 (에스테틱 등)
+    "202020": "맛집",    # 카페/식당 방문
+    "202030": "맛집",    # 지역 맛집 방문 (의정부 등)
+    "202040": "맛집",    # 지역 맛집 방문 (안양 등)
+    "202070": "문화",    # 스튜디오/촬영
+    "202080": "여행",    # 레저/테마파크
+    "202100": "생활",    # 체험/놀이
+    "202200": "맛집",    # 지역 맛집 (파주 등)
+    "202240": "맛집",    # 지역 맛집 (동탄 등)
+    "203": "맛집",       # 지역 방문 - 인천
+    "204": "맛집",       # 지역 방문 - 광주
+    "205": "뷰티",       # 지역 방문 - 대전 (살롱)
+    "208": "여행",       # 지역 방문 - 강원 (캠핑/펜션)
+    "209": "생활",       # 지역 방문 - 청주
+    "213": "맛집",       # 지역 방문 - 전남
+    "215": "생활",       # 지역 방문 - 경상
+    "216": "맛집",       # 지역 방문 - 대구
+    "217": "맛집",       # 지역 방문 - 부산
+}
+
+def _get_category_from_id(cate_id: str | int | None) -> str | None:
+    """카테고리 ID로 표준 카테고리 결정."""
+    if not cate_id:
+        return None
+
+    cate_str = str(cate_id)
+
+    # 긴 prefix부터 먼저 매칭 시도 (더 구체적인 매핑 우선)
+    for prefix_len in [6, 3]:
+        prefix = cate_str[:prefix_len]
+        if prefix in CATEGORY_MAP:
+            return CATEGORY_MAP[prefix]
+
+    return None
+
 # SNS 타입 → 채널명 매핑
 SNS_TYPE_MAP = {
     "naverblog": "블로그",
@@ -105,8 +164,17 @@ def _parse_campaign(item: dict) -> Campaign | None:
         if not title:
             return None
 
-        # 카테고리
-        category = item.get("ca_name") or None  # 제품, 서비스, 방문
+        # 카테고리: tr_it_cate_id 기반으로 표준 카테고리 결정
+        cate_id = item.get("tr_it_cate_id")
+        category = _get_category_from_id(cate_id)
+
+        # ca_name: 제품, 서비스, 방문, 기타 (타입 결정에 사용)
+        ca_name = item.get("ca_name") or None
+
+        # fallback: category ID 매핑 실패 시 ca_name을 raw category로 사용
+        # utils.py의 normalize_category에서 키워드 기반으로 처리됨
+        if category is None:
+            category = ca_name
 
         # 마감일 확인 (dday < 0 이면 이미 마감)
         dday = item.get("dday")
@@ -140,10 +208,10 @@ def _parse_campaign(item: dict) -> Campaign | None:
 
         # 타입 결정: API의 ca_name 기반
         # 제품 → delivery, 방문/서비스 → visit
-        if category == "제품":
+        if ca_name == "제품":
             campaign_type = "delivery"
             location = "배송"
-        elif category in ["방문", "서비스"]:
+        elif ca_name in ["방문", "서비스"]:
             campaign_type = "visit"
         else:
             campaign_type = None  # utils.py에서 추론
