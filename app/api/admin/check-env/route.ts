@@ -21,8 +21,22 @@ export async function GET(request: NextRequest) {
       throw createUnauthorizedError("로그인이 필요합니다");
     }
 
-    // 관리자 권한 체크
-    if (!isAdmin(user.email)) {
+    // 관리자 권한 체크 (디버깅 정보 포함)
+    const { getAdminEmails } = await import("@/lib/admin-utils");
+    const adminEmails = getAdminEmails();
+    const userEmail = user.email || "";
+    const userIsAdmin = isAdmin(userEmail);
+    
+    if (!userIsAdmin) {
+      console.error("관리자 권한 체크 실패:", {
+        userEmail,
+        normalizedUserEmail: userEmail.trim().toLowerCase(),
+        adminEmails,
+        adminEmailsCount: adminEmails.length,
+        hasADMIN_EMAILS: !!process.env.ADMIN_EMAILS,
+        hasNEXT_PUBLIC_ADMIN_EMAILS: !!process.env.NEXT_PUBLIC_ADMIN_EMAILS,
+        ADMIN_EMAILS_raw: process.env.ADMIN_EMAILS?.substring(0, 50), // 처음 50자만 로그
+      });
       throw createForbiddenError("관리자 권한이 필요합니다");
     }
 
