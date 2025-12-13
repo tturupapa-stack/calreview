@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Calendar } from "@/components/features/Calendar";
 import { CheckSelectionButton } from "@/components/features/CheckSelectionButton";
 import { calculateReviewDeadlineString, estimateSelectionDate } from "@/lib/review-deadline-calculator";
+import { SELECTION_CHECK_ENABLED } from "@/lib/feature-flags";
 import type { Campaign } from "@/types/campaign";
 
 interface Application {
@@ -611,7 +612,7 @@ export default function MyCampaignsPage() {
                           </div>
 
                           {/* 자동 당첨 확인 표시 */}
-                          {app.status === "selected" && app.auto_detected && (
+                          {SELECTION_CHECK_ENABLED && app.status === "selected" && app.auto_detected && (
                             <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
                               <div className="flex items-center gap-2">
                                 <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -759,17 +760,19 @@ export default function MyCampaignsPage() {
                               {app.status === "bookmarked" && (
                                 <>
                                   {/* 당첨 확인 버튼 */}
-                                  <div className="w-full sm:w-auto">
-                                    <CheckSelectionButton
-                                      applicationId={app.id}
-                                      campaignTitle={app.campaigns.title}
-                                      applicationDeadline={app.campaigns.application_deadline}
-                                      onSuccess={() => {
-                                        // 당첨 확인 성공 시 목록 새로고침
-                                        fetchData();
-                                      }}
-                                    />
-                                  </div>
+                                  {SELECTION_CHECK_ENABLED && (
+                                    <div className="w-full sm:w-auto">
+                                      <CheckSelectionButton
+                                        applicationId={app.id}
+                                        campaignTitle={app.campaigns.title}
+                                        applicationDeadline={app.campaigns.application_deadline}
+                                        onSuccess={() => {
+                                          // 당첨 확인 성공 시 목록 새로고침
+                                          fetchData();
+                                        }}
+                                      />
+                                    </div>
+                                  )}
                                   <button
                                     onClick={() => handleSelectClick(app.id)}
                                     disabled={(() => {

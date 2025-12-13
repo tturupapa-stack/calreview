@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import { getSelectionChecker } from "@/lib/selection-checkers";
 import { calculateReviewDeadlineString } from "@/lib/review-deadline-calculator";
+import { SELECTION_CHECK_ENABLED } from "@/lib/feature-flags";
 
 /**
  * 당첨 여부 자동 확인 API
@@ -11,6 +12,14 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // 당첨 확인 기능이 비활성화된 경우
+  if (!SELECTION_CHECK_ENABLED) {
+    return NextResponse.json(
+      { error: "당첨 확인 기능은 현재 준비 중입니다." },
+      { status: 503 }
+    );
+  }
+
   try {
     const supabase = await createClient();
     const { id } = await params;

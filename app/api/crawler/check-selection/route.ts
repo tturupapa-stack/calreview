@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { SELECTION_CHECK_ENABLED } from "@/lib/feature-flags";
 
 /**
  * 당첨 확인 크롤러 API
@@ -8,6 +9,14 @@ import { NextRequest, NextResponse } from "next/server";
  * 현재는 구조만 구현하고, 실제 크롤링 로직은 추후 추가합니다.
  */
 export async function POST(request: NextRequest) {
+  // 당첨 확인 기능이 비활성화된 경우
+  if (!SELECTION_CHECK_ENABLED) {
+    return NextResponse.json(
+      { error: "당첨 확인 기능은 현재 준비 중입니다." },
+      { status: 503 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { site, campaignUrl, cookies } = body;
