@@ -33,7 +33,7 @@ SITES = [
     # "pavlovu",  # 🔄 대체됨
     # ✅ 새로운 사이트 (법적 리스크 검토 완료)
     "stylec",  # 스타일씨 - ✅ API 방식
-    # "modan",  # 모두의체험단 - 대기
+    "modan",  # 모두의체험단 - ✅ 크롤링 방식
     # "myinfluencer",  # 마이인플루언서 - 대기
     # "chuble",  # 츄블 - 대기
     # "real_review",  # 리얼리뷰 - 대기
