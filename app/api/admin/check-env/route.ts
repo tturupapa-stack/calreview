@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
-import { isAdmin } from "@/lib/admin-utils";
+import { isAdmin, getAdminEmails } from "@/lib/admin-utils";
 import {
   createErrorResponse,
   createUnauthorizedError,
@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
     }
 
     // 관리자 권한 체크 (디버깅 정보 포함)
-    const { getAdminEmails } = await import("@/lib/admin-utils");
     const adminEmails = getAdminEmails();
     const userEmail = user.email || "";
     const userIsAdmin = isAdmin(userEmail);
@@ -49,10 +48,6 @@ export async function GET(request: NextRequest) {
       ADMIN_EMAILS: !!process.env.ADMIN_EMAILS,
       NEXT_PUBLIC_ADMIN_EMAILS: !!process.env.NEXT_PUBLIC_ADMIN_EMAILS,
     };
-
-    // 관리자 이메일 목록 확인 (디버깅용)
-    const { getAdminEmails } = await import("@/lib/admin-utils");
-    const adminEmails = getAdminEmails();
 
     const missingEnvVars = Object.entries(envStatus)
       .filter(([_, exists]) => !exists)
