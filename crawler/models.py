@@ -4,7 +4,10 @@ from dataclasses import dataclass
 from typing import Optional, Literal
 
 
-SiteName = Literal["reviewnote", "revu", "dinnerqueen", "gangnam", "reviewplace", "seoulouba", "modooexperience", "pavlovu"]
+SiteName = Literal[
+    "reviewnote", "revu", "dinnerqueen", "gangnam", "reviewplace", "seoulouba", "modooexperience", "pavlovu",
+    "stylec", "modan", "myinfluencer", "chuble", "real_review", "dinodan"
+]
 
 
 @dataclass

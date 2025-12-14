@@ -91,11 +91,11 @@ def _parse_campaign_element(card, category_name: str) -> Campaign | None:
             url=url,
             site_name="modan",
             category=category_name,
-            deadline=None,
+            deadline=None,  # modan은 수시 모집, 마감일 없음
             location=location,
             image_url=image_url,
             channel=channel,
-            review_deadline_days=None,
+            review_deadline_days=7,  # modan 정책: 체험 후 7일 이내 리뷰 등록
         )
     except Exception as e:
         logger.error("모두의체험단 캠페인 파싱 중 오류: %s", e)
