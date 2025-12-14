@@ -274,8 +274,9 @@ function SearchContent() {
       </div>
 
       {isPreviewMode ? (
-        // Dashboard View
+        // Dashboard View - 활성화된 사이트별 미리보기
         <div className="mt-8">
+          <SitePreviewSection siteId="modan" siteName="모두의체험단" onMoreClick={handleMoreClick} shouldLoad={true} />
           <SitePreviewSection siteId="stylec" siteName="스타일씨" onMoreClick={handleMoreClick} shouldLoad={true} />
         </div>
       ) : (
