@@ -26,13 +26,43 @@ def normalize_category(site_name: str, raw_category: Optional[str], title: str) 
         return "맛집"
 
     # 뷰티 키워드 - Raw Category가 "식품"이어도 두피/탈모 등이 있으면 뷰티로 분류
-    beauty_keywords = ["헤어", "네일", "속눈썹", "에스테틱", "왁싱", "피부", "미용실", "뷰티", "펌", "염색", "스파", "피부관리", "메이크업", "눈썹", "모발", "미용", "두피", "탈모"]
+    beauty_keywords = ["헤어", "네일", "속눈썹", "에스테틱", "왁싱", "피부", "미용실", "뷰티", "펌", "염색", "피부관리", "메이크업", "눈썹", "모발", "미용", "두피", "탈모", "살롱", "태닝", "손톱"]
     if any(k in title_norm for k in beauty_keywords):
         return "뷰티"
 
     # 서비스/클리닉 키워드 - Raw Category가 "식품"이어도 연구소/클리닉이면 생활로 분류
     service_keywords = ["연구소", "클리닉", "센터", "학원", "교습소"]
     if any(k in title_norm for k in service_keywords):
+        return "생활"
+
+    # 반려동물 키워드 - Raw Category보다 우선
+    pet_keywords = ["펫", "독", "도그", "dog", "냥", "멍", "강아지", "고양이", "반려", "애견", "펫샵", "펫호텔", "동물병원", "사료", "달마시안", "푸들", "말티즈", "포메", "비숑"]
+    if any(k in title_norm for k in pet_keywords):
+        return "반려동물"
+
+    # 꽃집/플라워 키워드 - 생활로 분류
+    flower_keywords = ["플라워", "플로리스트", "꽃집", "꽃배달", "화원", "플로라"]
+    if any(k in title_norm for k in flower_keywords):
+        return "생활"
+
+    # 가구 키워드 - 문화(전시) 전에 체크
+    furniture_keywords = ["가구", "소파", "침대", "매트리스", "식탁", "의자", "책상", "인테리어", "조명", "이불"]
+    if any(k in title_norm for k in furniture_keywords):
+        return "생활"
+
+    # 곤충/체험학습 키워드 - 생활로 분류
+    experience_keywords = ["곤충", "체험학습", "자연학습"]
+    if any(k in title_norm for k in experience_keywords):
+        return "생활"
+
+    # 노래방/엔터테인먼트 키워드 - 문화로 분류
+    entertainment_keywords = ["노래방", "코인노래", "노래타운", "코노"]
+    if any(k in title_norm for k in entertainment_keywords):
+        return "문화"
+
+    # 세탁/크리닝 키워드 - 생활로 분류
+    cleaning_keywords = ["세탁", "크리닝", "드라이"]
+    if any(k in title_norm for k in cleaning_keywords):
         return "생활"
 
     # 3. 명시적 세부 카테고리 매핑 (Raw Category가 아주 구체적인 경우)
