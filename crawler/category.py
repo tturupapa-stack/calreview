@@ -17,9 +17,25 @@ def normalize_category(site_name: str, raw_category: Optional[str], title: str) 
     # 패션/의류/잡화
     if any(k in title_norm for k in ["슬리퍼", "신발", "의류", "패션", "옷", "양말"]):
         return "패션"
-    
-    # 2. 명시적 세부 카테고리 매핑 (Raw Category가 아주 구체적인 경우)
-    # Raw Category가 명확한 경우 우선적으로 처리
+
+    # 2. 타이틀 기반 강력한 키워드 - Raw Category보다 우선 (잘못된 카테고리 보정)
+
+    # 특정 음식점 체인명
+    food_chain_names = ["텍사스파파", "스노우폭스", "본죽", "본도시락", "김가네", "한솥", "이삭토스트"]
+    if any(k in title_norm for k in food_chain_names):
+        return "맛집"
+
+    # 뷰티 키워드 - Raw Category가 "식품"이어도 두피/탈모 등이 있으면 뷰티로 분류
+    beauty_keywords = ["헤어", "네일", "속눈썹", "에스테틱", "왁싱", "피부", "미용실", "뷰티", "펌", "염색", "스파", "피부관리", "메이크업", "눈썹", "모발", "미용", "두피", "탈모"]
+    if any(k in title_norm for k in beauty_keywords):
+        return "뷰티"
+
+    # 서비스/클리닉 키워드 - Raw Category가 "식품"이어도 연구소/클리닉이면 생활로 분류
+    service_keywords = ["연구소", "클리닉", "센터", "학원", "교습소"]
+    if any(k in title_norm for k in service_keywords):
+        return "생활"
+
+    # 3. 명시적 세부 카테고리 매핑 (Raw Category가 아주 구체적인 경우)
     if "디지털" in cat or "가전" in cat:
         return "디지털"
     if "식품" in cat or "밀키트" in cat:
@@ -34,19 +50,8 @@ def normalize_category(site_name: str, raw_category: Optional[str], title: str) 
         return "패션"
     if "재택" in cat:
         return "재택"
-        
-    # 3. 타이틀 기반 세부 키워드 매핑 (Raw Category가 '제품'='배송' 등으로 뭉뚱그려져 있을 때를 대비해 상위로 이동)
-    # 방문형, 기자단, 또는 카테고리가 없는 경우 타이틀 키워드로 추론
 
-    # 특정 음식점 체인명 (뷰티 키워드와 겹칠 수 있음) - 최우선 처리
-    food_chain_names = ["텍사스파파", "스노우폭스", "본죽", "본도시락", "김가네", "한솥", "이삭토스트"]
-    if any(k in title_norm for k in food_chain_names):
-        return "맛집"
-
-    # 뷰티 키워드 - 맛집보다 먼저 체크 (뷰티샵 이름에 "탕", "회" 등이 포함될 수 있음)
-    beauty_keywords = ["헤어", "네일", "속눈썹", "에스테틱", "왁싱", "피부", "미용실", "뷰티", "펌", "염색", "스파", "피부관리", "메이크업", "눈썹", "모발", "미용"]
-    if any(k in title_norm for k in beauty_keywords):
-        return "뷰티"
+    # 4. 타이틀 기반 세부 키워드 매핑
 
     # 패션/의류 매장 키워드
     fashion_store_keywords = ["핫스노우", "편집샵", "빈티지샵", "옷가게", "의류매장", "쇼룸"]
@@ -89,7 +94,7 @@ def normalize_category(site_name: str, raw_category: Optional[str], title: str) 
     # 생활/여가(청소)보다 먼저 체크해야 "청소기"가 디지털로 분류됨
     if any(k in title_norm for k in ["디지털", "가전", "노트북", "폰", "이어폰", "정수기", "음식물", "처리기", "청소기", "비데", "제습기", "에어컨", "전자"]):
         return "디지털"
-    if any(k in title_norm for k in ["밀키트", "식품", "간식", "음료", "영양제", "비타민", "멜라토닌", "유산균", "건강"]):
+    if any(k in title_norm for k in ["밀키트", "식품", "간식", "음료", "영양제", "비타민", "멜라토닌", "유산균", "건강식품", "건강즙", "홍삼", "프로바이오틱스"]):
         return "식품"
     if any(k in title_norm for k in ["책", "도서"]):
         return "도서"
@@ -109,7 +114,7 @@ def normalize_category(site_name: str, raw_category: Optional[str], title: str) 
         return "생활"
 
     # 생활/여가 키워드
-    life_keywords = ["운동", "pt", "필라테스", "요가", "헬스", "클래스", "청소", "이사", "생활", "바레", "유도", "태권도", "주짓수", "댄스", "무용", "짐", "체육관", "골프", "누수", "마사지", "네일", "왁싱", "세차", "워시", "타로", "점술", "사주", "운세"]
+    life_keywords = ["운동", "pt", "필라테스", "요가", "헬스", "클래스", "청소", "이사", "생활", "바레", "유도", "태권도", "주짓수", "댄스", "무용", "짐", "체육관", "골프", "누수", "마사지", "네일", "왁싱", "세차", "워시", "타로", "점술", "사주", "운세", "연구소", "클리닉", "센터"]
     if any(k in title_norm for k in life_keywords):
         return "생활"
 
