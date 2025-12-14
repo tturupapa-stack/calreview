@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 
 from crawler.models import Campaign
 from crawler.utils import clean_text, logger
+from crawler.category import normalize_category
 
 BASE_URL = "https://www.modan.kr"
 
@@ -86,11 +87,14 @@ def _parse_campaign_element(card, category_name: str) -> Campaign | None:
             elif image_url.startswith("/"):
                 image_url = BASE_URL + image_url
 
+        # 키워드 기반 카테고리 분류 (modan 카테고리가 부정확할 수 있음)
+        normalized_category = normalize_category("modan", category_name, title)
+
         return Campaign(
             title=title,
             url=url,
             site_name="modan",
-            category=category_name,
+            category=normalized_category,
             deadline=None,  # modan은 수시 모집, 마감일 없음
             location=location,
             image_url=image_url,
