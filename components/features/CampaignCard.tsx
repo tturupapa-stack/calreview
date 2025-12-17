@@ -2,6 +2,7 @@
 
 import { ChannelIcon } from "@/components/ui/ChannelIcon";
 import { SiteLogo } from "@/components/ui/SiteLogo";
+import { SelectionRateBadge } from "@/components/ui/SelectionRateBadge";
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
@@ -216,7 +217,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           </h3>
 
           {/* 태그 (1: 대분류, 2: 중분류) */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
             {/* 대분류: Type */}
             {campaign.type && TypeLabelMap[campaign.type] && (
               <span className="text-xs font-medium text-white bg-primary px-2 py-1 rounded">
@@ -234,6 +235,19 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
                 </span>
               )}
           </div>
+
+          {/* 선택률 배지 */}
+          {campaign.recruit_count && campaign.applicant_count && (
+            <div className="mt-2">
+              <SelectionRateBadge
+                recruitCount={campaign.recruit_count}
+                applicantCount={campaign.applicant_count}
+                selectionRate={campaign.selection_rate}
+                showProgress={true}
+                size="sm"
+              />
+            </div>
+          )}
         </div>
       </a>
 

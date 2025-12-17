@@ -1,4 +1,4 @@
-export type SiteName = "reviewnote" | "revu" | "dinnerqueen" | "gangnam" | "reviewplace" | "seoulouba" | "modooexperience" | "pavlovu";
+export type SiteName = "reviewnote" | "revu" | "dinnerqueen" | "gangnam" | "reviewplace" | "seoulouba" | "modooexperience" | "pavlovu" | "stylec" | "modan" | "myinfluencer" | "chuble" | "real_review" | "dinodan";
 
 export interface Campaign {
   id: string;
@@ -16,6 +16,9 @@ export interface Campaign {
   capacity?: number | null;
   application_deadline?: string | null;
   review_deadline_days?: number | null;
+  recruit_count?: number | null;       // 모집인원
+  applicant_count?: number | null;     // 신청자수
+  selection_rate?: number | null;      // 선택률 (%)
   is_active: boolean;
   created_at: string;
   updated_at: string;

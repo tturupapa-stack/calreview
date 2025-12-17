@@ -254,6 +254,12 @@ def _parse_campaign(item: dict) -> Campaign | None:
         enroll_dday = item.get("enroll_dday")
         review_deadline_days = int(enroll_dday) if enroll_dday is not None else None
 
+        # 모집인원/신청자수 (당첨확률 계산용)
+        recruit_max = item.get("tr_recruit_max")
+        enroll_cnt = item.get("tr_enroll_cnt")
+        recruit_count = int(recruit_max) if recruit_max is not None else None
+        applicant_count = int(enroll_cnt) if enroll_cnt is not None else None
+
         return Campaign(
             title=title,
             url=url,
@@ -265,6 +271,8 @@ def _parse_campaign(item: dict) -> Campaign | None:
             channel=channel,
             type=campaign_type,
             review_deadline_days=review_deadline_days,
+            recruit_count=recruit_count,
+            applicant_count=applicant_count,
         )
 
     except Exception as e:

@@ -27,4 +27,6 @@ class Campaign:
     channel: Optional[str] = None  # 채널 정보 (인스타, 블로그, 클립, 릴스 등)
     type: Optional[str] = None  # 캠페인 유형 (visit, delivery, reporter 등)
     review_deadline_days: Optional[int] = None  # 리뷰 기간 (일수)
+    recruit_count: Optional[int] = None  # 모집인원
+    applicant_count: Optional[int] = None  # 신청자수
 

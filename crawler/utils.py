@@ -220,14 +220,21 @@ def _campaign_to_supabase_dict(campaign: Campaign) -> dict:
         else:
             campaign_type = None
     
+    # 선택률 계산 (신청자수가 있을 때만)
+    # 선택률은 최대 100%로 제한 (모집인원 > 신청자수인 경우)
+    selection_rate = None
+    if campaign.recruit_count and campaign.applicant_count and campaign.applicant_count > 0:
+        rate = (campaign.recruit_count / campaign.applicant_count) * 100
+        selection_rate = round(min(rate, 100), 2)  # 최대 100%로 제한
+
     return {
         "source": campaign.site_name,
         "source_id": source_id,
         "title": campaign.title,
         "description": "",  # 상세 설명은 별도 크롤링 필요
-        "source_url": campaign.url,    
+        "source_url": campaign.url,
         "thumbnail_url": campaign.image_url,
-        "category": std_category,  # 정규화된 카테고리 저장    
+        "category": std_category,  # 정규화된 카테고리 저장
         "region": std_region,  # 정규화된 지역명 저장
         "type": campaign_type,
         "channel": campaign.channel,  # 채널 정보 저장
@@ -236,6 +243,9 @@ def _campaign_to_supabase_dict(campaign: Campaign) -> dict:
         "capacity": None,
         "application_deadline": application_deadline,
         "review_deadline_days": campaign.review_deadline_days,  # 리뷰 기간 저장
+        "recruit_count": campaign.recruit_count,  # 모집인원
+        "applicant_count": campaign.applicant_count,  # 신청자수
+        "selection_rate": selection_rate,  # 선택률 (%)
         "is_active": True,
     }
 

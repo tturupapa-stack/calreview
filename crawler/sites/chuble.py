@@ -128,6 +128,14 @@ def _parse_campaign_element(card, category_id: str) -> Campaign | None:
                 else:
                     image_url = BASE_URL + "/" + src
 
+        # 신청자수/모집인원 추출 (X/Y 형식)
+        recruit_count = None
+        applicant_count = None
+        count_match = re.search(r'(\d+)\s*/\s*(\d+)', card.get_text())
+        if count_match:
+            applicant_count = int(count_match.group(1))
+            recruit_count = int(count_match.group(2))
+
         return Campaign(
             title=title,
             url=url,
@@ -138,6 +146,8 @@ def _parse_campaign_element(card, category_id: str) -> Campaign | None:
             image_url=image_url,
             channel="블로그",
             review_deadline_days=7,  # 츄블 정책: 체험 후 7일 이내 리뷰
+            recruit_count=recruit_count,
+            applicant_count=applicant_count,
         )
     except Exception as e:
         logger.error("츄블 캠페인 파싱 중 오류: %s", e)

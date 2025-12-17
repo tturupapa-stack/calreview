@@ -351,9 +351,10 @@ export function AdvancedFilters({ filters, onFiltersChange, isOpen, onToggle }: 
                 className="w-full rounded-lg border-border/60 bg-white/50 text-sm py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               >
                 <option value="">전체</option>
+                <option value="reviewnote">리뷰노트</option>
+                <option value="dinnerqueen">디너의여왕</option>
                 <option value="stylec">스타일씨</option>
                 <option value="modan">모두의체험단</option>
-                <option value="myinfluencer">마이인플루언서</option>
                 <option value="chuble">츄블</option>
                 <option value="real_review">리얼리뷰</option>
                 <option value="dinodan">디노단</option>
@@ -372,6 +373,8 @@ export function AdvancedFilters({ filters, onFiltersChange, isOpen, onToggle }: 
               >
                 <option value="deadline">마감임박순</option>
                 <option value="latest">최신순</option>
+                <option value="selection_rate">당첨확률순</option>
+                <option value="competition">경쟁률낮은순</option>
               </select>
             </div>
           </div>

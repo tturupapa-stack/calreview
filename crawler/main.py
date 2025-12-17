@@ -24,15 +24,15 @@ from crawler.utils import logger, save_campaigns_to_supabase, get_existing_sourc
 # ✅ 활성 사이트 목록
 SITES = [
     # 🔴 중단된 사이트 (robots.txt 위반)
-    # "reviewnote",  # robots.txt: /campaigns/ 금지
-    # "dinnerqueen",  # 중단
     # "gangnam",  # 대체됨
     # "reviewplace",  # robots.txt: /pr 금지
     # "seoulouba",  # robots.txt: 전체 금지
     # "modooexperience",  # robots.txt: /campaign.php 금지
     # "pavlovu",  # 대체됨
     # "myinfluencer",  # 운영 중단
-    # ✅ 활성 사이트 (법적 리스크 검토 완료)
+    # ✅ 활성 사이트
+    "reviewnote",  # 리뷰노트
+    "dinnerqueen", # 디너의여왕
     "stylec",      # 스타일씨
     "modan",       # 모두의체험단
     "chuble",      # 츄블
@@ -75,6 +75,8 @@ def _campaign_to_dict(c: Campaign) -> Dict:
         "channel": c.channel,
         "type": c.type,
         "review_deadline_days": c.review_deadline_days,
+        "recruit_count": c.recruit_count,
+        "applicant_count": c.applicant_count,
     }
 
 
@@ -234,6 +236,8 @@ def enrich_review_deadlines_batch(campaigns: List[Campaign], max_workers: int = 
                     channel=campaign.channel,
                     type=campaign.type,
                     review_deadline_days=review_deadline_days,
+                    recruit_count=campaign.recruit_count,
+                    applicant_count=campaign.applicant_count,
                 ), True
             else:
                 return campaign, False

@@ -285,6 +285,12 @@ export async function GET(request: NextRequest) {
       query = query.order("application_deadline", { ascending: true, nullsFirst: false });
     } else if (sort === "latest") {
       query = query.order("created_at", { ascending: false });
+    } else if (sort === "selection_rate") {
+      // 당첨확률순 (selection_rate 높은 순, NULL 값은 마지막)
+      query = query.order("selection_rate", { ascending: false, nullsFirst: false });
+    } else if (sort === "competition") {
+      // 경쟁률 낮은 순 (selection_rate 높은 순과 동일하지만 신청자 적은 것 우선)
+      query = query.order("selection_rate", { ascending: false, nullsFirst: false });
     }
 
     // 페이지네이션 적용

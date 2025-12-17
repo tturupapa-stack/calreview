@@ -276,6 +276,8 @@ function SearchContent() {
       {isPreviewMode ? (
         // Dashboard View - 활성화된 사이트별 미리보기
         <div className="mt-8">
+          <SitePreviewSection siteId="reviewnote" siteName="리뷰노트" onMoreClick={handleMoreClick} shouldLoad={true} />
+          <SitePreviewSection siteId="dinnerqueen" siteName="디너의여왕" onMoreClick={handleMoreClick} shouldLoad={true} />
           <SitePreviewSection siteId="modan" siteName="모두의체험단" onMoreClick={handleMoreClick} shouldLoad={true} />
           <SitePreviewSection siteId="stylec" siteName="스타일씨" onMoreClick={handleMoreClick} shouldLoad={true} />
           <SitePreviewSection siteId="real_review" siteName="리얼리뷰" onMoreClick={handleMoreClick} shouldLoad={true} />
