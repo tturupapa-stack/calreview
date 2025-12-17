@@ -3,3 +3,4 @@ beautifulsoup4==4.12.3
 supabase==2.25.0
 python-dotenv==1.0.1
 websockets>=15.0.0
+selenium>=4.15.0

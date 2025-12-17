@@ -21,23 +21,23 @@ from crawler.utils import logger, save_campaigns_to_supabase, get_existing_sourc
 # ✅ 법적 리스크 검토 완료 사이트 (2025년 1월)
 # - stylec, modan, myinfluencer, chuble, real_review, dinodan: robots.txt 및 이용약관 확인 완료
 # 
-# 🧪 테스트 모드: 한 사이트씩 확인 후 다음 사이트로 진행
-# 현재 테스트 중: stylec
+# ✅ 활성 사이트 목록
 SITES = [
-    # "reviewnote",  # 🔴 중단: robots.txt 위반 (/campaigns/ 금지)
-    # "dinnerqueen",  # 🔴 중단
-    # "gangnam",  # 🔄 대체됨
-    # "reviewplace",  # 🔴 중단: robots.txt 위반 (/pr 금지)
-    # "seoulouba",  # 🔴 중단: robots.txt 위반 (전체 금지)
-    # "modooexperience",  # 🔴 중단: robots.txt 위반 (/campaign.php 금지)
-    # "pavlovu",  # 🔄 대체됨
-    # ✅ 새로운 사이트 (법적 리스크 검토 완료)
-    "stylec",  # 스타일씨 - ✅ API 방식
-    "modan",  # 모두의체험단 - ✅ 크롤링 방식
-    # "myinfluencer",  # 마이인플루언서 - 대기
-    # "chuble",  # 츄블 - 대기
-    # "real_review",  # 리얼리뷰 - 대기
-    # "dinodan",  # 디노단 - 대기
+    # 🔴 중단된 사이트 (robots.txt 위반)
+    # "reviewnote",  # robots.txt: /campaigns/ 금지
+    # "dinnerqueen",  # 중단
+    # "gangnam",  # 대체됨
+    # "reviewplace",  # robots.txt: /pr 금지
+    # "seoulouba",  # robots.txt: 전체 금지
+    # "modooexperience",  # robots.txt: /campaign.php 금지
+    # "pavlovu",  # 대체됨
+    # "myinfluencer",  # 운영 중단
+    # ✅ 활성 사이트 (법적 리스크 검토 완료)
+    "stylec",      # 스타일씨
+    "modan",       # 모두의체험단
+    "chuble",      # 츄블
+    "dinodan",     # 디노단
+    "real_review", # 리얼리뷰
 ]
 
 

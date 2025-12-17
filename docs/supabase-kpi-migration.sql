@@ -151,3 +151,4 @@ AFTER INSERT OR UPDATE ON public.applications
 FOR EACH ROW
 EXECUTE FUNCTION update_user_last_active_at();
 
+

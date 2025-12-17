@@ -58,6 +58,7 @@ export default async function CampaignDetailPage({ params }: PageProps) {
                   {campaign.source === "seoulouba" && "서울오빠"}
                   {campaign.source === "modooexperience" && "모두의체험단"}
                   {campaign.source === "pavlovu" && "파블로"}
+                  {campaign.source === "stylec" && "스타일씨"}
                 </span>
               </div>
               {campaign.deadline && (

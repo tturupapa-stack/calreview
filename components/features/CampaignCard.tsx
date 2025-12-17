@@ -21,6 +21,7 @@ const SiteNameMap: Record<string, string> = {
   seoulouba: "서울오빠",
   modooexperience: "모두의체험단",
   pavlovu: "파블로",
+  stylec: "스타일씨",
 };
 
 const TypeLabelMap: Record<string, string> = {

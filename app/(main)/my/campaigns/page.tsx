@@ -598,6 +598,7 @@ export default function MyCampaignsPage() {
                                 {app.campaigns.source === "dinnerqueen" && "디너의여왕"}
                                 {app.campaigns.source === "gangnam" && "강남맛집"}
                                 {app.campaigns.source === "reviewplace" && "리뷰플레이스"}
+                                {app.campaigns.source === "stylec" && "스타일씨"}
                               </span>
                             )}
                             {app.campaigns.category && (

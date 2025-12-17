@@ -1,6 +1,7 @@
 """모두의체험단 크롤러"""
 
 import re
+from datetime import datetime, timedelta
 from typing import List
 import requests
 from bs4 import BeautifulSoup
@@ -90,12 +91,15 @@ def _parse_campaign_element(card, category_name: str) -> Campaign | None:
         # 키워드 기반 카테고리 분류 (modan 카테고리가 부정확할 수 있음)
         normalized_category = normalize_category("modan", category_name, title)
 
+        # modan은 마감일 정보를 제공하지 않으므로 기본값으로 30일 후 설정
+        default_deadline = (datetime.now() + timedelta(days=30)).strftime("%Y-%m-%d")
+
         return Campaign(
             title=title,
             url=url,
             site_name="modan",
             category=normalized_category,
-            deadline=None,  # modan은 수시 모집, 마감일 없음
+            deadline=default_deadline,  # 기본 30일 후
             location=location,
             image_url=image_url,
             channel=channel,

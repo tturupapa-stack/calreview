@@ -52,3 +52,4 @@ env/
 # Crawler Output
 crawler/output/
 clear-cache.txt
+crawler/logs/

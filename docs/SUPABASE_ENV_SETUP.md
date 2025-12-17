@@ -99,3 +99,4 @@ Vercel에 배포할 때는 Vercel 대시보드에서 환경 변수를 설정하�
 - ✅ 올바른 형식: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` (매우 긴 문자열)
 - ❌ 잘못된 형식: `your_supabase_anon_key`, 짧은 문자열
 
+

@@ -66,7 +66,7 @@ export interface Database {
             campaigns: {
                 Row: {
                     id: string
-                    source: 'reviewnote' | 'revu' | 'dinnerqueen' | 'gangnam' | 'reviewplace'
+                    source: 'reviewnote' | 'revu' | 'dinnerqueen' | 'gangnam' | 'reviewplace' | 'seoulouba' | 'modooexperience' | 'pavlovu' | 'stylec' | 'modan' | 'myinfluencer' | 'chuble' | 'real_review' | 'dinodan'
                     source_id: string
                     source_url: string
                     title: string
@@ -86,7 +86,7 @@ export interface Database {
                 }
                 Insert: {
                     id?: string
-                    source: 'reviewnote' | 'revu' | 'dinnerqueen' | 'gangnam' | 'reviewplace'
+                    source: 'reviewnote' | 'revu' | 'dinnerqueen' | 'gangnam' | 'reviewplace' | 'seoulouba' | 'modooexperience' | 'pavlovu' | 'stylec' | 'modan' | 'myinfluencer' | 'chuble' | 'real_review' | 'dinodan'
                     source_id: string
                     source_url: string
                     title: string

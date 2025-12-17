@@ -65,6 +65,38 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "www.reviewplace.co.kr",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.stylec.co.kr",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn-optimized.imweb.me",
+      },
+      {
+        protocol: "https",
+        hostname: "chuble.net",
+      },
+      {
+        protocol: "https",
+        hostname: "dinodan.co.kr",
+      },
+      {
+        protocol: "https",
+        hostname: "img.reviewerns.com",
+      },
+      {
+        protocol: "https",
+        hostname: "serveproxy.com",
+      },
+      {
+        protocol: "https",
+        hostname: "wsrv.nl",
+      },
+      {
+        protocol: "https",
+        hostname: "www.real-review.kr",
+      },
     ],
   },
 };

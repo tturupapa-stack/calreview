@@ -278,6 +278,9 @@ function SearchContent() {
         <div className="mt-8">
           <SitePreviewSection siteId="modan" siteName="모두의체험단" onMoreClick={handleMoreClick} shouldLoad={true} />
           <SitePreviewSection siteId="stylec" siteName="스타일씨" onMoreClick={handleMoreClick} shouldLoad={true} />
+          <SitePreviewSection siteId="real_review" siteName="리얼리뷰" onMoreClick={handleMoreClick} shouldLoad={true} />
+          <SitePreviewSection siteId="chuble" siteName="츄블" onMoreClick={handleMoreClick} shouldLoad={true} />
+          <SitePreviewSection siteId="dinodan" siteName="디노단" onMoreClick={handleMoreClick} shouldLoad={true} />
         </div>
       ) : (
         // List View
