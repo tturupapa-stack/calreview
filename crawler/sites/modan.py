@@ -110,26 +110,37 @@ def _parse_campaign_element(card, category_name: str) -> Campaign | None:
         return None
 
 
-def crawl(max_pages: int = 20) -> List[Campaign]:
-    """모두의체험단 크롤링 로직."""
-    logger.info("모두의체험단 크롤링 시작")
+def crawl(max_pages: int = 20, max_total: int = 200) -> List[Campaign]:
+    """모두의체험단 크롤링 로직.
+
+    Args:
+        max_pages: 카테고리별 최대 페이지 수
+        max_total: 전체 최대 수집 캠페인 수 (기본 200개)
+    """
+    logger.info("모두의체험단 크롤링 시작 (최대 %d개)", max_total)
     campaigns: List[Campaign] = []
     empty_page_count = 0
-    
+
     # 카테고리별 크롤링
     categories = [
         ("/matzip/", "맛집"),
         ("/beauty/", "뷰티"),
         ("/product/", "제품"),
     ]
-    
+
     for category_path, category_name in categories:
+        if len(campaigns) >= max_total:
+            break
+
         for page in range(1, max_pages + 1):
+            if len(campaigns) >= max_total:
+                break
+
             try:
                 url = f"{BASE_URL}{category_path}?page={page}"
                 res = requests.get(url, headers=HEADERS, timeout=10)
                 res.raise_for_status()
-                
+
                 soup = BeautifulSoup(res.text, "html.parser")
                 cards = soup.select(".shop-item")
 
@@ -144,15 +155,17 @@ def crawl(max_pages: int = 20) -> List[Campaign]:
                 logger.info("모두의체험단 %s 페이지 %d에서 %d개 카드 발견", category_name, page, len(cards))
 
                 for card in cards:
+                    if len(campaigns) >= max_total:
+                        break
                     campaign = _parse_campaign_element(card, category_name)
                     if campaign:
                         campaigns.append(campaign)
-                        
+
             except Exception as e:
                 logger.error("모두의체험단 %s 페이지 %d 크롤링 중 오류: %s", category_name, page, e)
                 empty_page_count += 1
                 if empty_page_count >= 2:
                     break
-    
+
     logger.info("모두의체험단 총 %d개 캠페인 수집", len(campaigns))
     return campaigns
