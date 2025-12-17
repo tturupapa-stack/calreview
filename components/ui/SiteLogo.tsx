@@ -22,7 +22,7 @@ const SiteLogoUrl: Record<string, string> = {
     gangnam: "https://www.google.com/s2/favicons?domain=xn--939au0g4vj8sq.net&sz=64",
     stylec: "https://www.google.com/s2/favicons?domain=stylec.co.kr&sz=64",
     modan: "https://www.google.com/s2/favicons?domain=modan.kr&sz=64",
-    chuble: "https://www.google.com/s2/favicons?domain=chuble.co.kr&sz=64",
+    chuble: "https://www.google.com/s2/favicons?domain=chuble.net&sz=64",
     real_review: "https://www.google.com/s2/favicons?domain=real-review.kr&sz=64",
     dinodan: "https://www.google.com/s2/favicons?domain=dinodan.co.kr&sz=64",
 };
