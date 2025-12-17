@@ -124,7 +124,12 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
     }
   };
 
-  const imageUrl = campaign.thumbnail_url || campaign.image_url;
+  // 이미지 URL (핫링킹 차단 도메인은 프록시 사용)
+  let imageUrl = campaign.thumbnail_url || campaign.image_url;
+  if (imageUrl && imageUrl.includes("dq-files.gcdn.ntruss.com")) {
+    // 디너의여왕 CDN은 핫링킹 차단 -> wsrv.nl 프록시 사용
+    imageUrl = `https://wsrv.nl/?url=${encodeURIComponent(imageUrl)}`;
+  }
   const hasValidUrl = campaign.source_url && campaign.source_url.trim() !== "";
 
   // 지역 정보 (region이 있으면 사용하고, 없으면 location 사용, 그래도 없으면 빈 문자열)
