@@ -15,7 +15,7 @@ interface SiteLogoProps {
 const SiteLogoUrl: Record<string, string> = {
     seoulouba: "/images/logos/seoulouba.png",
     reviewplace: "/images/logos/reviewplace.png",
-    reviewnote: "https://logo.clearbit.com/reviewnote.co.kr",
+    reviewnote: "https://www.google.com/s2/favicons?domain=reviewnote.co.kr&sz=64",
     dinnerqueen: "/images/logos/dinnerqueen.png",
     modooexperience: "/images/logos/modooexperience.png",
     pavlovu: "/images/logos/pavlovu.png",
