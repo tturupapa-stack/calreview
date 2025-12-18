@@ -7,46 +7,50 @@
   --font-heading: "Pretendard Variable", Pretendard, ui-sans-serif, system-ui, sans-serif;
   --font-number: "Outfit", ui-sans-serif, system-ui, sans-serif;
 
-  /* Vivid & Playful Color Palette */
-  --color-border: hsl(200 20% 90%);
-  --color-input: hsl(200 20% 92%);
-  --color-ring: hsl(168 100% 42%);
-  --color-background: hsl(210 20% 98%);
-  --color-foreground: hsl(230 30% 12%);
+  /* Modern & Sophisticated Color Palette - Pink-Orange Theme */
+  --color-border: hsl(214.3 31.8% 91.4%);
+  --color-input: hsl(0 0% 98%);
+  --color-ring: hsl(15 90% 60%);
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(222.2 84% 4.9%);
 
-  /* Primary: Mint Green - 활기찬 메인 컬러 */
-  --color-primary: hsl(168 100% 42%);
+  /* Primary: Pink-Orange (핑크 40% 가미된 오렌지톤) - 활기차고 따뜻한 메인 컬러 */
+  --color-primary: hsl(15 90% 60%);
   --color-primary-foreground: hsl(0 0% 100%);
 
-  /* Secondary: Soft Gray - 보조 컬러 */
-  --color-secondary: hsl(210 20% 96%);
+  /* Secondary: Off White - 깔끔한 보조 컬러 */
+  --color-secondary: hsl(0 0% 98%);
   --color-secondary-foreground: hsl(230 30% 12%);
 
   /* Accent Colors for different states */
   --color-accent: hsl(45 100% 70%);
   --color-accent-foreground: hsl(230 30% 12%);
 
-  /* Urgent: Hot Pink - 마감 임박 */
-  --color-urgent: hsl(340 82% 65%);
+  /* Urgent: Coral Red - 마감 임박 */
+  --color-urgent: hsl(0 70% 65%);
   --color-urgent-foreground: hsl(0 0% 100%);
 
-  /* Premium: Purple - 프리미엄/특별 */
-  --color-premium: hsl(255 70% 68%);
+  /* Premium: Lavender Purple - 프리미엄/특별 */
+  --color-premium: hsl(280 55% 68%);
   --color-premium-foreground: hsl(0 0% 100%);
 
-  /* Success: Bright Green */
+  /* Success: Green - 성공, 완료 상태 */
   --color-success: hsl(145 65% 50%);
   --color-success-foreground: hsl(0 0% 100%);
 
-  /* Warning: Sunshine Yellow */
+  /* Warning: Yellow - 주의, 경고 */
   --color-warning: hsl(45 100% 60%);
   --color-warning-foreground: hsl(230 30% 12%);
+
+  /* Info: Blue - 정보, 알림 */
+  --color-info: hsl(200 90% 50%);
+  --color-info-foreground: hsl(0 0% 100%);
 
   --color-destructive: hsl(0 84% 60%);
   --color-destructive-foreground: hsl(0 0% 98%);
 
-  --color-muted: hsl(210 20% 96%);
-  --color-muted-foreground: hsl(230 15% 45%);
+  --color-muted: hsl(210 40% 96.1%);
+  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
 
   --color-popover: hsl(0 0% 100%);
   --color-popover-foreground: hsl(230 30% 12%);
@@ -229,22 +233,22 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(210 20% 96%);
+  background: hsl(0 0% 98%);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(168 100% 42% / 0.4);
+  background: hsl(15 90% 60% / 0.4);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(168 100% 42% / 0.6);
+  background: hsl(15 90% 60% / 0.6);
 }
 
 /* Smooth focus styles */
 *:focus-visible {
-  outline: 2px solid hsl(168 100% 42%);
+  outline: 2px solid hsl(15 90% 60%);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -260,7 +264,7 @@
 
 .animate-shimmer {
   animation: shimmer 2s linear infinite;
-  background: linear-gradient(90deg, transparent 25%, hsl(210 20% 96%) 50%, transparent 75%);
+  background: linear-gradient(90deg, transparent 25%, hsl(0 0% 98%) 50%, transparent 75%);
   background-size: 200% 100%;
 }
 
@@ -280,17 +284,17 @@
   animation: count-up 0.5s ease-out forwards;
 }
 
-/* Gradient backgrounds */
+/* Gradient backgrounds - Pink-Orange Theme */
 .bg-gradient-vivid {
-  background: linear-gradient(135deg, hsl(168 100% 42%) 0%, hsl(168 100% 52%) 100%);
+  background: linear-gradient(135deg, hsl(15 90% 60%) 0%, hsl(15 90% 70%) 100%);
 }
 
 .bg-gradient-urgent {
-  background: linear-gradient(135deg, hsl(340 82% 65%) 0%, hsl(340 82% 55%) 100%);
+  background: linear-gradient(135deg, hsl(0 70% 65%) 0%, hsl(0 70% 55%) 100%);
 }
 
 .bg-gradient-premium {
-  background: linear-gradient(135deg, hsl(255 70% 68%) 0%, hsl(255 70% 58%) 100%);
+  background: linear-gradient(135deg, hsl(280 55% 68%) 0%, hsl(280 55% 58%) 100%);
 }
 
 .bg-gradient-success {
@@ -316,8 +320,8 @@
 }
 
 .status-selected {
-  background: hsl(168 100% 92%);
-  color: hsl(168 100% 25%);
+  background: hsl(15 90% 95%);
+  color: hsl(15 90% 25%);
 }
 
 .status-completed {
