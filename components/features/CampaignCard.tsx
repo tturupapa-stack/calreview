@@ -36,6 +36,182 @@ const TypeLabelMap: Record<string, string> = {
   "기자단": "기자단",
 };
 
+// 각 사이트별 브랜드 컬러 팔레트 (완전한 클래스명 사용)
+interface SiteTheme {
+  cardBorder: string;
+  cardShadow: string;
+  imageBg: string;
+  ddayUrgent: string;
+  ddayWarning: string;
+  categoryTag: string;
+  titleHover: string;
+  regionText: string;
+  bookmarkActive: string;
+  bookmarkInactive: string;
+}
+
+const SiteThemes: Record<string, SiteTheme> = {
+  reviewnote: {
+    cardBorder: "border-blue-200/60 group-hover:border-blue-400/80",
+    cardShadow: "shadow-blue-100/30 group-hover:shadow-blue-300/50",
+    imageBg: "from-blue-50/80 via-blue-50/40 to-blue-50/20",
+    ddayUrgent: "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md shadow-blue-200/50",
+    ddayWarning: "bg-blue-50 text-blue-700",
+    categoryTag: "text-blue-600 bg-blue-50",
+    titleHover: "group-hover:text-blue-600",
+    regionText: "text-blue-600",
+    bookmarkActive: "bg-blue-500 hover:bg-blue-600",
+    bookmarkInactive: "bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white",
+  },
+  dinnerqueen: {
+    cardBorder: "border-red-200/60 group-hover:border-red-400/80",
+    cardShadow: "shadow-red-100/30 group-hover:shadow-red-300/50",
+    imageBg: "from-red-50/80 via-amber-50/40 to-red-50/20",
+    ddayUrgent: "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md shadow-red-200/50",
+    ddayWarning: "bg-amber-50 text-amber-700",
+    categoryTag: "text-red-600 bg-red-50",
+    titleHover: "group-hover:text-red-600",
+    regionText: "text-red-600",
+    bookmarkActive: "bg-red-600 hover:bg-red-700",
+    bookmarkInactive: "bg-red-50 text-red-600 hover:bg-red-600 hover:text-white",
+  },
+  stylec: {
+    cardBorder: "border-pink-200/60 group-hover:border-pink-400/80",
+    cardShadow: "shadow-pink-100/30 group-hover:shadow-pink-300/50",
+    imageBg: "from-pink-50/80 via-purple-50/40 to-pink-50/20",
+    ddayUrgent: "bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md shadow-pink-200/50",
+    ddayWarning: "bg-pink-50 text-pink-700",
+    categoryTag: "text-pink-600 bg-pink-50",
+    titleHover: "group-hover:text-pink-600",
+    regionText: "text-pink-600",
+    bookmarkActive: "bg-pink-500 hover:bg-pink-600",
+    bookmarkInactive: "bg-pink-50 text-pink-600 hover:bg-pink-500 hover:text-white",
+  },
+  modan: {
+    cardBorder: "border-emerald-200/60 group-hover:border-emerald-400/80",
+    cardShadow: "shadow-emerald-100/30 group-hover:shadow-emerald-300/50",
+    imageBg: "from-emerald-50/80 via-teal-50/40 to-emerald-50/20",
+    ddayUrgent: "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-200/50",
+    ddayWarning: "bg-emerald-50 text-emerald-700",
+    categoryTag: "text-emerald-600 bg-emerald-50",
+    titleHover: "group-hover:text-emerald-600",
+    regionText: "text-emerald-600",
+    bookmarkActive: "bg-emerald-500 hover:bg-emerald-600",
+    bookmarkInactive: "bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white",
+  },
+  chuble: {
+    cardBorder: "border-orange-200/60 group-hover:border-orange-400/80",
+    cardShadow: "shadow-orange-100/30 group-hover:shadow-orange-300/50",
+    imageBg: "from-orange-50/80 via-amber-50/40 to-orange-50/20",
+    ddayUrgent: "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-200/50",
+    ddayWarning: "bg-orange-50 text-orange-700",
+    categoryTag: "text-orange-600 bg-orange-50",
+    titleHover: "group-hover:text-orange-600",
+    regionText: "text-orange-600",
+    bookmarkActive: "bg-orange-500 hover:bg-orange-600",
+    bookmarkInactive: "bg-orange-50 text-orange-600 hover:bg-orange-500 hover:text-white",
+  },
+  real_review: {
+    cardBorder: "border-blue-300/60 group-hover:border-blue-500/80",
+    cardShadow: "shadow-blue-200/30 group-hover:shadow-blue-400/50",
+    imageBg: "from-blue-50/80 via-indigo-50/40 to-blue-50/20",
+    ddayUrgent: "bg-gradient-to-r from-blue-700 to-blue-800 text-white shadow-md shadow-blue-300/50",
+    ddayWarning: "bg-blue-50 text-blue-700",
+    categoryTag: "text-blue-700 bg-blue-50",
+    titleHover: "group-hover:text-blue-700",
+    regionText: "text-blue-700",
+    bookmarkActive: "bg-blue-700 hover:bg-blue-800",
+    bookmarkInactive: "bg-blue-50 text-blue-700 hover:bg-blue-700 hover:text-white",
+  },
+  dinodan: {
+    cardBorder: "border-violet-200/60 group-hover:border-violet-400/80",
+    cardShadow: "shadow-violet-100/30 group-hover:shadow-violet-300/50",
+    imageBg: "from-violet-50/80 via-purple-50/40 to-violet-50/20",
+    ddayUrgent: "bg-gradient-to-r from-violet-600 to-violet-700 text-white shadow-md shadow-violet-200/50",
+    ddayWarning: "bg-violet-50 text-violet-700",
+    categoryTag: "text-violet-600 bg-violet-50",
+    titleHover: "group-hover:text-violet-600",
+    regionText: "text-violet-600",
+    bookmarkActive: "bg-violet-600 hover:bg-violet-700",
+    bookmarkInactive: "bg-violet-50 text-violet-600 hover:bg-violet-600 hover:text-white",
+  },
+  // 레거시 사이트들
+  gangnam: {
+    cardBorder: "border-amber-200/60 group-hover:border-amber-400/80",
+    cardShadow: "shadow-amber-100/30 group-hover:shadow-amber-300/50",
+    imageBg: "from-amber-50/80 via-yellow-50/40 to-amber-50/20",
+    ddayUrgent: "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-200/50",
+    ddayWarning: "bg-amber-50 text-amber-700",
+    categoryTag: "text-amber-600 bg-amber-50",
+    titleHover: "group-hover:text-amber-600",
+    regionText: "text-amber-600",
+    bookmarkActive: "bg-amber-500 hover:bg-amber-600",
+    bookmarkInactive: "bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white",
+  },
+  reviewplace: {
+    cardBorder: "border-purple-200/60 group-hover:border-purple-400/80",
+    cardShadow: "shadow-purple-100/30 group-hover:shadow-purple-300/50",
+    imageBg: "from-purple-50/80 via-pink-50/40 to-purple-50/20",
+    ddayUrgent: "bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-200/50",
+    ddayWarning: "bg-purple-50 text-purple-700",
+    categoryTag: "text-purple-600 bg-purple-50",
+    titleHover: "group-hover:text-purple-600",
+    regionText: "text-purple-600",
+    bookmarkActive: "bg-purple-500 hover:bg-purple-600",
+    bookmarkInactive: "bg-purple-50 text-purple-600 hover:bg-purple-500 hover:text-white",
+  },
+  seoulouba: {
+    cardBorder: "border-slate-200/60 group-hover:border-slate-400/80",
+    cardShadow: "shadow-slate-100/30 group-hover:shadow-slate-300/50",
+    imageBg: "from-slate-50/80 via-gray-50/40 to-slate-50/20",
+    ddayUrgent: "bg-gradient-to-r from-slate-600 to-slate-700 text-white shadow-md shadow-slate-200/50",
+    ddayWarning: "bg-slate-50 text-slate-700",
+    categoryTag: "text-slate-600 bg-slate-50",
+    titleHover: "group-hover:text-slate-600",
+    regionText: "text-slate-600",
+    bookmarkActive: "bg-slate-600 hover:bg-slate-700",
+    bookmarkInactive: "bg-slate-50 text-slate-600 hover:bg-slate-600 hover:text-white",
+  },
+  modooexperience: {
+    cardBorder: "border-green-200/60 group-hover:border-green-400/80",
+    cardShadow: "shadow-green-100/30 group-hover:shadow-green-300/50",
+    imageBg: "from-green-50/80 via-emerald-50/40 to-green-50/20",
+    ddayUrgent: "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md shadow-green-200/50",
+    ddayWarning: "bg-green-50 text-green-700",
+    categoryTag: "text-green-600 bg-green-50",
+    titleHover: "group-hover:text-green-600",
+    regionText: "text-green-600",
+    bookmarkActive: "bg-green-500 hover:bg-green-600",
+    bookmarkInactive: "bg-green-50 text-green-600 hover:bg-green-500 hover:text-white",
+  },
+  pavlovu: {
+    cardBorder: "border-rose-200/60 group-hover:border-rose-400/80",
+    cardShadow: "shadow-rose-100/30 group-hover:shadow-rose-300/50",
+    imageBg: "from-rose-50/80 via-pink-50/40 to-rose-50/20",
+    ddayUrgent: "bg-gradient-to-r from-rose-500 to-rose-600 text-white shadow-md shadow-rose-200/50",
+    ddayWarning: "bg-rose-50 text-rose-700",
+    categoryTag: "text-rose-600 bg-rose-50",
+    titleHover: "group-hover:text-rose-600",
+    regionText: "text-rose-600",
+    bookmarkActive: "bg-rose-500 hover:bg-rose-600",
+    bookmarkInactive: "bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white",
+  },
+};
+
+// 기본 테마 (사이트가 매핑되지 않은 경우)
+const defaultTheme: SiteTheme = {
+  cardBorder: "border-border/50 group-hover:border-primary/50",
+  cardShadow: "shadow-primary/10 group-hover:shadow-primary/20",
+  imageBg: "from-secondary to-secondary/50",
+  ddayUrgent: "bg-gradient-urgent text-white",
+  ddayWarning: "bg-amber-100 text-amber-700",
+  categoryTag: "text-primary bg-primary/10",
+  titleHover: "group-hover:text-primary",
+  regionText: "text-primary",
+  bookmarkActive: "bg-primary hover:bg-primary/90",
+  bookmarkInactive: "bg-secondary text-foreground hover:bg-primary hover:text-white",
+};
+
 export function CampaignCard({ campaign }: CampaignCardProps) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -152,21 +328,24 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
     channels = channels.filter(c => !c.includes("블로그"));
   }
 
-  // D-Day 색상 계산
+  // 사이트별 테마 가져오기
+  const siteTheme = SiteThemes[campaign.source || ""] || defaultTheme;
+
+  // D-Day 색상 계산 (사이트별 테마 적용)
   const getDdayColor = () => {
     if (!campaign.deadline) return "";
     const match = campaign.deadline.match(/D-(\d+)/);
     if (match) {
       const days = parseInt(match[1]);
-      if (days <= 1) return "bg-gradient-urgent text-white";
-      if (days <= 3) return "bg-amber-100 text-amber-700";
+      if (days <= 1) return siteTheme.ddayUrgent;
+      if (days <= 3) return siteTheme.ddayWarning;
       return "bg-secondary text-muted-foreground";
     }
     return "bg-secondary text-muted-foreground";
   };
 
   return (
-    <div className="group bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+    <div className={`group bg-white rounded-2xl border-2 ${siteTheme.cardBorder} shadow-md ${siteTheme.cardShadow} hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden`}>
       <a
         href={hasValidUrl ? campaign.source_url : undefined}
         target={hasValidUrl ? "_blank" : undefined}
@@ -181,7 +360,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         }}
       >
         {/* 이미지 */}
-        <div className="relative w-full h-48 bg-gradient-to-br from-secondary to-secondary/50 overflow-hidden">
+        <div className={`relative w-full h-48 bg-gradient-to-br ${siteTheme.imageBg} overflow-hidden`}>
           {imageUrl && !imageError ? (
             <>
               <img
@@ -244,9 +423,9 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           </div>
 
           {/* 제목 */}
-          <h3 className="text-base font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className={`text-base font-bold text-foreground mb-2 line-clamp-2 ${siteTheme.titleHover} transition-colors`}>
             {regionText && (
-              <span className="text-primary mr-1">[{regionText}]</span>
+              <span className={`${siteTheme.regionText} mr-1`}>[{regionText}]</span>
             )}
             {campaign.title}
           </h3>
@@ -255,7 +434,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           {campaign.category &&
             !(campaign.source === "seoulouba" && campaign.type === "delivery") &&
             campaign.category !== TypeLabelMap[campaign.type || ""] && (
-              <span className="inline-block text-xs text-primary font-medium bg-primary/10 px-2.5 py-1 rounded-lg mb-2">
+              <span className={`inline-block text-xs font-medium ${siteTheme.categoryTag} px-2.5 py-1 rounded-lg mb-2`}>
                 {campaign.category}
               </span>
             )}
@@ -285,7 +464,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           <button
             onClick={handleUnbookmark}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium bg-primary text-white rounded-xl hover:bg-primary/90 hover:shadow-md disabled:opacity-50 transition-all duration-200 active:scale-[0.98]"
+            className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium ${siteTheme.bookmarkActive} text-white rounded-xl hover:shadow-md disabled:opacity-50 transition-all duration-200 active:scale-[0.98]`}
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
@@ -296,7 +475,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           <button
             onClick={handleBookmark}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium bg-secondary text-foreground rounded-xl hover:bg-primary hover:text-white hover:shadow-sm disabled:opacity-50 transition-all duration-200 active:scale-[0.98]"
+            className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium ${siteTheme.bookmarkInactive} rounded-xl hover:shadow-sm disabled:opacity-50 transition-all duration-200 active:scale-[0.98]`}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
