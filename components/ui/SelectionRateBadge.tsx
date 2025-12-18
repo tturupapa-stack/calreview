@@ -30,58 +30,60 @@ export function SelectionRateBadge({
   // applicantCount가 0이면 100% (신청자가 없으면 당첨 확정)
   const rate = selectionRate ?? (applicantCount > 0 ? Math.min(100, (recruitCount / applicantCount) * 100) : 100);
 
-  // 경쟁률 (신청자수 / 모집인원)
-  const competitionRatio = recruitCount > 0 ? applicantCount / recruitCount : 0;
-
   // 색상 결정 (선택률 기준)
-  // 높은 선택률 = 좋음 (초록), 낮은 선택률 = 경쟁 치열 (빨강)
-  const getColorClass = () => {
-    if (rate >= 50) return "bg-green-100 text-green-700 border-green-200"; // 50% 이상: 쉬움
-    if (rate >= 20) return "bg-yellow-100 text-yellow-700 border-yellow-200"; // 20-50%: 보통
-    if (rate >= 10) return "bg-orange-100 text-orange-700 border-orange-200"; // 10-20%: 경쟁
-    return "bg-red-100 text-red-700 border-red-200"; // 10% 미만: 치열
+  const getRateClass = () => {
+    if (rate >= 50) return "rate-easy";
+    if (rate >= 20) return "rate-normal";
+    if (rate >= 10) return "rate-competitive";
+    return "rate-intense";
   };
 
   const getProgressColor = () => {
-    if (rate >= 50) return "bg-green-500";
-    if (rate >= 20) return "bg-yellow-500";
+    if (rate >= 50) return "bg-emerald-500";
+    if (rate >= 20) return "bg-amber-500";
     if (rate >= 10) return "bg-orange-500";
     return "bg-red-500";
   };
 
+  const getRateLabel = () => {
+    if (rate >= 50) return "당첨 쉬움";
+    if (rate >= 20) return "보통";
+    if (rate >= 10) return "경쟁 중";
+    return "경쟁 치열";
+  };
+
   // 사이즈별 스타일
   const sizeClasses = {
-    sm: "text-xs px-1.5 py-0.5",
-    md: "text-sm px-2 py-1",
-    lg: "text-base px-3 py-1.5",
+    sm: "text-xs px-2 py-1",
+    md: "text-sm px-2.5 py-1.5",
+    lg: "text-base px-3 py-2",
   };
 
   // 프로그레스 바 높이
   const progressHeight = {
-    sm: "h-1",
-    md: "h-1.5",
-    lg: "h-2",
+    sm: "h-1.5",
+    md: "h-2",
+    lg: "h-2.5",
   };
 
   // 채워진 비율 (100%를 넘지 않도록)
   const fillPercent = Math.min(100, (applicantCount / recruitCount) * 100);
 
   return (
-    <div className="flex flex-col gap-1">
-      <div className={`inline-flex items-center gap-1 ${sizeClasses[size]} rounded border ${getColorClass()} font-medium`}>
-        <span>{applicantCount}</span>
-        <span className="opacity-60">/</span>
-        <span>{recruitCount}</span>
-        <span className="opacity-60 ml-0.5">명</span>
-        <span className="ml-1 opacity-80">
-          ({Math.min(100, rate).toFixed(0)}%)
-        </span>
+    <div className="flex flex-col gap-1.5">
+      <div className={`inline-flex items-center gap-1.5 ${sizeClasses[size]} rounded-lg ${getRateClass()} font-semibold`}>
+        <span className="font-number">{applicantCount}</span>
+        <span className="opacity-50">/</span>
+        <span className="font-number">{recruitCount}</span>
+        <span className="opacity-50">명</span>
+        <span className="mx-1 opacity-30">|</span>
+        <span className="font-number">{Math.min(100, rate).toFixed(0)}%</span>
       </div>
 
       {showProgress && (
-        <div className={`w-full ${progressHeight[size]} bg-gray-200 rounded-full overflow-hidden`}>
+        <div className={`w-full ${progressHeight[size]} bg-secondary rounded-full overflow-hidden`}>
           <div
-            className={`${progressHeight[size]} ${getProgressColor()} transition-all duration-300`}
+            className={`${progressHeight[size]} ${getProgressColor()} rounded-full transition-all duration-500 ease-out`}
             style={{ width: `${fillPercent}%` }}
           />
         </div>

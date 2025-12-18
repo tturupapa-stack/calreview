@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Calendar } from "@/components/features/Calendar";
 import { CheckSelectionButton } from "@/components/features/CheckSelectionButton";
+import { StatusPipeline } from "@/components/ui/StatusPipeline";
+import { StatDashboard } from "@/components/ui/StatCard";
 import { calculateReviewDeadlineString, estimateSelectionDate } from "@/lib/review-deadline-calculator";
 import { SELECTION_CHECK_ENABLED } from "@/lib/feature-flags";
 import type { Campaign } from "@/types/campaign";
@@ -338,6 +340,32 @@ export default function MyCampaignsPage() {
     return app.status === statusFilter;
   });
 
+  // Calculate status counts
+  const statusCounts = useMemo(() => ({
+    bookmarked: applications.filter(a => a.status === "bookmarked").length,
+    applied: applications.filter(a => a.status === "applied").length,
+    selected: applications.filter(a => a.status === "selected").length,
+    completed: applications.filter(a => a.status === "completed").length,
+  }), [applications]);
+
+  // Calculate monthly stats (current month)
+  const monthlyStats = useMemo(() => {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const thisMonthApps = applications.filter(app => {
+      const created = new Date(app.created_at);
+      return created >= startOfMonth;
+    });
+
+    const applied = thisMonthApps.filter(a => a.status !== "bookmarked").length;
+    const selected = thisMonthApps.filter(a => a.status === "selected" || a.status === "completed").length;
+    const completed = thisMonthApps.filter(a => a.status === "completed").length;
+    const selectionRate = applied > 0 ? Math.round((selected / applied) * 100) : 0;
+
+    return { applied, selected, completed, selectionRate };
+  }, [applications]);
+
   // 캘린더 이벤트 변환
   const calendarEvents = applications
     .filter((app) => app.status === "selected")
@@ -407,39 +435,56 @@ export default function MyCampaignsPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="bg-background min-h-screen">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {/* 헤더 */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">체험단 관리</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">체험단 관리</h1>
+            <p className="text-sm text-muted-foreground mt-1">북마크부터 리뷰 완료까지 한눈에</p>
+          </div>
 
           {/* 뷰 모드 전환 */}
-          <div className="flex gap-2 bg-white rounded-lg p-1 shadow-sm">
+          <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm border border-border/50">
             <button
               onClick={() => setViewMode("list")}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === "list"
-                ? "bg-blue-600 text-white"
-                : "text-gray-700 hover:bg-gray-100"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${viewMode === "list"
+                ? "bg-primary text-white shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                 }`}
             >
-              <svg className="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
               </svg>
               리스트
             </button>
             <button
               onClick={() => setViewMode("calendar")}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === "calendar"
-                ? "bg-blue-600 text-white"
-                : "text-gray-700 hover:bg-gray-100"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${viewMode === "calendar"
+                ? "bg-primary text-white shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                 }`}
             >
-              <svg className="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               캘린더
             </button>
           </div>
+        </div>
+
+        {/* Status Pipeline */}
+        <div className="mb-6">
+          <StatusPipeline
+            counts={statusCounts}
+            currentStatus={statusFilter}
+            onStatusChange={setStatusFilter}
+          />
+        </div>
+
+        {/* Monthly Stats Dashboard */}
+        <div className="mb-6">
+          <StatDashboard stats={monthlyStats} />
         </div>
 
         {/* 캘린더 뷰 */}
@@ -480,105 +525,92 @@ export default function MyCampaignsPage() {
         ) : (
           /* 리스트 뷰 */
           <div>
-            {/* 상태 필터 탭 */}
-            <div className="mb-6 flex gap-2 flex-wrap bg-white rounded-lg p-1 shadow-sm">
-              <button
-                onClick={() => setStatusFilter("bookmarked")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${statusFilter === "bookmarked"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
-                  }`}
-              >
-                북마크
-                <span className="ml-2 text-xs opacity-75">
-                  ({applications.filter(a => a.status === "bookmarked").length})
-                </span>
-              </button>
-              <button
-                onClick={() => setStatusFilter("applied")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${statusFilter === "applied"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
-                  }`}
-              >
-                신청중
-                <span className="ml-2 text-xs opacity-75">
-                  ({applications.filter(a => a.status === "applied").length})
-                </span>
-              </button>
-              <button
-                onClick={() => setStatusFilter("selected")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${statusFilter === "selected"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
-                  }`}
-              >
-                선정됨
-                <span className="ml-2 text-xs opacity-75">
-                  ({applications.filter(a => a.status === "selected").length})
-                </span>
-              </button>
-              <button
-                onClick={() => setStatusFilter("completed")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${statusFilter === "completed"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
-                  }`}
-              >
-                완료
-                <span className="ml-2 text-xs opacity-75">
-                  ({applications.filter(a => a.status === "completed").length})
-                </span>
-              </button>
-            </div>
-
             {/* 리스트 */}
             {filteredApplications.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
-                {statusFilter === "bookmarked" && "북마크한 체험단이 없습니다."}
-                {statusFilter === "applied" && "신청한 체험단이 없습니다."}
-                {statusFilter === "selected" && "선정된 체험단이 없습니다."}
-                {statusFilter === "completed" && "완료한 체험단이 없습니다."}
+              <div className="bg-white rounded-2xl shadow-sm border border-border/50 p-12 text-center">
+                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                  {statusFilter === "bookmarked" && (
+                    <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                  )}
+                  {statusFilter === "applied" && (
+                    <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  )}
+                  {statusFilter === "selected" && (
+                    <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  {statusFilter === "completed" && (
+                    <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                  )}
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {statusFilter === "bookmarked" && "아직 북마크한 체험단이 없어요"}
+                  {statusFilter === "applied" && "신청한 체험단이 없어요"}
+                  {statusFilter === "selected" && "선정된 체험단이 없어요"}
+                  {statusFilter === "completed" && "완료한 체험단이 없어요"}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  {statusFilter === "bookmarked" && "관심있는 체험단을 북마크해보세요!"}
+                  {statusFilter === "applied" && "북마크한 체험단에 신청해보세요!"}
+                  {statusFilter === "selected" && "신청한 체험단의 당첨 발표를 기다려보세요!"}
+                  {statusFilter === "completed" && "선정된 체험단의 리뷰를 완료해보세요!"}
+                </p>
+                <Link
+                  href="/search"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  체험단 둘러보기
+                </Link>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {filteredApplications.map((app) => (
                   <div
                     key={app.id}
-                    className="bg-white rounded-lg shadow-sm overflow-hidden"
+                    className="bg-white rounded-2xl shadow-sm border border-border/50 overflow-hidden hover:shadow-md hover:border-primary/20 transition-all duration-300"
                   >
-                    <div className="p-6">
+                    <div className="p-5 sm:p-6">
                       <div className="flex flex-col sm:flex-row gap-4">
                         {/* 썸네일 */}
                         {app.campaigns.thumbnail_url && (
-                          <div className="relative w-full sm:w-32 h-32 bg-gray-200 rounded-md flex-shrink-0">
+                          <div className="relative w-full sm:w-36 h-36 bg-secondary rounded-xl flex-shrink-0 overflow-hidden group">
                             <Image
                               src={app.campaigns.thumbnail_url}
                               alt={app.campaigns.title}
                               fill
-                              className="object-cover rounded-md"
-                              sizes="128px"
+                              className="object-cover group-hover:scale-105 transition-transform duration-300"
+                              sizes="144px"
                             />
                           </div>
                         )}
 
                         {/* 내용 */}
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-3 mb-3">
                             <Link
                               href={`/campaign/${app.campaigns.id}`}
-                              className="text-lg font-semibold text-gray-900 hover:text-blue-600"
+                              className="text-lg font-bold text-foreground hover:text-primary transition-colors line-clamp-2"
                             >
                               {app.campaigns.title}
                             </Link>
                             <span
-                              className={`px-3 py-1 rounded-full text-xs font-medium ${app.status === "bookmarked"
-                                ? "bg-blue-100 text-blue-700"
+                              className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold ${app.status === "bookmarked"
+                                ? "status-bookmarked"
                                 : app.status === "applied"
-                                  ? "bg-yellow-100 text-yellow-700"
+                                  ? "status-applied"
                                   : app.status === "selected"
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-gray-100 text-gray-700"
+                                    ? "status-selected"
+                                    : "status-completed"
                                 }`}
                             >
                               {app.status === "bookmarked" && "북마크"}
@@ -588,10 +620,10 @@ export default function MyCampaignsPage() {
                             </span>
                           </div>
 
-                          <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-3">
+                          <div className="flex flex-wrap gap-2 mb-3">
                             {app.campaigns.source && (
-                              <span className="flex items-center gap-1">
-                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-secondary rounded-lg text-xs font-medium text-muted-foreground">
+                                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                                   <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                                 </svg>
                                 {app.campaigns.source === "reviewnote" && "리뷰노트"}
@@ -599,16 +631,30 @@ export default function MyCampaignsPage() {
                                 {app.campaigns.source === "gangnam" && "강남맛집"}
                                 {app.campaigns.source === "reviewplace" && "리뷰플레이스"}
                                 {app.campaigns.source === "stylec" && "스타일씨"}
+                                {app.campaigns.source === "modan" && "모두의체험단"}
+                                {app.campaigns.source === "chuble" && "츄블"}
+                                {app.campaigns.source === "dinodan" && "디노단"}
+                                {app.campaigns.source === "real_review" && "리얼리뷰"}
                               </span>
                             )}
                             {app.campaigns.category && (
-                              <span>📁 {app.campaigns.category}</span>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary/10 rounded-lg text-xs font-medium text-primary">
+                                {app.campaigns.category}
+                              </span>
                             )}
                             {app.campaigns.region && (
-                              <span>📍 {app.campaigns.region}</span>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-secondary rounded-lg text-xs font-medium text-muted-foreground">
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                {app.campaigns.region}
+                              </span>
                             )}
                             {app.campaigns.channel && (
-                              <span>📱 {app.campaigns.channel}</span>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-secondary rounded-lg text-xs font-medium text-muted-foreground">
+                                {app.campaigns.channel}
+                              </span>
                             )}
                           </div>
 
@@ -757,7 +803,7 @@ export default function MyCampaignsPage() {
                             </div>
                           ) : (
                             /* 액션 버튼 */
-                            <div className="flex gap-2 flex-wrap">
+                            <div className="flex gap-2 flex-wrap pt-2 border-t border-border/50 mt-3">
                               {app.status === "bookmarked" && (
                                 <>
                                   {/* 당첨 확인 버튼 */}
@@ -768,7 +814,6 @@ export default function MyCampaignsPage() {
                                         campaignTitle={app.campaigns.title}
                                         applicationDeadline={app.campaigns.application_deadline}
                                         onSuccess={() => {
-                                          // 당첨 확인 성공 시 목록 새로고침
                                           fetchData();
                                         }}
                                       />
@@ -784,7 +829,7 @@ export default function MyCampaignsPage() {
                                       today.setHours(0, 0, 0, 0);
                                       return today < deadline;
                                     })()}
-                                    className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-success text-white text-sm font-medium rounded-xl hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                     title={(() => {
                                       if (!app.campaigns.application_deadline) return "선정 처리";
                                       const deadline = new Date(app.campaigns.application_deadline);
@@ -797,6 +842,9 @@ export default function MyCampaignsPage() {
                                       return "선정 처리";
                                     })()}
                                   >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
                                     수동 선정
                                   </button>
                                 </>
@@ -804,8 +852,11 @@ export default function MyCampaignsPage() {
                               {app.status === "applied" && (
                                 <button
                                   onClick={() => handleStatusChange(app.id, "selected")}
-                                  className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700"
+                                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-success text-white text-sm font-medium rounded-xl hover:shadow-md transition-all duration-200"
                                 >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
                                   당첨됨
                                 </button>
                               )}
@@ -813,14 +864,20 @@ export default function MyCampaignsPage() {
                                 <>
                                   <button
                                     onClick={() => handleSelectClick(app.id)}
-                                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary/90 hover:shadow-md transition-all duration-200"
                                   >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
                                     일정 수정
                                   </button>
                                   <button
                                     onClick={() => handleStatusChange(app.id, "completed")}
-                                    className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700"
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-premium text-white text-sm font-medium rounded-xl hover:shadow-md transition-all duration-200"
                                   >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                    </svg>
                                     완료
                                   </button>
                                 </>
@@ -829,14 +886,20 @@ export default function MyCampaignsPage() {
                                 href={app.campaigns.source_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-secondary text-foreground text-sm font-medium rounded-xl hover:bg-secondary/80 transition-all duration-200"
                               >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
                                 원본 보기
                               </a>
                               <button
                                 onClick={() => handleRemove(app.id)}
-                                className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200"
+                                className="inline-flex items-center gap-1.5 px-4 py-2 text-muted-foreground text-sm font-medium rounded-xl hover:bg-destructive/10 hover:text-destructive transition-all duration-200"
                               >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
                                 제거
                               </button>
                             </div>

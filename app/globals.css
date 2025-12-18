@@ -1,62 +1,131 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Pretendard Variable", Pretendard, var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Pretendard Variable", Pretendard, var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Pretendard Variable", Pretendard, ui-sans-serif, system-ui, sans-serif;
+  --font-number: "Outfit", ui-sans-serif, system-ui, sans-serif;
 
-  --color-border: hsl(20 10% 90%);
-  --color-input: hsl(20 10% 90%);
-  --color-ring: hsl(350 89% 60%);
-  --color-background: hsl(30 33% 98%);
-  --color-foreground: hsl(340 30% 15%);
+  /* Vivid & Playful Color Palette */
+  --color-border: hsl(200 20% 90%);
+  --color-input: hsl(200 20% 92%);
+  --color-ring: hsl(168 100% 42%);
+  --color-background: hsl(210 20% 98%);
+  --color-foreground: hsl(230 30% 12%);
 
-  --color-primary: hsl(350 89% 60%);
+  /* Primary: Mint Green - 활기찬 메인 컬러 */
+  --color-primary: hsl(168 100% 42%);
   --color-primary-foreground: hsl(0 0% 100%);
 
-  --color-secondary: hsl(30 20% 96%);
-  --color-secondary-foreground: hsl(340 30% 15%);
+  /* Secondary: Soft Gray - 보조 컬러 */
+  --color-secondary: hsl(210 20% 96%);
+  --color-secondary-foreground: hsl(230 30% 12%);
 
-  --color-destructive: hsl(0 84.2% 60.2%);
+  /* Accent Colors for different states */
+  --color-accent: hsl(45 100% 70%);
+  --color-accent-foreground: hsl(230 30% 12%);
+
+  /* Urgent: Hot Pink - 마감 임박 */
+  --color-urgent: hsl(340 82% 65%);
+  --color-urgent-foreground: hsl(0 0% 100%);
+
+  /* Premium: Purple - 프리미엄/특별 */
+  --color-premium: hsl(255 70% 68%);
+  --color-premium-foreground: hsl(0 0% 100%);
+
+  /* Success: Bright Green */
+  --color-success: hsl(145 65% 50%);
+  --color-success-foreground: hsl(0 0% 100%);
+
+  /* Warning: Sunshine Yellow */
+  --color-warning: hsl(45 100% 60%);
+  --color-warning-foreground: hsl(230 30% 12%);
+
+  --color-destructive: hsl(0 84% 60%);
   --color-destructive-foreground: hsl(0 0% 98%);
 
-  --color-muted: hsl(30 20% 96%);
-  --color-muted-foreground: hsl(340 10% 45%);
-
-  --color-accent: hsl(30 20% 96%);
-  --color-accent-foreground: hsl(340 30% 15%);
+  --color-muted: hsl(210 20% 96%);
+  --color-muted-foreground: hsl(230 15% 45%);
 
   --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(340 30% 15%);
+  --color-popover-foreground: hsl(230 30% 12%);
 
   --color-card: hsl(0 0% 100%);
-  --color-card-foreground: hsl(340 30% 15%);
+  --color-card-foreground: hsl(230 30% 12%);
 
-  --radius-lg: 0.75rem;
-  --radius-md: calc(0.75rem - 2px);
-  --radius-sm: calc(0.75rem - 4px);
+  /* Rounded corners - more playful */
+  --radius-lg: 1rem;
+  --radius-md: 0.75rem;
+  --radius-sm: 0.5rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
 
+  /* Animation definitions */
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-bounce-in: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --animate-pulse-attention: pulse-attention 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-scale-in: scale-in 0.2s ease-out;
 
   @keyframes accordion-down {
-    from {
-      height: 0
-    }
-
-    to {
-      height: var(--radix-accordion-content-height)
-    }
+    from { height: 0 }
+    to { height: var(--radix-accordion-content-height) }
   }
 
   @keyframes accordion-up {
-    from {
-      height: var(--radix-accordion-content-height)
-    }
+    from { height: var(--radix-accordion-content-height) }
+    to { height: 0 }
+  }
 
-    to {
-      height: 0
-    }
+  @keyframes bounce-in {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes pulse-attention {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes scale-in {
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes heart-burst {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.3); }
+    50% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes confetti-fall {
+    0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  @keyframes progress-fill {
+    0% { width: 0%; }
+    100% { width: var(--progress-width, 100%); }
+  }
+
+  @keyframes count-up {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
   }
 }
 
@@ -155,26 +224,129 @@
 
 /* Enhanced scrollbar styling */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(30 20% 96%);
+  background: hsl(210 20% 96%);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(350 89% 60% / 0.5);
-  border-radius: 5px;
+  background: hsl(168 100% 42% / 0.4);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(350 89% 60% / 0.7);
+  background: hsl(168 100% 42% / 0.6);
 }
 
 /* Smooth focus styles */
 *:focus-visible {
-  outline: 2px solid hsl(350 89% 60%);
+  outline: 2px solid hsl(168 100% 42%);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Animation utility classes */
+.animate-bounce-in {
+  animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-pulse-attention {
+  animation: pulse-attention 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+  background: linear-gradient(90deg, transparent 25%, hsl(210 20% 96%) 50%, transparent 75%);
+  background-size: 200% 100%;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+.animate-heart-burst {
+  animation: heart-burst 0.4s ease-in-out;
+}
+
+.animate-count-up {
+  animation: count-up 0.5s ease-out forwards;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-vivid {
+  background: linear-gradient(135deg, hsl(168 100% 42%) 0%, hsl(168 100% 52%) 100%);
+}
+
+.bg-gradient-urgent {
+  background: linear-gradient(135deg, hsl(340 82% 65%) 0%, hsl(340 82% 55%) 100%);
+}
+
+.bg-gradient-premium {
+  background: linear-gradient(135deg, hsl(255 70% 68%) 0%, hsl(255 70% 58%) 100%);
+}
+
+.bg-gradient-success {
+  background: linear-gradient(135deg, hsl(145 65% 50%) 0%, hsl(145 65% 40%) 100%);
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Status badge colors */
+.status-bookmarked {
+  background: hsl(210 20% 96%);
+  color: hsl(230 30% 12%);
+}
+
+.status-applied {
+  background: hsl(45 100% 92%);
+  color: hsl(45 100% 25%);
+}
+
+.status-selected {
+  background: hsl(168 100% 92%);
+  color: hsl(168 100% 25%);
+}
+
+.status-completed {
+  background: hsl(255 70% 95%);
+  color: hsl(255 70% 40%);
+}
+
+/* Competition rate colors */
+.rate-easy {
+  background: hsl(145 65% 90%);
+  color: hsl(145 65% 30%);
+}
+
+.rate-normal {
+  background: hsl(45 100% 90%);
+  color: hsl(45 100% 30%);
+}
+
+.rate-competitive {
+  background: hsl(25 100% 90%);
+  color: hsl(25 100% 35%);
+}
+
+.rate-intense {
+  background: hsl(0 84% 92%);
+  color: hsl(0 84% 40%);
+}
+
+/* Number font utility */
+.font-number {
+  font-family: "Outfit", ui-sans-serif, system-ui, sans-serif;
 }

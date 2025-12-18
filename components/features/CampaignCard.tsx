@@ -152,8 +152,21 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
     channels = channels.filter(c => !c.includes("블로그"));
   }
 
+  // D-Day 색상 계산
+  const getDdayColor = () => {
+    if (!campaign.deadline) return "";
+    const match = campaign.deadline.match(/D-(\d+)/);
+    if (match) {
+      const days = parseInt(match[1]);
+      if (days <= 1) return "bg-gradient-urgent text-white";
+      if (days <= 3) return "bg-amber-100 text-amber-700";
+      return "bg-secondary text-muted-foreground";
+    }
+    return "bg-secondary text-muted-foreground";
+  };
+
   return (
-    <div className="group bg-white rounded-xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+    <div className="group bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
       <a
         href={hasValidUrl ? campaign.source_url : undefined}
         target={hasValidUrl ? "_blank" : undefined}
@@ -164,87 +177,88 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
             e.preventDefault();
             return;
           }
-          // 원본 사이트 클릭 추적
           events.original_site_click(campaign.id, campaign.source || "");
         }}
       >
         {/* 이미지 */}
-        <div className="relative w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+        <div className="relative w-full h-48 bg-gradient-to-br from-secondary to-secondary/50 overflow-hidden">
           {imageUrl && !imageError ? (
             <>
               <img
                 src={imageUrl}
                 alt={campaign.title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
                 onError={() => {
                   console.error("이미지 로드 실패:", imageUrl);
                   setImageError(true);
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </>
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground">
-              <svg className="w-16 h-16 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-16 h-16 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
+            </div>
+          )}
+
+          {/* D-Day 배지 (이미지 위) */}
+          {campaign.deadline && (
+            <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-lg text-xs font-bold ${getDdayColor()}`}>
+              {campaign.deadline}
+            </div>
+          )}
+
+          {/* 타입 배지 (이미지 위) */}
+          {campaign.type && TypeLabelMap[campaign.type] && (
+            <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-lg text-xs font-semibold text-foreground shadow-sm">
+              {TypeLabelMap[campaign.type]}
             </div>
           )}
         </div>
 
         <div className="p-4">
-          {/* 출처 & 채널 아이콘 & 마감일 */}
+          {/* 출처 & 채널 아이콘 */}
           <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <SiteLogo
                 site={campaign.source}
                 siteName={SiteNameMap[campaign.source] || campaign.source}
-                size={24}
+                size={20}
               />
-
-              {/* 채널 아이콘 표시 */}
-              <div className="flex gap-1">
-                {channels.map((ch, idx) => (
-                  <div key={idx} title={ch}>
-                    <ChannelIcon channel={ch} size={18} />
-                  </div>
-                ))}
-              </div>
+              <span className="text-xs text-muted-foreground">
+                {SiteNameMap[campaign.source] || campaign.source}
+              </span>
             </div>
 
-            {campaign.deadline && (
-              <span className="text-xs text-gray-500">{campaign.deadline}</span>
-            )}
+            {/* 채널 아이콘 표시 */}
+            <div className="flex gap-1">
+              {channels.map((ch, idx) => (
+                <div key={idx} title={ch} className="p-1 bg-secondary rounded-md">
+                  <ChannelIcon channel={ch} size={16} />
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* 제목 (지역명 크게 + 제목) */}
-          <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
+          {/* 제목 */}
+          <h3 className="text-base font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
             {regionText && (
-              <span className="text-lg font-bold text-gray-800 mr-1.5">[{regionText}]</span>
+              <span className="text-primary mr-1">[{regionText}]</span>
             )}
             {campaign.title}
           </h3>
 
-          {/* 태그 (1: 대분류, 2: 중분류) */}
-          <div className="flex flex-wrap gap-2 items-center">
-            {/* 대분류: Type */}
-            {campaign.type && TypeLabelMap[campaign.type] && (
-              <span className="text-xs font-medium text-white bg-primary px-2 py-1 rounded">
-                {TypeLabelMap[campaign.type]}
+          {/* 카테고리 태그 */}
+          {campaign.category &&
+            !(campaign.source === "seoulouba" && campaign.type === "delivery") &&
+            campaign.category !== TypeLabelMap[campaign.type || ""] && (
+              <span className="inline-block text-xs text-primary font-medium bg-primary/10 px-2.5 py-1 rounded-lg mb-2">
+                {campaign.category}
               </span>
             )}
-            {/* 중분류: Category */}
-            {campaign.category &&
-              // 서울오빠 배송형이면 카테고리 태그 숨김 (사용자 요청)
-              !(campaign.source === "seoulouba" && campaign.type === "delivery") &&
-              // 카테고리명과 타입명이 동일하면 숨김 (예: [배송] [배송])
-              campaign.category !== TypeLabelMap[campaign.type || ""] && (
-                <span className="text-xs text-foreground/80 bg-secondary px-2 py-1 rounded">
-                  {campaign.category}
-                </span>
-              )}
-          </div>
 
           {/* 선택률 배지 */}
           {campaign.recruit_count != null && campaign.applicant_count != null && (
@@ -264,23 +278,29 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
       {/* 북마크 버튼 */}
       <div className="px-4 pb-4">
         {isChecking ? (
-          <button disabled className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-400 rounded transition-all">
+          <button disabled className="w-full px-3 py-2.5 text-sm bg-secondary text-muted-foreground rounded-xl transition-all">
             확인 중...
           </button>
         ) : isBookmarked ? (
           <button
             onClick={handleUnbookmark}
             disabled={isLoading}
-            className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 hover:shadow-md hover:shadow-primary/25 disabled:opacity-50 transition-all duration-200 active:scale-95"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium bg-primary text-white rounded-xl hover:bg-primary/90 hover:shadow-md disabled:opacity-50 transition-all duration-200 active:scale-[0.98]"
           >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
             {isLoading ? "처리 중..." : "북마크됨"}
           </button>
         ) : (
           <button
             onClick={handleBookmark}
             disabled={isLoading}
-            className="w-full px-3 py-2 text-sm bg-secondary text-foreground rounded-md hover:bg-secondary/80 hover:shadow-sm disabled:opacity-50 transition-all duration-200 active:scale-95"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium bg-secondary text-foreground rounded-xl hover:bg-primary hover:text-white hover:shadow-sm disabled:opacity-50 transition-all duration-200 active:scale-[0.98]"
           >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
             {isLoading ? "처리 중..." : "북마크"}
           </button>
         )}
