@@ -149,10 +149,27 @@ def _extract_campaigns_from_page_props(page_props: dict) -> list[Campaign]:
                         campaign_type = "delivery"
                     elif "기자단" in category or "기자단" in title:
                         campaign_type = "reporter"
-                
+
                 # location에 "배송"이 있으면 delivery로 강제 (단, 기자단 제외)
                 if location == "배송" and campaign_type != "reporter":
                     campaign_type = "delivery"
+
+                # 모집인원 및 신청자수 추출
+                recruit_count = item.get("infNum")  # 모집인원
+                applicant_count = item.get("applicantCount")  # 신청자수
+
+                # 숫자 변환
+                if recruit_count is not None:
+                    try:
+                        recruit_count = int(recruit_count)
+                    except (ValueError, TypeError):
+                        recruit_count = None
+
+                if applicant_count is not None:
+                    try:
+                        applicant_count = int(applicant_count)
+                    except (ValueError, TypeError):
+                        applicant_count = None
 
                 campaigns.append(
                     Campaign(
@@ -166,6 +183,8 @@ def _extract_campaigns_from_page_props(page_props: dict) -> list[Campaign]:
                         channel=channel,
                         type=campaign_type,
                         review_deadline_days=review_deadline_days,
+                        recruit_count=recruit_count,
+                        applicant_count=applicant_count,
                     )
                 )
             except Exception as e:  # pragma: no cover - 방어적 로깅

@@ -182,9 +182,23 @@ def _parse_campaign_element(card) -> Campaign | None:
 
         # 리뷰 기간 추출 (배치 처리로 이동 - 여기서는 None으로 설정)
         review_deadline_days = None
-        
+
         if category == "배송" or (category and "제품" in category):
              location = "배송"
+
+        # 모집인원 및 신청자수 추출 ("신청 469/ 모집 1" 또는 "신청 2,226/ 모집 1" 형식)
+        recruit_count = None
+        applicant_count = None
+        apply_badge = card.select_one(".apply_badge, [class*='apply']")
+        if apply_badge:
+            badge_text = apply_badge.get_text(strip=True)
+            # 콤마가 포함된 숫자도 처리 (예: "신청 2,226/ 모집 1")
+            apply_match = re.search(r"신청\s*([\d,]+)", badge_text)
+            recruit_match = re.search(r"모집\s*([\d,]+)", badge_text)
+            if apply_match:
+                applicant_count = int(apply_match.group(1).replace(",", ""))
+            if recruit_match:
+                recruit_count = int(recruit_match.group(1).replace(",", ""))
 
         return Campaign(
             title=title,
@@ -196,6 +210,8 @@ def _parse_campaign_element(card) -> Campaign | None:
             image_url=image_url,
             channel=channel,
             review_deadline_days=review_deadline_days,
+            recruit_count=recruit_count,
+            applicant_count=applicant_count,
         )
     except Exception as e:  # pragma: no cover
         logger.error("디너의여왕 캠페인 파싱 중 오류: %s", e)

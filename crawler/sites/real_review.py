@@ -8,9 +8,47 @@ from bs4 import BeautifulSoup
 
 from crawler.models import Campaign
 from crawler.utils import clean_text, logger
-from crawler.category import normalize_category
 
 BASE_URL = "https://www.real-review.kr"
+
+def _classify_category(title: str, campaign_type: str) -> str:
+    """리얼리뷰 카테고리 분류 (제목 키워드 기반)."""
+    title_lower = title.lower()
+
+    # 뷰티 키워드 (우선순위 높음)
+    beauty_keywords = ["피부", "에스테틱", "뷰티", "눈썹", "화장품", "세럼", "바디",
+                      "네일", "속눈썹", "왁싱", "미용", "헤어", "펌", "염색", "두피", "탈모"]
+    if any(k in title_lower for k in beauty_keywords):
+        return "뷰티"
+
+    # 맛집/카페 키워드
+    food_keywords = ["맛집", "카페", "음식", "식당", "커피", "브런치", "고기", "삼겹",
+                    "치킨", "피자", "라멘", "국밥", "파스타", "베이커리", "디저트"]
+    if any(k in title_lower for k in food_keywords):
+        return "맛집"
+
+    # 숙박/여행 키워드
+    travel_keywords = ["숙박", "호텔", "펜션", "리조트", "캠핑", "글램핑", "여행"]
+    if any(k in title_lower for k in travel_keywords):
+        return "여행"
+
+    # 문화 키워드
+    culture_keywords = ["스튜디오", "촬영", "공방", "전시", "연극"]
+    if any(k in title_lower for k in culture_keywords):
+        return "문화"
+
+    # 생활/서비스 키워드
+    life_keywords = ["운동", "필라테스", "요가", "헬스", "pt", "클리닉", "센터",
+                    "세탁", "청소", "마사지", "연구소", "학원"]
+    if any(k in title_lower for k in life_keywords):
+        return "생활"
+
+    # 배송형이면 배송 카테고리
+    if campaign_type == "delivery":
+        return "배송"
+
+    # 기본값: 맛집 (방문형 체험단은 대부분 맛집)
+    return "맛집"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -113,34 +151,8 @@ def _parse_campaign_element(card) -> Campaign | None:
         if type_el:
             campaign_type = "delivery"
 
-        # 카테고리 추출
-        raw_category = ""
-        # 제목에서 카테고리 힌트 찾기
-        category_hints = {
-            "피부": "뷰티",
-            "에스테틱": "뷰티",
-            "뷰티": "뷰티",
-            "눈썹": "뷰티",
-            "화장품": "뷰티",
-            "세럼": "뷰티",
-            "바디": "뷰티",
-            "상담": "기타",
-            "심리": "기타",
-            "도서": "도서",
-            "맛집": "맛집",
-            "카페": "카페",
-            "음식": "맛집",
-            "숙박": "숙박",
-            "호텔": "숙박",
-            "펜션": "숙박",
-        }
-        for hint, cat in category_hints.items():
-            if hint in raw_title:
-                raw_category = cat
-                break
-
-        # 카테고리 정규화
-        normalized_category = normalize_category("real_review", raw_category, title)
+        # 카테고리 분류 (제목 키워드 기반)
+        normalized_category = _classify_category(title, campaign_type)
 
         # 이미지 찾기
         img_el = card.select_one("._o-featured-image img")

@@ -21,13 +21,14 @@ export function SelectionRateBadge({
   showProgress = false,
   size = "sm",
 }: SelectionRateBadgeProps) {
-  // 데이터가 없으면 표시하지 않음
-  if (!recruitCount || !applicantCount) {
+  // 데이터가 없으면 표시하지 않음 (0은 유효한 값이므로 null/undefined만 체크)
+  if (recruitCount == null || applicantCount == null) {
     return null;
   }
 
   // 선택률 계산 (없으면 직접 계산)
-  const rate = selectionRate ?? (applicantCount > 0 ? (recruitCount / applicantCount) * 100 : 0);
+  // applicantCount가 0이면 100% (신청자가 없으면 당첨 확정)
+  const rate = selectionRate ?? (applicantCount > 0 ? Math.min(100, (recruitCount / applicantCount) * 100) : 100);
 
   // 경쟁률 (신청자수 / 모집인원)
   const competitionRatio = recruitCount > 0 ? applicantCount / recruitCount : 0;
@@ -72,11 +73,9 @@ export function SelectionRateBadge({
         <span className="opacity-60">/</span>
         <span>{recruitCount}</span>
         <span className="opacity-60 ml-0.5">명</span>
-        {rate < 100 && (
-          <span className="ml-1 opacity-80">
-            ({rate.toFixed(0)}%)
-          </span>
-        )}
+        <span className="ml-1 opacity-80">
+          ({Math.min(100, rate).toFixed(0)}%)
+        </span>
       </div>
 
       {showProgress && (

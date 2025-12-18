@@ -17,12 +17,17 @@ interface CampaignCardProps {
 const SiteNameMap: Record<string, string> = {
   reviewnote: "리뷰노트",
   dinnerqueen: "디너의여왕",
+  stylec: "스타일씨",
+  modan: "모두의체험단",
+  chuble: "츄블",
+  real_review: "리얼리뷰",
+  dinodan: "디노단",
+  // 레거시 (비활성화)
   gangnam: "강남맛집",
   reviewplace: "리뷰플레이스",
   seoulouba: "서울오빠",
   modooexperience: "모두의체험단",
   pavlovu: "파블로",
-  stylec: "스타일씨",
 };
 
 const TypeLabelMap: Record<string, string> = {
@@ -242,7 +247,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           </div>
 
           {/* 선택률 배지 */}
-          {campaign.recruit_count && campaign.applicant_count && (
+          {campaign.recruit_count != null && campaign.applicant_count != null && (
             <div className="mt-2">
               <SelectionRateBadge
                 recruitCount={campaign.recruit_count}

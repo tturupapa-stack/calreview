@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 
 from crawler.models import Campaign
 from crawler.utils import clean_text, logger
-from crawler.category import normalize_category
 
 BASE_URL = "https://chuble.net"
 
@@ -20,17 +19,20 @@ HEADERS = {
 
 # 카테고리 ID -> 카테고리명 매핑
 CATEGORY_MAP = {
+    # 방문형
     "850": "맛집",
     "852": "뷰티",
-    "853": "숙박",
-    "854": "기타",
-    "832": "배송",  # 제품
-    "834": "기자단",
-    "893": "뷰티",  # 제품-뷰티
+    "853": "여행",    # 숙박 -> 여행으로 통일
+    "854": "생활",    # 기타 -> 생활로 변경
+    "829": "맛집",    # 방문형 전체 (대부분 맛집)
+    # 배송형
+    "832": "배송",    # 제품 전체
+    "834": "생활",    # 기자단 -> 생활
+    "893": "뷰티",    # 제품-뷰티
     "970": "디지털",  # 제품-디지털
-    "1003": "패션",  # 제품-패션
-    "1004": "도서",  # 제품-도서
-    "1005": "식품",  # 제품-식품
+    "1003": "패션",   # 제품-패션
+    "1004": "도서",   # 제품-도서
+    "1005": "식품",   # 제품-식품
 }
 
 
@@ -98,18 +100,19 @@ def _parse_campaign_element(card, category_id: str) -> Campaign | None:
                 days = int(dday_match.group(1))
                 deadline = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d")
 
-        # 카테고리 - URL 또는 매핑에서 추출
-        raw_category = CATEGORY_MAP.get(category_id, "")
+        # 카테고리 - URL 또는 매핑에서 추출 (소스 카테고리 직접 사용)
+        normalized_category = CATEGORY_MAP.get(category_id, "")
 
         # URL에서 카테고리 ID 추출 (detail.php?number=xxx&category=yyy)
         cat_match = re.search(r"category=(\d+)", url)
         if cat_match:
             url_cat_id = cat_match.group(1)
             if url_cat_id in CATEGORY_MAP:
-                raw_category = CATEGORY_MAP[url_cat_id]
+                normalized_category = CATEGORY_MAP[url_cat_id]
 
-        # 카테고리 정규화
-        normalized_category = normalize_category("chuble", raw_category, title)
+        # 카테고리가 없으면 기본값
+        if not normalized_category:
+            normalized_category = "생활"
 
         # 이미지 - flexslider 내의 첫 번째 이미지
         img_el = card.select_one(".flexslider ul.slides li img, .flexslider img")

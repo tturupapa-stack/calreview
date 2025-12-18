@@ -163,7 +163,32 @@ def _campaign_to_supabase_dict(campaign: Campaign) -> dict:
         match = re.search(r'[?&]id=(\d+)', campaign.url)
         if match:
             source_id = match.group(1)
-    
+    elif campaign.site_name == "chuble":
+        # https://chuble.net/detail.php?number=4839
+        match = re.search(r'[?&]number=(\d+)', campaign.url)
+        if match:
+            source_id = match.group(1)
+    elif campaign.site_name == "dinodan":
+        # https://dinodan.co.kr/detail.php?number=xxx&category=xxx
+        match = re.search(r'[?&]number=(\d+)', campaign.url)
+        if match:
+            source_id = match.group(1)
+    elif campaign.site_name == "stylec":
+        # https://www.stylec.co.kr/campaign/12345 또는 ?seq=12345
+        match = re.search(r'/campaign/(\d+)', campaign.url) or re.search(r'[?&]seq=(\d+)', campaign.url)
+        if match:
+            source_id = match.group(1)
+    elif campaign.site_name == "modan":
+        # https://www.modan.kr/lodging/?idx=2167
+        match = re.search(r'[?&]idx=(\d+)', campaign.url)
+        if match:
+            source_id = match.group(1)
+    elif campaign.site_name == "real_review":
+        # https://www.real-review.kr/campaign/12345
+        match = re.search(r'/campaign/(\d+)', campaign.url) or re.search(r'[?&]id=(\d+)', campaign.url)
+        if match:
+            source_id = match.group(1)
+
     # ID를 찾을 수 없으면 URL 해시 사용
     if not source_id:
         source_id = hashlib.md5(campaign.url.encode()).hexdigest()[:16]

@@ -8,9 +8,60 @@ from bs4 import BeautifulSoup
 
 from crawler.models import Campaign
 from crawler.utils import clean_text, logger
-from crawler.category import normalize_category
 
 BASE_URL = "https://www.modan.kr"
+
+# modan 카테고리 경로 → 표준 카테고리 매핑
+MODAN_CATEGORY_MAP = {
+    "맛집": "맛집",
+    "뷰티": "뷰티",
+    "제품": None,  # 제품은 제목 키워드로 세부 분류 필요
+}
+
+def _classify_product_category(title: str) -> str:
+    """modan 제품 카테고리 세부 분류 (키워드 기반)."""
+    title_lower = title.lower()
+
+    # 식품 키워드
+    food_keywords = ["밀키트", "음료", "간식", "식품", "영양제", "비타민", "홍삼", "건강식품",
+                    "젤리", "과자", "초콜릿", "커피", "차", "음식", "떡", "김치", "반찬"]
+    if any(k in title_lower for k in food_keywords):
+        return "식품"
+
+    # 뷰티/화장품 키워드
+    beauty_keywords = ["화장품", "스킨", "로션", "세럼", "마스크팩", "클렌저", "샴푸",
+                      "바디", "헤어", "립스틱", "파운데이션", "썬크림", "향수"]
+    if any(k in title_lower for k in beauty_keywords):
+        return "뷰티"
+
+    # 디지털/가전 키워드
+    digital_keywords = ["전자", "디지털", "가전", "이어폰", "충전기", "케이블", "usb",
+                       "배터리", "보조배터리", "정수기", "청소기", "공기청정", "가습기"]
+    if any(k in title_lower for k in digital_keywords):
+        return "디지털"
+
+    # 유아동 키워드
+    baby_keywords = ["아기", "유아", "육아", "기저귀", "젖병", "장난감", "어린이"]
+    if any(k in title_lower for k in baby_keywords):
+        return "유아동"
+
+    # 반려동물 키워드
+    pet_keywords = ["강아지", "고양이", "펫", "사료", "간식", "반려"]
+    if any(k in title_lower for k in pet_keywords):
+        return "반려동물"
+
+    # 패션 키워드
+    fashion_keywords = ["의류", "옷", "신발", "가방", "악세사리", "양말", "모자"]
+    if any(k in title_lower for k in fashion_keywords):
+        return "패션"
+
+    # 생활 키워드
+    life_keywords = ["주방", "욕실", "청소", "수납", "인테리어", "가구", "침구", "이불"]
+    if any(k in title_lower for k in life_keywords):
+        return "생활"
+
+    # 기본값: 배송 (일반 제품)
+    return "배송"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -88,8 +139,15 @@ def _parse_campaign_element(card, category_name: str) -> Campaign | None:
             elif image_url.startswith("/"):
                 image_url = BASE_URL + image_url
 
-        # 키워드 기반 카테고리 분류 (modan 카테고리가 부정확할 수 있음)
-        normalized_category = normalize_category("modan", category_name, title)
+        # 카테고리 결정: modan 카테고리 경로 기반
+        if category_name in MODAN_CATEGORY_MAP:
+            normalized_category = MODAN_CATEGORY_MAP[category_name]
+            # "제품" 카테고리는 제목 키워드로 세부 분류
+            if normalized_category is None:
+                normalized_category = _classify_product_category(title)
+        else:
+            # 알 수 없는 카테고리는 제목 키워드로 분류
+            normalized_category = _classify_product_category(title)
 
         # modan은 마감일 정보를 제공하지 않으므로 기본값으로 30일 후 설정
         default_deadline = (datetime.now() + timedelta(days=30)).strftime("%Y-%m-%d")
