@@ -144,8 +144,8 @@ def _campaign_to_supabase_dict(campaign: Campaign) -> dict:
     source_id = None
     # 사이트별 URL 패턴으로 ID 추출
     if campaign.site_name == "reviewnote":
-        # https://www.reviewnote.co.kr/campaign/985180
-        match = re.search(r'/campaign/(\d+)', campaign.url)
+        # https://www.reviewnote.co.kr/campaigns/985180
+        match = re.search(r'/campaigns?/(\d+)', campaign.url)
         if match:
             source_id = match.group(1)
     elif campaign.site_name == "dinnerqueen":
